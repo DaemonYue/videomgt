@@ -33,6 +33,7 @@
                 url: '/app',
                 templateUrl: 'pages/app.html'
             })
+            //多媒体库
             .state('app.video', {
                 url: '/video',
                 templateUrl: 'pages/video.html'
@@ -53,9 +54,15 @@
                 url: '/musicLibrary',
                 templateUrl: 'pages/musicLibrary.html'
             })
+            //用户管理
             .state('app.user', {
                 url: '/user',
                 templateUrl: 'pages/userManagement.html'
+            })
+            //插播管理
+            .state('app.innerCut', {
+                url: '/innerCut',
+                templateUrl: 'pages/innerCut.html'
             })
 
     }])

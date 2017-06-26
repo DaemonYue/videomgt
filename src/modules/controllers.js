@@ -122,7 +122,7 @@
                     }
                 }
 
-                // 1:酒店客房，2:酒店客房订单 3:移动商城，4:商城订单，5:tv界面, 6:终端管理，7:微信用户，9：字幕
+                // 1:酒店客房，2:酒店客房订单 3:移动商城，4:商城订单，5:tv界面, 6:终端管理
                 self.switchApp = function (n) {
                     // 收起桌面
                     self.appPhase = 2;
@@ -133,12 +133,14 @@
 
                     switch (n) {
                         case 1:
-                            if (!$state.includes('app.hotelRoom')) {
+                            if (!$state.includes('app.hotel')) {
                                 $state.go('app.hotelRoom', {'appId': n});
                             }
                             break;
                         case 2:
-                            $state.go('app.hotelOrderList', {'appId': n});
+                            if(!$state.includes('app.innerCut')){
+                                $state.go('app.innerCut', {'appId': n});
+                            }
                             break;
                         case 3:
                             if ($state.current.name !== 'app.shop.goods.goodsList') {
@@ -151,7 +153,7 @@
                             }
                             break;
                         case 5:
-                            if (!$state.includes("app.user")) {
+                            if (!$state.includes('app.user')) {
                                 $state.go('app.user', {'appId': n});
                             }
                             break;
