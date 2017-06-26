@@ -1,0 +1,50 @@
+<div class="col-sm-9 page col-right">
+    <a>
+        <strong>
+            <i class="glyphicon glyphicon-upload"></i>
+            上传模块
+         </strong>
+    </a>
+    <hr>
+    <div class="btn-group">
+        <button ng-click="app.upload()" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i> 添加上传任务</button>
+    </div>
+    <hr class="break-space">
+    <table class="table table-hover table-condensed width-progress ">
+        <thead>
+            <tr>
+                <th>名称</th>
+                <th>大小</th>
+                <th>进度</th>
+                <th>字幕</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in app.uploadList.data">
+                
+                <!--影片名称-->
+                <td>{{row.video.name}}</td>
+                <!--影片名称-->
+
+                <!--影片size-->
+                <td>{{row.video.size}}字节</td>
+                <!--影片size-->
+
+                <!--影片上传进度-->
+                <td>{{row.video.percentComplete}}%</td>
+                <!--影片上传进度-->
+
+                <!--字幕上传进度-->
+                <td>{{row.subtitle.percentComplete | subtitlePercentComplete}}</td>
+                <!--字幕上传进度-->
+
+                <td>
+                    <button ng-click="app.uploadList.deleteById(row.id)" class="btn btn-xs btn-default" title="删除">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

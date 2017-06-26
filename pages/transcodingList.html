@@ -1,0 +1,48 @@
+<div ng-controller="transcodingListController as tl" ng-init="tl.init()" class="col-sm-9 page col-right">
+    <a>
+        <strong>
+            <i class="glyphicon glyphicon-random"></i>
+            转码模块
+         </strong>
+    </a>
+    <hr>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-sm" ng-click="tl.refresh();"><i class="glyphicon glyphicon-refresh"></i > 刷新列表</button>
+    </div>
+    <hr class="break-space">
+    <div ng-show="tl.loading">loading....</div>
+    <table class="table table-hover table-condensed width-progress ">
+        <thead>
+            <tr>
+                <th>名称</th>
+                <th>大小</th>
+                <th>进度</th>
+                <th>剩余</th>
+                <th>描述</th>
+                <!-- <th>操作</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat= "task in tl.taskList track by $index">
+                <td>{{task.FileOrigName}}</td>
+                <td>{{task.Size}} 字节</td>
+                <td>
+                    <div class="progress in-table">
+                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{task.TranscodePercent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{task.TranscodePercent}}%;min-width: 2em;">
+                            {{task.TranscodePercent}}%
+                        </div>
+                    </div>
+                </td>
+                <td>{{task.Size*(100-task.TranscodePercent)/100}} 字节</td>
+                <td>{{task.TranscodeFailInfo}}</td>
+                <!-- 删除先不做 -->
+                <!--<td>
+                    <button class="btn btn-xs btn-default" title="删除">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                </td> -->
+            </tr>
+        </tbody>
+    </table>
+    <div ng-show="tl.noData">查无数据</div>
+</div>
