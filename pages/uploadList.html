@@ -7,7 +7,7 @@
     </a>
     <hr>
     <div class="btn-group">
-        <button ng-click="app.upload()" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i> 添加上传任务</button>
+        <button ng-click="video.upload()" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-plus"></i> 添加上传任务</button>
     </div>
     <hr class="break-space">
     <table class="table table-hover table-condensed width-progress ">
@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="row in app.uploadList.data">
+            <tr ng-repeat="row in video.uploadList.data">
                 
                 <!--影片名称-->
                 <td>{{row.video.name}}</td>
@@ -40,7 +40,7 @@
                 <!--字幕上传进度-->
 
                 <td>
-                    <button ng-click="app.uploadList.deleteById(row.id)" class="btn btn-xs btn-default" title="删除">
+                    <button ng-click="video.uploadList.deleteById(row.id)" class="btn btn-xs btn-default" title="删除">
                         <i class="glyphicon glyphicon-remove"></i>
                     </button>
                 </td>

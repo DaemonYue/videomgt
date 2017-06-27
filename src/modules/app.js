@@ -59,12 +59,42 @@
                 url: '/user',
                 templateUrl: 'pages/userManagement.html'
             })
+            .state('app.user.add', {
+                url: '/add',
+                templateUrl: 'pages/userAdd.html'
+            })
+            .state('app.user.list', {
+                url: '/list',
+                templateUrl: 'pages/userList.html'
+            })
             //插播管理
             .state('app.innerCut', {
                 url: '/innerCut',
                 templateUrl: 'pages/innerCut.html'
             })
-
+            .state('app.innerCut.plan', {
+                url: '/plan',
+                templateUrl: 'pages/innerCutPlan.html'
+            })
+            .state('app.innerCut.search', {
+                url: '/search',
+                templateUrl: 'pages/innerCutSearch.html'
+            })
+            //终端管理
+            .state('app.terminal', {
+                url: '/terminal',
+                templateUrl: 'pages/terminal.html'
+            })
+            //医嘱提醒
+            .state('app.doctorAdvice', {
+                url: '/doctorAdvice',
+                templateUrl: 'pages/doctorAdvice.html'
+            })
+            //版本管理
+            .state('app.version', {
+                url: '/version',
+                templateUrl: 'pages/version.html'
+            })
     }])
 
 

@@ -5,15 +5,15 @@
         <div class="row">
             <!--左侧导航栏-->
             <div class="col-sm-3 col-left">
-                <a ng-click="video.gotoPage('uploadList')" class="font-bold no-underline cursor-default">
+                <a ng-click="user.gotoPage('userInfo')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-user"></i>&nbsp&nbsp个人信息
                 </a>
                 <hr>
-                <a ng-click="video.gotoPage('app.video.transcodingList')" class="font-bold no-underline cursor-default">
+                <a ng-click="user.gotoPage('app.user.add')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-plus" style="font-size:14px"></i>&nbsp&nbsp用户创建
                 </a>
                 <hr>
-                <a ng-click="video.gotoPage('app.video.notEditedList')" class="font-bold no-underline cursor-default">
+                <a ng-click="user.gotoPage('app.user.list')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-list-alt" style="font-size:14px"></i>&nbsp&nbsp用户管理
                 </a>
                 <hr>
@@ -23,8 +23,8 @@
             <!--左侧导航栏-->
 
             <!--pages-->
-            <div ng-show="video.showUploadList" ng-include="video.uploadListUrl" class="autoscroll"></div>
-            <ui-view ng-show="!video.showUploadList"></ui-view>
+            <div ng-show="user.showUserInfo" ng-include="user.userInfoUrl" class="autoscroll"></div>
+            <ui-view ng-show="!user.showUserInfo"></ui-view>
             <!--pages-->
 
         </div>
@@ -32,6 +32,6 @@
     <!--body-->
 
     <!--弹窗-->
-    <div ng-include="video.maskUrl" class="autoscroll"></div>
+    <div ng-include="user.maskUrl" class="autoscroll"></div>
     <!--弹窗-->
 </div>

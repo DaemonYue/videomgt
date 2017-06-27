@@ -4,9 +4,6 @@
     var app = angular.module('app.services', [])
 
         .factory('util', ['$cookies', '$translate', 'CONFIG', function ($cookies, $translate, CONFIG) {
-
-
-
             return {
                 /** 
                  * 调用接口，本地和服务器的接口切换，方便调试

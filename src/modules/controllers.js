@@ -72,6 +72,7 @@
                      $state.go('login')
                      }
                      // app 页面展开desktop*/
+                    self.showMaskClass = false;
                     if ($state.current.name !== 'app') {
                         self.appPhase = 2;
                     }
@@ -133,8 +134,8 @@
 
                     switch (n) {
                         case 1:
-                            if (!$state.includes('app.hotel')) {
-                                $state.go('app.hotelRoom', {'appId': n});
+                            if (!$state.includes('app.terminal')) {
+                                $state.go('app.terminal', {'appId': n});
                             }
                             break;
                         case 2:
@@ -143,8 +144,8 @@
                             }
                             break;
                         case 3:
-                            if ($state.current.name !== 'app.shop.goods.goodsList') {
-                                $state.go('app.shop', {'appId': n});
+                            if (!$state.includes('app.doctorAdvice')) {
+                                $state.go('app.doctorAdvice', {'appId': n});
                             }
                             break;
                         case 4:
@@ -158,9 +159,11 @@
                             }
                             break;
                         case 6:
-                            $state.go('app.terminal', {'appId': n});
+                            if(!$state.includes('app.version')){
+                                $state.go('app.version', {'appId': n});
+                            }
                             break;
-                        case 7:
+                       /* case 7:
                             $state.go('app.wxUser', {'appId': n});
                             break;
                         case 8:
@@ -170,7 +173,7 @@
                             break;
                         case 9:
                             $state.go('app.realTimeCommand', {'appId': n});
-                            break;
+                            break;*/
                         default:
                             break;
 
@@ -201,16 +204,17 @@
                 self.showHideMask = function (bool, url) {
                     // bool 为true时，弹窗出现
                     if (bool) {
-                        $scope.app.maskUrl = url;
-                        $scope.app.showMaskClass = true;
+                        self.maskUrl = url;
+                        self.showMaskClass = true;
                     } else {
-                        $scope.app.maskUrl = '';
-                        $scope.app.showMaskClass = false;
+                        self.maskUrl = '';
+                        self.showMaskClass = false;
                     }
 
                 }
             }
         ])
+
         .controller('videoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
@@ -231,8 +235,6 @@
 
                     // 初始化上传列表对象
                     self.uploadList = new UploadLists();
-
-
                 }
 
                 self.gotoPage = function (pageName) {
@@ -264,7 +266,8 @@
                 }
 
                 self.upload = function () {
-                    self.maskUrl = "pages/addMovie.html";
+                   // self.maskUrl = "pages/addMovie.html";
+                    $scope.app.showHideMask(true, "pages/addMovie.html");
                 }
 
                 function UploadLists() {
@@ -497,7 +500,7 @@
                 var self = this;
                 self.init = function () {
                     // 隐藏上传列表
-                    $scope.app.showUploadList = false;
+                    $scope.video.showUploadList = false;
                     self.getTranscodeTaskList();
                 }
 
@@ -547,12 +550,13 @@
                 var self = this;
                 self.init = function () {
                     // 隐藏上传列表
-                    $scope.app.showUploadList = false;
+                    $scope.video.showUploadList = false;
                     self.getTranscodeTaskList();
                 }
 
                 self.add = function (task) {
-                    $scope.app.maskUrl = "pages/addMovieInfo.html";
+                    //$scope.video.maskUrl = "pages/addMovieInfo.html";
+                    $scope.app.showHideMask(true, "pages/addMovieInfo.html");
                     $scope.app.maskParams = task;
                 }
                 // 获取转码完成的列表
@@ -641,7 +645,9 @@
                 }
 
                 self.edit = function (movieID) {
-                    $scope.app.maskUrl = "pages/editMovieInfo.html";
+                   // $scope.video.maskUrl = "pages/editMovieInfo.html";
+                    $scope.app.showHideMask(true, "pages/editMovieInfo.html");
+
                     $scope.app.maskParams = {movieID: movieID};
                 }
 
@@ -747,7 +753,8 @@
                 }
 
                 self.addMoreMovie = function () {
-                    $scope.app.maskUrl = "pages/addMoreMovie.html";
+                   // $scope.video.maskUrl = "pages/addMoreMovie.html";
+                    $scope.app.showHideMask(true, "pages/addMoreMovie.html");
                 }
 
                 // 删除已入库电影
@@ -816,17 +823,16 @@
                 console.log('addMovieController')
                 var self = this;
                 self.init = function () {
-
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                    $scope.app.showHideMask(false);
                 }
 
 
                 self.add = function () {
-                    $scope.app.uploadList.uploadFile($scope.myFileMovie, $scope.myFileSubtitle, $scope.app.uploadList);
-                    $scope.app.maskUrl = "";
+                    $scope.video.uploadList.uploadFile($scope.myFileMovie, $scope.myFileSubtitle, $scope.video.uploadList);
+                    $scope.app.showHideMask(false);
                 }
             }
         ])
@@ -836,7 +842,7 @@
                 console.log('addMovieInfoController')
                 var self = this;
                 self.init = function () {
-                    self.editLangs = util.getParams('editLangs')
+                    self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
 
                     self.maskParams = $scope.app.maskParams;
@@ -851,7 +857,9 @@
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                   // $scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
                 }
 
                 // 上传图片
@@ -1095,7 +1103,9 @@
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                   // $scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
                 }
 
                 // 上传图片
@@ -1338,7 +1348,9 @@
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
                 }
 
                 // 上传图片
@@ -1662,12 +1674,14 @@
                 }
 
                 self.addMusic = function () {
-                    $scope.app.maskUrl = "pages/addMusic.html";
-                    // $scope.app.maskParams = { movieID: movieID };
+                    //$scope.video.maskUrl = "pages/addMusic.html";
+                    $scope.app.showHideMask(true, "pages/addMusic.html");
+                    // $scope.video.maskParams = { movieID: movieID };
                 }
 
                 self.editMusic = function (music) {
-                    $scope.app.maskUrl = "pages/editMusic.html";
+                    //$scope.video.maskUrl = "pages/editMusic.html";
+                    $scope.app.showHideMask(true, "pages/editMusic.html");
                     $scope.app.maskParams = {music: music};
                 }
 
@@ -1761,7 +1775,9 @@
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
                 }
 
                 // 上传图标
@@ -1957,7 +1973,9 @@
                 }
 
                 self.cancel = function () {
-                    $scope.app.maskUrl = "";
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
                 }
 
                 // 上传图标
@@ -2069,15 +2087,296 @@
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
-
                     // 上传页面加载页面url
-                    self.uploadListUrl = '';
+                    self.userInfoUrl = '';
 
                     // 不显示上传页面
-                    self.showUploadList = false;
+                    self.showUserInfo = false;
 
                     // 显示上传页面
-                    self.gotoPage('uploadList');
+                    self.gotoPage('userInfo');
+
+                    // 弹窗层
+                    self.maskUrl = '';
+                    self.maskParams = {};
+
+                    // 初始化上传列表对象
+                    self.uploadList = new UploadLists();
+
+                }
+
+                self.gotoPage = function (pageName) {
+                    // 上传列表页
+                    if (pageName == 'userInfo') {
+                        // 不是第一次加载
+                        if (self.userInfoUrl !== '') {
+
+                        }
+                        // 第一次加载
+                        else {
+                            self.userInfoUrl = 'pages/userInformation.html';
+                        }
+                        self.showUserInfo = true;
+                    }
+
+                    //其他页
+                    else {
+                        self.showUserInfo = false;
+                        $state.go(pageName);
+                    }
+
+
+                }
+
+                self.logout = function (event) {
+                    util.setParams('token', '');
+                    $state.go('login');
+                }
+
+                self.upload = function () {
+                   // self.maskUrl = "pages/addMovie.html";
+                    $scope.app.showHideMask(true, "pages/addMovie.html");
+
+                }
+
+                function UploadLists() {
+                    this.data = [
+                        /*{
+                         "id":0,
+                         "video":{
+                         "name": "星际迷航", "size": 1111, "percentComplete": 40, "xhr":"xhr", "src":"xx"
+                         },
+                         "subtitle":{
+                         "name": "星际迷航－字幕", "size": 1111, "percentComplete": 40, "xhr":"xhr", "src":"xx"
+                         }
+                         }*/
+                    ];
+                    this.maxId = 0;
+                }
+
+                UploadLists.prototype = {
+                    add: function (video, subtitle) {
+                        this.data.push({"video": video, "subtitle": subtitle, "id": this.maxId});
+                        return this.maxId++;
+                    },
+                    setPercentById: function (type, id, percentComplete) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].percentComplete = percentComplete;
+                                break;
+                            }
+                        }
+                    },
+                    setSrcSizeById: function (type, id, src, size) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].src = src;
+                                this.data[i][type].size = size;
+                                break;
+                            }
+                        }
+                    },
+                    deleteById: function (id) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果正在上传，取消上传
+                                // 视频
+                                if (l[i].video.percentComplete < 100 && l[i].video.percentComplete != '失败') {
+                                    l[i].video.xhr.abort();
+                                }
+                                // 字幕
+                                if (l[i].subtitle.percentComplete != undefined && l[i].subtitle.percentComplete < 100 && l[i].subtitle.percentComplete != '失败') {
+                                    l[i].subtitle.xhr.abort();
+                                }
+                                // 删除data
+                                l.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    judgeCompleted: function (id, o) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果视频和字幕都上传完毕
+                                if ((l[i].video.percentComplete >= 100 && l[i].subtitle.percentComplete == undefined) ||
+                                    (l[i].video.percentComplete >= 100 && l[i].subtitle.percentComplete >= 100)) {
+                                    o.transcode(id, o);
+                                }
+                                break;
+                            }
+                        }
+                    },
+                    transcode: function (id, o) {
+                        var o = o;
+                        var id = id;
+                        var l = this.data;
+                        var source = {};
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                source = l[i];
+                                break;
+                            }
+                        }
+                        // 转码
+                        var data = JSON.stringify({
+                            "action": "submitTranscodeTask",
+                            "token": util.getParams('token'),
+                            "rescode": "200",
+                            "data": {
+                                "movie": {
+                                    "oriFileName": source.video.name,
+                                    "filePath": source.video.src
+                                },
+                                "subtitle": {
+                                    "oriFileName": source.subtitle.name,
+                                    "filePath": source.subtitle.src
+                                }
+                            }
+                        })
+                        console && console.log(data);
+                        $http({
+                            method: 'POST',
+                            url: util.getApiUrl('tanscodetask', '', 'server'),
+                            data: data
+                        }).then(function successCallback(response) {
+                            var msg = response.data;
+                            if (msg.rescode == '200') {
+                                console && console.log('转码 ' + id);
+                                // 从列表中删除
+                                o.deleteById(id);
+                            }
+                            else if (msg.rescode == '401') {
+                                alert('访问超时，请重新登录');
+                                $state.go('login');
+                            }
+                            else {
+                                // 转码申请失败后再次调用
+                                console && console.log('转码申请失败后再次调用');
+                                setTimeout(function () {
+                                    o.transcode(id, o);
+                                }, 5000);
+
+                            }
+                        }, function errorCallback(response) {
+                            // 转码申请失败后再次调用
+                            console && console.log('转码申请失败后再次调用');
+                            console && console.log(response);
+                            setTimeout(function () {
+                                o.transcode(id, o);
+                            }, 5000);
+                        });
+                    },
+                    uploadFile: function (videoFile, subtitleFile, o) {
+                        // 上传后台地址
+                        var uploadUrl = CONFIG.uploadVideoUrl;
+
+                        // 电影对象
+                        var videoXhr = new XMLHttpRequest();
+                        var video = {
+                            "name": videoFile.name,
+                            "size": videoFile.size,
+                            "percentComplete": 0,
+                            "xhr": videoXhr
+                        };
+
+                        // 字幕对象
+                        var subtitle = {};
+                        if (subtitleFile) {
+                            var subtitleXhr = new XMLHttpRequest();
+                            subtitle = {
+                                "name": subtitleFile.name,
+                                "size": subtitleFile.size,
+                                "percentComplete": 0,
+                                "xhr": subtitleXhr
+                            };
+                        }
+
+                        // 添加data，并获取id
+                        var id = this.add(video, subtitle);
+
+                        // 上传视频
+                        util.uploadFileToUrl(videoXhr, videoFile, uploadUrl, 'normal',
+                            // 上传中
+                            function (evt) {
+                                $scope.$apply(function () {
+                                    if (evt.lengthComputable) {
+                                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                        // 更新上传进度
+                                        o.setPercentById('video', id, percentComplete);
+                                    }
+                                });
+                            },
+                            // 上传成功
+                            function (xhr) {
+                                var ret = JSON.parse(xhr.responseText);
+                                console && console.log(ret);
+                                $scope.$apply(function () {
+                                    o.setSrcSizeById('video', id, ret.filePath, ret.size);
+                                    o.judgeCompleted(id, o);
+                                });
+                            },
+                            // 上传失败
+                            function (xhr) {
+                                $scope.$apply(function () {
+                                    o.setPercentById('video', id, '失败');
+                                });
+                                xhr.abort();
+                            }
+                        );
+
+                        // 上传字幕
+                        if (subtitle.percentComplete != undefined) {
+                            util.uploadFileToUrl(subtitle.xhr, subtitleFile, uploadUrl, 'normal',
+                                // 上传中
+                                function (evt) {
+                                    $scope.$apply(function () {
+                                        if (evt.lengthComputable) {
+                                            var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                            // 更新上传进度
+                                            o.setPercentById('subtitle', id, percentComplete);
+                                        }
+                                    });
+                                },
+                                // 上传成功
+                                function (xhr) {
+                                    var ret = JSON.parse(xhr.responseText);
+                                    console && console.log(ret);
+                                    $scope.$apply(function () {
+                                        o.setSrcSizeById('subtitle', id, ret.filePath, ret.size);
+                                        o.judgeCompleted(id, o);
+                                    });
+                                },
+                                // 上传失败
+                                function (xhr) {
+                                    $scope.$apply(function () {
+                                        o.setPercentById('subtitle', id, '失败');
+                                    });
+                                    xhr.abort();
+                                }
+                            );
+                        }
+                    }
+                }
+
+            }
+        ])
+
+        //插播main
+        .controller('innerCutController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+
+                    // 上传页面加载页面url
+                    self.resourceUrl = '';
+
+                    // 不显示上传页面
+                    self.showResource = false;
+
+                    // 显示上传页面
+                    self.gotoPage('innerCutResource');
 
                     // 弹窗层
                     self.maskUrl = '';
@@ -2091,21 +2390,21 @@
 
                 self.gotoPage = function (pageName) {
                     // 上传列表页
-                    if (pageName == 'uploadList') {
-                        // 上传页面不是第一次加载
-                        if (self.uploadListUrl !== '') {
+                    if (pageName == 'innerCutResource') {
+                        // 不是第一次加载
+                        if (self.resourceUrl !== '') {
 
                         }
-                        // 第一次加载上传页面
+                        // 第一次加载
                         else {
-                            self.uploadListUrl = 'pages/uploadList.html';
+                            self.resourceUrl = 'pages/innerCutResource.html';
                         }
-                        self.showUploadList = true;
+                        self.showResource = true;
                     }
 
                     //其他页
                     else {
-                        self.showUploadList = false;
+                        self.showResource = false;
                         $state.go(pageName);
                     }
 
@@ -2118,7 +2417,9 @@
                 }
 
                 self.upload = function () {
-                    self.maskUrl = "pages/addMovie.html";
+                   // self.maskUrl = "pages/addMovie.html";
+                    $scope.app.showHideMask(true, "pages/addMovie.html");
+
                 }
 
                 function UploadLists() {

@@ -1,19 +1,19 @@
-<div ng-controller="userController as user" ng-init="user.init()">
+<div ng-controller="innerCutController as cut" ng-init="cut.init()">
 
     <!--body-->
     <div class="container-fluid">
         <div class="row">
             <!--左侧导航栏-->
             <div class="col-sm-3 col-left">
-                <a ng-click="video.gotoPage('uploadList')" class="font-bold no-underline cursor-default">
+                <a ng-click="cut.gotoPage('innerCutResource')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-upload"></i>&nbsp&nbsp插播资源
                 </a>
                 <hr>
-                <a ng-click="video.gotoPage('app.video.transcodingList')" class="font-bold no-underline cursor-default">
+                <a ng-click="cut.gotoPage('app.innerCut.plan')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-list" style="font-size:14px"></i>&nbsp&nbsp插播计划
                 </a>
                 <hr>
-                <a ng-click="video.gotoPage('app.video.notEditedList')" class="font-bold no-underline cursor-default">
+                <a ng-click="cut.gotoPage('app.innerCut.search')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-search" style="font-size:14px"></i>&nbsp&nbsp计划查询
                 </a>
                 <hr>
@@ -23,8 +23,8 @@
             <!--左侧导航栏-->
 
             <!--pages-->
-            <div ng-show="video.showUploadList" ng-include="video.uploadListUrl" class="autoscroll"></div>
-            <ui-view ng-show="!video.showUploadList"></ui-view>
+            <div ng-show="cut.showResource" ng-include="cut.resourceUrl" class="autoscroll"></div>
+            <ui-view ng-show="!cut.showResource"></ui-view>
             <!--pages-->
 
         </div>
@@ -32,6 +32,6 @@
     <!--body-->
 
     <!--弹窗-->
-    <div ng-include="video.maskUrl" class="autoscroll"></div>
+    <div ng-include="cut.maskUrl" class="autoscroll"></div>
     <!--弹窗-->
 </div>
