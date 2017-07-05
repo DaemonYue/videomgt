@@ -86,6 +86,12 @@
                     self.maskUrl = '';
                     self.maskParams = {};
 
+                    //初始化ajax的数控
+                    self.data = {
+                        "token": util.getParams('token'),
+                        "user": ""
+                    }
+
                     // 读取applists
                     self.loading = true;
                     $http({
@@ -158,12 +164,12 @@
                                 $state.go('app.user', {'appId': n});
                             }
                             break;
-                        case 6:
+                       /* case 6:
                             if(!$state.includes('app.version')){
                                 $state.go('app.version', {'appId': n});
                             }
                             break;
-                       /* case 7:
+                        case 7:
                             $state.go('app.wxUser', {'appId': n});
                             break;
                         case 8:
@@ -235,6 +241,8 @@
 
                     // 初始化上传列表对象
                     self.uploadList = new UploadLists();
+
+                    self.test="哈哈哈哈"
                 }
 
                 self.gotoPage = function (pageName) {
@@ -266,8 +274,8 @@
                 }
 
                 self.upload = function () {
-                   // self.maskUrl = "pages/addMovie.html";
-                    $scope.app.showHideMask(true, "pages/addMovie.html");
+                    self.maskUrl = "pages/addMovie.html";
+                   // $scope.app.showHideMask(true, "pages/addMovie.html");
                 }
 
                 function UploadLists() {
@@ -502,6 +510,7 @@
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
                     self.getTranscodeTaskList();
+                    console.log($scope.video.test)
                 }
 
                 //  获取正在转码的列表
@@ -820,19 +829,24 @@
 
         .controller('addMovieController', ['$http', '$scope', '$state', '$stateParams', 'util',
             function ($http, $scope, $state, $stateParams, util) {
-                console.log('addMovieController')
+                console.log('addMovieController');
+                console.log($scope.video.test);
                 var self = this;
                 self.init = function () {
+                    console.log($scope.video.test);
                 }
 
                 self.cancel = function () {
-                    $scope.app.showHideMask(false);
+                   // $scope.app.showHideMask(false);
+                    $scope.video.maskUrl = "";
+
                 }
 
 
                 self.add = function () {
                     $scope.video.uploadList.uploadFile($scope.myFileMovie, $scope.myFileSubtitle, $scope.video.uploadList);
-                    $scope.app.showHideMask(false);
+                    $scope.video.maskUrl = "";
+
                 }
             }
         ])
@@ -2083,7 +2097,7 @@
         ])
 
         //用户main
-        .controller('userController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            .controller('userController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
@@ -2092,6 +2106,7 @@
 
                     // 不显示上传页面
                     self.showUserInfo = false;
+
 
                     // 显示上传页面
                     self.gotoPage('userInfo');

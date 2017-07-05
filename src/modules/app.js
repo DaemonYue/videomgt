@@ -30,7 +30,7 @@
                 templateUrl: 'pages/login.html'
             })
             .state('app', {
-                url: '/app',
+                url: '/app?appId',
                 templateUrl: 'pages/app.html'
             })
             //多媒体库
@@ -67,6 +67,14 @@
                 url: '/list',
                 templateUrl: 'pages/userList.html'
             })
+            .state('app.user.section', {
+                url: '/section',
+                templateUrl: 'pages/section.html'
+            })
+            .state('app.user.version', {
+                url: '/version',
+                templateUrl: 'pages/version.html'
+            })
             //插播管理
             .state('app.innerCut', {
                 url: '/innerCut',
@@ -89,11 +97,6 @@
             .state('app.doctorAdvice', {
                 url: '/doctorAdvice',
                 templateUrl: 'pages/doctorAdvice.html'
-            })
-            //版本管理
-            .state('app.version', {
-                url: '/version',
-                templateUrl: 'pages/version.html'
             })
     }])
 

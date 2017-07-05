@@ -1,8 +1,8 @@
 <div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
-            <i class="glyphicon glyphicon-film"></i>
-            已入库
+            <i class="glyphicon glyphicon-user"></i>
+            个人信息
         </strong>
     </a>
     <hr>
@@ -20,62 +20,4 @@
     </div><!-- /.row -->
     <!--搜索框-->
 
-    <hr class="break-space">
-
-    <div class="form-group">
-        <label>类型</label><br>
-        <div ng-show="editedList.noCategotyData">查无数据</div>
-        <span ng-repeat="category in editedList.categoryList track by $index">
-            <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseCateory(category.ID,this.value)" ng-disabled="editedList.loading"> {{category.CategoryName[editedList.defaultLang]}} 
-        </span>
-    </div>
-
-    <div class="form-group">
-        <label>产地</label><br>
-        <div ng-show="editedList.noLocationData">查无数据</div>
-        <span ng-repeat="location in editedList.locationList track by $index">
-            <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseLocation(location.ID,this.value)" ng-disabled="editedList.loading"> {{location.LocationName[editedList.defaultLang]}} 
-        </span>
-    </div>
-    <hr class="break-space">
-    <button ng-click="editedList.addMoreMovie()" class="btn btn-default">添加</button>
-    <hr class="break-space">
-    <table class="table table-hover table-condensed" ng-table="editedList.tableParams">
-        <thead>
-        <tr>
-            <th>序号</th>
-            <th>名称</th>
-            <th>类型</th>
-            <th>产地</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <div ng-show="editedList.loading">loading...</div>
-        <tr ng-repeat="movie in $data track by $index">
-            <td data-title="'序号'" >{{movie.Seq}}</td>
-            <td data-title="'名称'" >{{movie.Name[editedList.defaultLang]}}</td>
-            <td data-title="'类型'" ><span ng-repeat="category in movie.CategoryName track by $index">{{category[editedList.defaultLang]}}</span> </td>
-            <td data-title="'产地'" ><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span> </td>
-            <!--
-                            <td data-title="'类型'" ><span ng-repeat="category in editedList.categoryList track by $index"> {{category[editedList.defaultLang]}}</span> </td>
-                            <td data-title="'产地'" ><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span> </td> -->
-
-
-
-
-
-            <td data-title="'操作'">
-                <button ng-click="editedList.edit(movie.ID)" class="btn btn-xs btn-default" title="编辑">
-                    <i class="glyphicon glyphicon-pencil"></i>
-                </button>
-                <button ng-click="editedList.delMovie(movie.ID)" class="btn btn-xs btn-default" title="删除">
-                    <i class="glyphicon glyphicon-remove"></i>
-                </button>
-
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div ng-show="editedList.noData">查无数据</div>
 </div>

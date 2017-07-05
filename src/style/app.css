@@ -2,6 +2,39 @@ body{
   font-family: "Segoe UI","Lucida Grande",Helvetica,Arial,"Microsoft YaHei",FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",FontAwesome,sans-serif;
 }
 
+.top-extra{
+    background-color: #0788d4;
+}
+
+.top-extra a{
+    color: white;
+}
+
+.big-background{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("../../dist/imgs/big-bg.png");
+    background-size: 100% 100%;
+}
+
+.login-outline{
+    background-image: url("../../dist/imgs/login.png");
+    background-size: 100% 100%;
+    width: 480px;
+    height: 400px;
+    padding-top: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.login-top{
+    color:white;
+    font-size: 50px;
+    height: 50px;
+
+}
+
 .ng-table th {
   text-align: left;
 }
@@ -48,7 +81,10 @@ body{
     padding-right: 30px;
     padding-bottom: 24px;
 }
-
+#admov{
+    pointer-events: auto;
+}
+/*---------------------------*/
 .break-space-double{
   opacity: 0;
   margin-top:15px;

@@ -1,1 +1,23 @@
-插播查询
+<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+    <a>
+        <strong>
+            <i class="glyphicon glyphicon-search"></i>
+            插播查询
+        </strong>
+    </a>
+    <hr>
+
+    <!--搜索框-->
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="input-group">
+                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
+                <span class="input-group-btn">
+            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
+          </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div><!-- /.row -->
+    <!--搜索框-->
+
+</div>

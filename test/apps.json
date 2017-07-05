@@ -4,15 +4,15 @@
       "id": 1,
       "name": "终端管理",
       "icon": "dist/imgs/app-icon-02.png",
-      "bgColor": "rgb(186,104,4)",
-      "themeColor":"#fbb03b"
+      "bgColor": "#097dc2",
+      "themeColor":"#097dc2"
     },
     {
       "id": 2,
       "name": "插播管理",
       "icon": "dist/imgs/app-icon-04.png",
       "bgColor": "rgb(186,104,4)",
-      "themeColor":"#fbb03b"
+      "themeColor":"#097dc2"
     },
     {
       "id": 3,
@@ -33,13 +33,6 @@
       "name": "权限管理",
       "icon": "dist/imgs/app-icon-06.png",
       "bgColor": "rgb(31,30,23)",
-      "themeColor":"rgb(51,121,191)"
-    },
-    {
-      "id": 6,
-      "name": "版本管理",
-      "icon": "dist/imgs/app-icon-07.png",
-      "bgColor": "rgb(21,21,21)",
       "themeColor":"rgb(51,121,191)"
     }
   ]
