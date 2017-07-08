@@ -1,13 +1,22 @@
-<div ng-controller="appController as app" ng-init="app.init(); app.avatarPhase = 'phase1' " class="app phase{{app.appPhase}}" style="background-image: url('dist/imgs/bg-01.png'); ">
+<div ng-controller="appController as app" ng-init="app.init(); app.avatarPhase = 'phase1' " class="app phase{{app.appPhase}}" style="background-image: url('dist/imgs/bg-main.png'); ">
     <!-- desktop -->
     <div class="desktop ">
         <!-- loading... -->
+        <!--标题-->
+        <div id="top-nav" class="app-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <span class="project-name">医院IPTV本地管理系统</span>
+                </div>
+            </div>
+        </div>
+        <!--标题-->
         <div ng-show="app.loading">loading...</div>
         <!-- header start -->
         <div class="project-title">
             <div class="project-logo" style="background-image: url(dist/imgs/icon-05.png)"></div>
         </div>
-        <span class="project-name navbar-header">医院本地管理系统</span>
+        <!--<span class="project-name navbar-header">医院本地管理系统</span>-->
         <!-- 头像/菜单 -->
 
         <div  class="avatar {{app.avatarPhase}}" ng-class="{'blur':(app.showMaskClass)}" ng-click="app.avatarPhase = app.avatarPhase == 'phase1' ? 'phase2' : 'phase1'">
@@ -22,8 +31,8 @@
         </div>
         <!-- grid -->
         <div class="app-grid-wrapper">
-            <div ng-repeat='appIcon in appList' class="app-grid">
-                <i ng-click="app.switchApp(appIcon.id)" class="app-icon" style="background-image: url({{appIcon.icon}})"></i>
+            <div ng-repeat='appIcon in appList' class="app-grid" id="main-table">
+                <i ng-click="app.switchApp(appIcon.id)" ng-mouseenter="app.focusAppIcon(this.appIcon,$event.target)" ng-mouseleave="app.blurAppIcon(this.appIcon,$event.target)" class="app-icon" style="background-image: url({{appIcon.icon}})"></i>
                 <h4 class="app-name">{{appIcon.name}}</h4>
                 <!-- {{appIcon.bgColor}} -->
             </div>
@@ -46,28 +55,28 @@
         <div ng-class="{'blur':(app.showMaskClass)}">
             <!-- app title -->
             <div class="app-title" style="background-color: {{app.activeAppBgColor}}">
-                <i class="app-icon" style="background-image: url({{app.activeAppIcon}})"></i>
+                <i class="app-icon" style="background-image: url({{app.activeAppIcon}})" ng-show="app.appFramePhase==1"></i>
                 <!-- background: -webkit-radial-gradient(0% 110%, rgba(216,156,44,1) 11%,rgba(211,157,116,0) 70%); {{app.activeAppThemeColor}}-->
-                <h4 class="app-name">{{app.activeAppName}} </h4>
+                <h4 class="app-name" style="color: white" ng-show="app.appFramePhase==1">{{app.activeAppName}} </h4>
             </div>
             <!-- launcher -->
             <div class="app-launcher">
                 <!-- back -->
                 <div class="app-launcher-grid">
-                    <i ng-click="app.showDesktop()" class="app-icon app-back" style="background-image: url('dist/imgs/app-icon-05.png'); box-shadow: inset 0px 0px 1px 1px rgba(255,255,255,.6);"></i>
-                    <h5 class="app-name">{{'HOME' | translate}}</h5>
+                    <i ng-click="app.showDesktop()" class="app-back app-icon-top" style="background-image: url('dist/imgs/app-icon-05.png')";></i>
+                    <h5 class="app-name" style="color: white">{{'HOME' | translate}}</h5>
                 </div>
                 <!-- launcher-grid -->
                 <div ng-repeat='appIcon in appList' class="app-launcher-grid">
-                    <i ng-click="app.switchApp(appIcon.id)" class="app-icon" style="background-image: url({{appIcon.icon}})"></i>
-                    <h5 class="app-name">{{appIcon.name}}</h5>
+                    <i ng-click="app.switchApp(appIcon.id)" class="app-icon-top" style="background-image: url({{appIcon.icon_top}});"></i>
+                    <h5 class="app-name" style="color: white">{{appIcon.name}}</h5>
                     <!-- {{appIcon.bgColor}} -->
                 </div>
             </div>
             <div ng-click="app.focusLauncher()" class="app-launcher-mask phase1" data-phase="1"></div>
             <!-- view -->
             <div class="app-view">
-                <ui-view></ui-view>
+                <ui-view ></ui-view>
             </div>
             <div ng-click="app.focusApp()" class="app-view-mask"></div>
         </div>

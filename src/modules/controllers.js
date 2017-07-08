@@ -120,7 +120,7 @@
                     for (var i = 0; i < l.length; i++) {
                         if (l[i].id == id) {
                             self.activeAppName = l[i].name;
-                            self.activeAppIcon = l[i].icon;
+                            self.activeAppIcon = l[i].icon_top;
                             self.activeAppBgColor = l[i].bgColor;
                             self.activeAppThemeColor = l[i].themeColor;
 
@@ -140,23 +140,23 @@
 
                     switch (n) {
                         case 1:
-                            if (!$state.includes('app.terminal')) {
-                                $state.go('app.terminal', {'appId': n});
-                            }
-                            break;
-                        case 2:
                             if(!$state.includes('app.innerCut')){
                                 $state.go('app.innerCut', {'appId': n});
                             }
                             break;
+                        case 2:
+                            if (!$state.includes('app.terminal')) {
+                                $state.go('app.terminal', {'appId': n});
+                            }
+                            break;
                         case 3:
-                            if (!$state.includes('app.doctorAdvice')) {
-                                $state.go('app.doctorAdvice', {'appId': n});
+                            if(!$state.includes('app.video')){
+                                $state.go('app.video', {'appId': n});
                             }
                             break;
                         case 4:
-                            if(!$state.includes('app.video')){
-                                $state.go('app.video', {'appId': n});
+                            if (!$state.includes('app.doctorAdvice')) {
+                                $state.go('app.doctorAdvice', {'appId': n});
                             }
                             break;
                         case 5:
@@ -191,6 +191,28 @@
                     setTimeout(function () {
                         self.appFramePhase = 1;
                     }, 530)
+                }
+
+                //app选中样式
+                self.focusAppIcon = function (scop,ele) {
+                    var url = 'url('+ scop['icon_focus'] +')';
+                    var child = ele.nextElementSibling;
+                    child.style.color = 'white';
+                    ele.style.backgroundImage = url;
+                    ele.style.width = '210px';
+                    ele.style.height = '252px';
+                    //ele.style.transitionDuration = '.5s';
+                }
+
+                //app未选中样式
+                self.blurAppIcon = function (scop,ele) {
+                    var url = 'url('+ scop['icon'] +')';
+                    var child = ele.nextElementSibling;
+                    child.style.color = '#468ed2';
+                    ele.style.backgroundImage = url;
+                    ele.style.width = '188px';
+                    ele.style.height = '219px';
+                   // ele.style.transitionDuration = '.5s';
                 }
 
                 self.focusLauncher = function () {

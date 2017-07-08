@@ -2,38 +2,49 @@
   "apps": [
     {
       "id": 1,
-      "name": "终端管理",
-      "icon": "dist/imgs/app-icon-02.png",
+      "name": "插播管理",
+      "icon": "dist/imgs/app-icon-new-01.png",
+      "icon_focus": "dist/imgs/app-icon-new-focus-01.png",
+      "icon_top": "dist/imgs/app-icon-top-01.png",
       "bgColor": "#097dc2",
       "themeColor":"#097dc2"
     },
     {
       "id": 2,
-      "name": "插播管理",
-      "icon": "dist/imgs/app-icon-04.png",
-      "bgColor": "rgb(186,104,4)",
+      "name": "终端管理",
+      "icon": "dist/imgs/app-icon-new-02.png",
+      "icon_focus": "dist/imgs/app-icon-new-focus-02.png",
+      "icon_top": "dist/imgs/app-icon-top-02.png",
+      "bgColor": "#097dc2",
       "themeColor":"#097dc2"
     },
     {
       "id": 3,
-      "name": "医嘱提醒",
-      "icon": "dist/imgs/app-icon-01.png",
-      "bgColor": "rgb(125,0,0)",
-      "themeColor":"#c1272d"
+      "name": "多媒体库",
+      "icon": "dist/imgs/app-icon-new-03.png",
+      "icon_focus": "dist/imgs/app-icon-new-focus-03.png",
+      "icon_top": "dist/imgs/app-icon-top-03.png",
+      "bgColor": "#097dc2",
+      "themeColor":"#097dc2"
     },
     {
       "id": 4,
-      "name": "多媒体库",
-      "icon": "dist/imgs/app-icon-03.png",
-      "bgColor": "rgb(125,0,0)",
-      "themeColor":"#c1272d"
+      "name": "医嘱提醒",
+      "icon": "dist/imgs/app-icon-new-04.png",
+      "icon_focus": "dist/imgs/app-icon-new-focus-04.png",
+      "icon_top": "dist/imgs/app-icon-top-04.png",
+      "bgColor": "#097dc2",
+      "themeColor":"#097dc2"
     },
     {
       "id": 5,
       "name": "权限管理",
-      "icon": "dist/imgs/app-icon-06.png",
-      "bgColor": "rgb(31,30,23)",
-      "themeColor":"rgb(51,121,191)"
+      "icon": "dist/imgs/app-icon-new-05.png",
+      "icon_focus": "dist/imgs/app-icon-new-focus-05.png",
+      "icon_top": "dist/imgs/app-icon-top-05.png",
+      "bgColor": "#097dc2",
+      "themeColor":"red"
     }
+
   ]
 }
