@@ -803,3 +803,13 @@ body, .app {
 .height100{
     height: 100%;
 }
+
+
+/*---------------------user--------------------------------------------*/
+.one_row{
+    display: inline;
+}
+
+.hospital-edit{
+    cursor: pointer;
+}

@@ -1,23 +1,46 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div ng-controller="hospitalManageController as hosm" ng-init="hosm.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
-            <i class="glyphicon glyphicon-th-large"></i>
-            科室分区
+            <!--<i class="glyphicon glyphicon-th-large"></i>-->
+            医院管理
         </strong>
     </a>
     <hr>
+    <!--loading-->
+    <div ng-show="hosm.loading">loading...</div>
+    <!--loading-->
+    <div>
+        <div class="row">
+            <h4 class="one_row">{{hosm.hospitalData.Name[hosm.defaultLang]}}</h4><img src="dist/imgs/edit-icon.png" ng-click="hosm.editHospital()" class="hospital-edit">
+            <button class="btn" ng-click="hosm.addSection()">添加分区</button>
+        </div>
+        <div class="row">
+            <!--左侧分区-->
+            <div class="col-xs-5">
+                <div class="row">
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+                </div>
+                <div class="row">
+                    <div>
+                        <ul class="">
+                            <li ng-repeat="section in hosm.hospitalData.Section" class="list-group-item">
+                                {{section.Name[hosm.defaultLang]}}
+                                <a ng-click="hosm.showSections(section)"  class="pull-right">分区</a>
+
+                                <a ng-click="hosm.deleteSection(hotel.ID)"  class="pull-right">删除</a>
+                                <a ng-click="hosm.editSction(section, hotel.ID)" class="pull-right">编辑</a>
+                                <br>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-1"></div>
+            <!--右侧科室-->
+            <div class="col-xs-6">
+               <ui-view></ui-view>
+            </div>
+        </div>
+    </div>
 
 </div>

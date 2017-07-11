@@ -1,0 +1,53 @@
+<div class="modal-dialog" ng-controller="editSectionController as editSection" ng-init="editSection.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="editSection.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">编辑分区</h4>
+        </div>
+        <form name="sectionForm" novalidate ng-submit="sectionForm.$valid && editSection.saveForm()">
+            <div class="modal-body">
+                <div class="form-group">
+                            <span ng-repeat="lang in editSection.editLangs track by $index">
+                                <label>分区名-{{lang.name}}</label>
+                                <input type="text" class="form-control" ng-model="editSection.sectionName[lang.code]"
+                                       required>
+                            </span>
+                </div>
+                <hr>
+
+                <div class="form-group">
+                    <label>分区图标</label><br>
+                    <input type="file" file-model="myCoverImg" data-e="none" required><br>
+                    <div ng-repeat="img in editSection.uploadList.data">
+                        <img width="100%" src="{{img.img.src}}" style="width:100px;height:100px;">
+                        上传进度：{{img.img.percentComplete}}
+                    </div>
+                    <hr class="break-space">
+                    <div ng-click="editSection.addCoverImg(1,editSection.uploadList)" class="btn btn-default">上传</div>
+                </div>
+                <hr>
+
+                <div class="form-group">
+                    <label>分区高亮图标</label><br>
+                    <input type="file" file-model="myCoverImgHigh" data-e="none" required><br>
+                    <div ng-repeat="img1 in editSection.uploadListHigh.data">
+                        <img width="100%" src="{{img1.img.src}}" style="width:100px;height:100px;">
+                        上传进度：{{img1.img.percentComplete}}
+                    </div>
+                    <hr class="break-space">
+                    <div ng-click="editSection.addCoverImg(2, editSection.uploadListHigh)" class="btn btn-default">上传</div>
+                </div>
+                <hr>
+
+            </div>
+            <div class="modal-footer">
+                <a ng-click="editSection.cancel()" class="btn">取消</a>
+                <button class="btn btn-primary" type="submit" ng-disabled="sectionForm.$invalid || editSection.saving ">
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<div ng-controller="smallSectionController as small" ng-init="small.init()">
+    <!--loading-->
+    <div ng-show="small.loading1">loading...</div>
+    <!--loading-->
+    <h4>{{small.chooseSection.Name[small.defaultLang]}}——子科室</h4>
+    <a ng-click="small.addSmallSection()" class="button button-light">
+        <i class="icon ion-ios-plus-outline"></i> 添加子科室
+    </a>
+    <div ng-show="small.noSmall">无</div>
+    <ul class="list-group">
+        <li ng-repeat="section in small.smallSctions track by $index" class="list-group-item">
+            {{section.Name}}
+            <a ng-click="small.del(section.ID)"  class="btn pull-right">删除</a>
+
+            <br>
+        </li>
+    </ul>
+
+</div>

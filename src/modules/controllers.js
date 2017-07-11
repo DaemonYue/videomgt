@@ -61,8 +61,8 @@
             }
         ])
 
-        .controller('appController', ['$http', '$scope', '$state', '$stateParams', 'util',
-            function ($http, $scope, $state, $stateParams, util) {
+        .controller('appController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
                     /*if (util.getParams("projectDes")) {
@@ -90,7 +90,7 @@
                     self.data = {
                         "token": util.getParams('token'),
                         "user": ""
-                    }
+                    };
 
                     // 读取applists
                     self.loading = true;
@@ -140,7 +140,7 @@
 
                     switch (n) {
                         case 1:
-                            if(!$state.includes('app.innerCut')){
+                            if (!$state.includes('app.innerCut')) {
                                 $state.go('app.innerCut', {'appId': n});
                             }
                             break;
@@ -150,7 +150,7 @@
                             }
                             break;
                         case 3:
-                            if(!$state.includes('app.video')){
+                            if (!$state.includes('app.video')) {
                                 $state.go('app.video', {'appId': n});
                             }
                             break;
@@ -164,22 +164,22 @@
                                 $state.go('app.user', {'appId': n});
                             }
                             break;
-                       /* case 6:
-                            if(!$state.includes('app.version')){
-                                $state.go('app.version', {'appId': n});
-                            }
-                            break;
-                        case 7:
-                            $state.go('app.wxUser', {'appId': n});
-                            break;
-                        case 8:
-                            if (!$state.includes('app.projectConfig')) {
-                                $state.go('app.projectConfig', {'appId': n});
-                            }
-                            break;
-                        case 9:
-                            $state.go('app.realTimeCommand', {'appId': n});
-                            break;*/
+                        /* case 6:
+                         if(!$state.includes('app.version')){
+                         $state.go('app.version', {'appId': n});
+                         }
+                         break;
+                         case 7:
+                         $state.go('app.wxUser', {'appId': n});
+                         break;
+                         case 8:
+                         if (!$state.includes('app.projectConfig')) {
+                         $state.go('app.projectConfig', {'appId': n});
+                         }
+                         break;
+                         case 9:
+                         $state.go('app.realTimeCommand', {'appId': n});
+                         break;*/
                         default:
                             break;
 
@@ -194,8 +194,8 @@
                 }
 
                 //app选中样式
-                self.focusAppIcon = function (scop,ele) {
-                    var url = 'url('+ scop['icon_focus'] +')';
+                self.focusAppIcon = function (scop, ele) {
+                    var url = 'url(' + scop['icon_focus'] + ')';
                     var child = ele.nextElementSibling;
                     child.style.color = 'white';
                     ele.style.backgroundImage = url;
@@ -205,14 +205,14 @@
                 }
 
                 //app未选中样式
-                self.blurAppIcon = function (scop,ele) {
-                    var url = 'url('+ scop['icon'] +')';
+                self.blurAppIcon = function (scop, ele) {
+                    var url = 'url(' + scop['icon'] + ')';
                     var child = ele.nextElementSibling;
                     child.style.color = '#468ed2';
                     ele.style.backgroundImage = url;
                     ele.style.width = '188px';
                     ele.style.height = '219px';
-                   // ele.style.transitionDuration = '.5s';
+                    // ele.style.transitionDuration = '.5s';
                 }
 
                 self.focusLauncher = function () {
@@ -240,6 +240,96 @@
                     }
 
                 }
+
+                self.uploadLists = function() {
+                    this.data = [];
+                    this.maxId = 0;
+                }
+
+                self.uploadLists.prototype = {
+                    add: function (img) {
+                        this.data.push({"img": img, "id": this.maxId});
+                        return this.maxId;
+                    },
+                    changeImg: function (img) {
+                        // 只允许 上传 一张图片
+                        this.data = [];
+                        this.data.push({"img": img, "id": this.maxId});
+                        return this.maxId;
+                    },
+                    setPercentById: function (type, id, percentComplete) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].percentComplete = percentComplete;
+                                break;
+                            }
+                        }
+                    },
+                    setSrcSizeById: function (type, id, src, size) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].src = src;
+                                this.data[i][type].size = size;
+                                break;
+                            }
+                        }
+                    },
+                    deleteById: function (id) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果正在上传，取消上传
+                                // 图片
+                                if (l[i].img.percentComplete < 100 && l[i].img.percentComplete != '失败') {
+                                    l[i].video.xhr.abort();
+                                }
+                                // 删除data
+                                l.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    uploadFile: function (imgFile, o) {
+                        // 图片上传后台地址
+                        var uploadUrl = CONFIG.uploadImgUrl;
+
+                        // 图片对象
+                        var imgXhr = new XMLHttpRequest();
+                        var img = {"name": imgFile.name, "size": imgFile.size, "percentComplete": 0, "xhr": imgXhr};
+
+                        var id = this.changeImg(img);
+                        // 上传视频
+                        util.uploadFileToUrl(imgXhr, imgFile, uploadUrl, 'normal',
+                            // 上传中
+                            function (evt) {
+                                $scope.$apply(function () {
+                                    if (evt.lengthComputable) {
+                                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                        // 更新上传进度
+                                        o.setPercentById('img', id, percentComplete);
+                                    }
+                                });
+                            },
+
+                            // 上传成功
+                            function (xhr) {
+                                var ret = JSON.parse(xhr.responseText);
+                                console && console.log(ret);
+                                $scope.$apply(function () {
+                                    o.setSrcSizeById('img', id, ret.upload_path, ret.size);
+                                });
+                               // self.movieInfo.PicSize = ret.size;
+                                // alert('上传成功')
+                            },
+                            // 上传失败
+                            function (xhr) {
+                                alert('图片上传失败，请重新上传');
+                                o.deleteById(id);
+                                xhr.abort();
+                            }
+                        );
+                    }
+                }
             }
         ])
 
@@ -264,7 +354,7 @@
                     // 初始化上传列表对象
                     self.uploadList = new UploadLists();
 
-                    self.test="哈哈哈哈"
+                    self.test = "哈哈哈哈"
                 }
 
                 self.gotoPage = function (pageName) {
@@ -297,7 +387,7 @@
 
                 self.upload = function () {
                     self.maskUrl = "pages/addMovie.html";
-                   // $scope.app.showHideMask(true, "pages/addMovie.html");
+                    // $scope.app.showHideMask(true, "pages/addMovie.html");
                 }
 
                 function UploadLists() {
@@ -676,7 +766,7 @@
                 }
 
                 self.edit = function (movieID) {
-                   // $scope.video.maskUrl = "pages/editMovieInfo.html";
+                    // $scope.video.maskUrl = "pages/editMovieInfo.html";
                     $scope.app.showHideMask(true, "pages/editMovieInfo.html");
 
                     $scope.app.maskParams = {movieID: movieID};
@@ -784,7 +874,7 @@
                 }
 
                 self.addMoreMovie = function () {
-                   // $scope.video.maskUrl = "pages/addMoreMovie.html";
+                    // $scope.video.maskUrl = "pages/addMoreMovie.html";
                     $scope.app.showHideMask(true, "pages/addMoreMovie.html");
                 }
 
@@ -859,7 +949,7 @@
                 }
 
                 self.cancel = function () {
-                   // $scope.app.showHideMask(false);
+                    // $scope.app.showHideMask(false);
                     $scope.video.maskUrl = "";
 
                 }
@@ -893,7 +983,7 @@
                 }
 
                 self.cancel = function () {
-                   // $scope.video.maskUrl = "";
+                    // $scope.video.maskUrl = "";
                     $scope.app.showHideMask(false);
 
                 }
@@ -1139,7 +1229,7 @@
                 }
 
                 self.cancel = function () {
-                   // $scope.video.maskUrl = "";
+                    // $scope.video.maskUrl = "";
                     $scope.app.showHideMask(false);
 
                 }
@@ -2119,45 +2209,40 @@
         ])
 
         //用户main
-            .controller('userController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+        .controller('userController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
-                    // 上传页面加载页面url
+                    // 首页面加载页面url
                     self.userInfoUrl = '';
 
-                    // 不显示上传页面
+                    // 不显示首页面
                     self.showUserInfo = false;
 
-
-                    // 显示上传页面
+                    // 显示首页面
                     self.gotoPage('userInfo');
 
-                    // 弹窗层
-                    self.maskUrl = '';
-                    self.maskParams = {};
+                    //初始化数据
+                    self.data =  $scope.app.data;
+                    self.loading = true;
+                    self.defaultLang = util.getDefaultLangCode();
 
-                    // 初始化上传列表对象
-                    self.uploadList = new UploadLists();
 
-                }
 
+                };
+
+                //页面跳转
                 self.gotoPage = function (pageName) {
-                    // 上传列表页
                     if (pageName == 'userInfo') {
                         // 不是第一次加载
                         if (self.userInfoUrl !== '') {
-
                         }
                         // 第一次加载
                         else {
                             self.userInfoUrl = 'pages/userInformation.html';
                         }
                         self.showUserInfo = true;
-                    }
-
-                    //其他页
-                    else {
+                    }else {
                         self.showUserInfo = false;
                         $state.go(pageName);
                     }
@@ -2165,18 +2250,7 @@
 
                 }
 
-                self.logout = function (event) {
-                    util.setParams('token', '');
-                    $state.go('login');
-                }
-
-                self.upload = function () {
-                   // self.maskUrl = "pages/addMovie.html";
-                    $scope.app.showHideMask(true, "pages/addMovie.html");
-
-                }
-
-                function UploadLists() {
+                self.UploadLists = function() {
                     this.data = [
                         /*{
                          "id":0,
@@ -2191,7 +2265,7 @@
                     this.maxId = 0;
                 }
 
-                UploadLists.prototype = {
+                self.UploadLists.prototype = {
                     add: function (video, subtitle) {
                         this.data.push({"video": video, "subtitle": subtitle, "id": this.maxId});
                         return this.maxId++;
@@ -2400,6 +2474,455 @@
             }
         ])
 
+        //医院管理
+        .controller('hospitalManageController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    //初始化数据
+                    self.data =  $scope.app.data;
+                    $scope.user.showUserInfo = false;
+                    self.loading = true;
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.showData();
+                    self.chooseSection = {};
+                }
+
+                //获取大分区信息
+                self.showData = function () {
+                    self.data.action = "getHospitalInfo";
+                    var data = JSON.stringify(self.data);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.hospitalData = msg.data;
+                            console.log(self.hospitalData);
+                            if (self.hospitalData.Section.length == 0) {
+                                self.noData = true;
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                }
+
+                //修改医院名称
+                self.editHospital = function () {
+                    $scope.app.showHideMask(true,'pages/hospitalEdit.html');
+                    $scope.app.maskParams = {hospital : self.hospitalData};
+                };
+
+                //添加大分区
+                self.addSection = function () {
+                    $scope.app.showHideMask(true,'pages/sectionAdd.html');
+                    $scope.app.maskParams = {hospital : self.hospitalData};
+                }
+
+                //修改大分区
+                self.editSction = function (section) {
+                    $scope.app.showHideMask(true,'pages/sectionEdit.html');
+                    $scope.app.maskParams = {hospital : self.hospitalData, section: section};
+                };
+                //删除大分区
+                self.deleteSection = function () {
+
+                };
+
+                //显示小科室
+                self.showSections = function (sec) {
+                    util.setObject('session',sec);
+                    $state.reload();
+                    $state.go('app.user.section.small',{id:sec.ID});
+                };
+
+                //添加子科室
+                self.addSmallSection = function () {
+                    $scope.app.showHideMask(true,'pages/samllSectionAdd.html');
+                    $scope.app.maskParams = {section: self.chooseSection};
+                }
+                
+            }
+        ])
+
+        //医院编辑
+        .controller('editHospitalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('editHospitalController')
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs')
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.hospital = $scope.app.maskParams.hospital;
+                    self.data = $scope.app.data;
+                }
+
+                // 保存编辑
+                self.saveForm = function () {
+                    self.data.action = "editHospital";
+                    self.data.data = {
+                        "ID": self.hospital.ID,
+                        "Name": self.hospital.Name
+                    }
+                    var data = JSON.stringify(self.data);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('保存成功')
+                            self.cancel();
+                           // $state.reload('app.user.section', $stateParams, {reload: true})
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+            }
+        ])
+
+        //添加大分区
+        .controller('addSectionController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('addSectionController')
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.hospital = $scope.app.maskParams.hospital;
+                    self.data = $scope.app.data;
+                    //初始化
+                    self.uploadList = new $scope.app.uploadLists();
+                    self.uploadListHigh = new $scope.app.uploadLists();
+
+                    self.sectionName = {};
+
+                }
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传分区图标');
+                        return;
+                    }
+                    if (self.uploadListHigh.data.length == 0) {
+                        alert('请上传分区高亮图标');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100 || self.uploadListHigh.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                // 上传图片
+                self.addCoverImg = function (b, a) {
+
+                    if(b == 1){
+                        if (!$scope.myCoverImg) {
+                            alert('请先选择图片');
+                            return;
+                        }
+                        self.uploadList.uploadFile($scope.myCoverImg, a);
+                    }else if(b ==2){
+                        self.uploadListHigh.uploadFile($scope.myCoverImgHigh, a);
+
+                    }
+                }
+
+            }
+        ])
+
+        //修改大分区
+        .controller('editSectionController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('addSectionController')
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.hospital = $scope.app.maskParams.hospital;
+                    self.section = $scope.app.maskParams.section;
+                    self.data = $scope.app.data;
+                    //初始化
+                    self.uploadList = new $scope.app.uploadLists();
+                    self.uploadListHigh = new $scope.app.uploadLists();
+
+                    self.uploadList.data = [{img: {src: self.section.IconURL, size: self.section.IconSize}}];
+                    self.uploadListHigh.data = [{img: {src: self.section.IconFocusURL, size: self.section.IconFocusSize}}];
+                    self.sectionName = self.section.Name;
+
+                }
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传分区图标');
+                        return;
+                    }
+                    if (self.uploadListHigh.data.length == 0) {
+                        alert('请上传分区高亮图标');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100 || self.uploadListHigh.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "editSection";
+                    self.data.data = {
+                        'ID': self.section.ID,
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功');
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                // 上传图片
+                self.addCoverImg = function (b, a) {
+
+                    if(b == 1){
+                        if (!$scope.myCoverImg) {
+                            alert('请先选择图片');
+                            return;
+                        }
+                        self.uploadList.uploadFile($scope.myCoverImg, a);
+                    }else if(b ==2){
+                        self.uploadListHigh.uploadFile($scope.myCoverImgHigh, a);
+
+                    }
+                }
+
+            }
+        ])
+
+        //子科室列表
+        .controller('smallSectionController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('addSectionController')
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.chooseSection = util.getObject('session');
+                    //初始化
+                    self.searchSmallSection();
+                };
+
+                // 保存编辑
+                self.searchSmallSection = function () {
+                    self.data1 = $scope.app.data;
+                    self.data1.action = "getLittleSectionByID";
+                    self.data1.data = {
+                        "ID": self.chooseSection.ID
+                    }
+
+                    var data = JSON.stringify(self.data1);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.smallSctions = msg.data;
+                            if (!self.smallSctions) {
+                                self.noSmall = true;
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                // 上传图片
+                self.addCoverImg = function (b, a) {
+
+                    if(b == 1){
+                        if (!$scope.myCoverImg) {
+                            alert('请先选择图片');
+                            return;
+                        }
+                        self.uploadList.uploadFile($scope.myCoverImg, a);
+                    }else if(b ==2){
+                        self.uploadListHigh.uploadFile($scope.myCoverImgHigh, a);
+
+                    }
+                }
+
+            }
+        ])
+
+        //添加子科室
+        .controller('addSmallSectionController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.section = $scope.app.maskParams.section;
+
+
+                };
+
+                self.getSmallSectionAvil = function () {
+                    self.loading = true;
+                    var datap = $scope.app.data;
+                    datap.action = "getLittleSectionInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response){
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功');
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                        self.cancel();
+                    })
+                };
+
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+
+            }
+        ])
+
         //插播main
         .controller('innerCutController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
@@ -2454,7 +2977,7 @@
                 }
 
                 self.upload = function () {
-                   // self.maskUrl = "pages/addMovie.html";
+                    // self.maskUrl = "pages/addMovie.html";
                     $scope.app.showHideMask(true, "pages/addMovie.html");
 
                 }

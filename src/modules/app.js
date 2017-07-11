@@ -71,6 +71,10 @@
                 url: '/section',
                 templateUrl: 'pages/section.html'
             })
+            .state('app.user.section.small', {
+                url: '/small?id',
+                templateUrl: 'pages/smallSection.html'
+            })
             .state('app.user.version', {
                 url: '/version',
                 templateUrl: 'pages/version.html'
@@ -102,7 +106,8 @@
 
 
     .constant('CONFIG', {
-        serverUrl: 'http://192.168.17.88/backend_movie/v1/',
+        serverUrlVideo: 'http://192.168.17.88/backend_movie/v1/',
+        serverUrlOther: 'http://192.168.17.88/backend_info/',
         uploadImgUrl: 'http://192.168.17.88/upload',
         uploadVideoUrl: 'http://192.168.17.88/videoupload',
         testUrl: 'test/',

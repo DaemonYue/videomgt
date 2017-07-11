@@ -3,7 +3,7 @@
 (function () {
     var app = angular.module('app.services', [])
 
-        .factory('util', ['$cookies', '$translate', 'CONFIG', function ($cookies, $translate, CONFIG) {
+        .factory('util', ['$cookies', '$translate', 'CONFIG', '$window', function ($cookies, $translate, CONFIG, $window) {
             return {
                 /**
                  * 调用接口，本地和服务器的接口切换，方便调试
@@ -14,7 +14,9 @@
                 'getApiUrl': function (url, testUrl, forceType) {
                     if (forceType) {
                         if (forceType == 'server') {
-                            return CONFIG.serverUrl + url;
+                            return CONFIG.serverUrlVideo + url;    //视频库的接口
+                        }else if(forceType == 'server1'){
+                            return CONFIG.serverUrlOther + url;    //
                         }
                         else {
                             return CONFIG.testUrl + testUrl;
@@ -74,6 +76,27 @@
                         return false;
                     }
                 },
+
+                //存储单个属性
+                'setValue' : function(key,value){
+                    $window.localStorage[key]=value;
+                },
+
+                //读取单个属性
+                'getValue' : function(key,defaultValue){
+                    return $window.localStorage[key] || defaultValue;
+                },
+
+                //存储对象，以JSON格式存储
+                'setObject': function(key,value){
+                    $window.localStorage[key]=JSON.stringify(value);
+                },
+
+                //读取对象
+                'getObject' : function (key) {
+                    return JSON.parse($window.localStorage[key] || '{}');
+                },
+
 
                 // 当前系统 使用 的 语言
                 'langStyle': function () {
