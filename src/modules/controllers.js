@@ -2515,7 +2515,7 @@
                     }).finally(function (value) {
                         self.loading = false;
                     });
-                }
+                };
 
                 //修改医院名称
                 self.editHospital = function () {
@@ -2527,7 +2527,7 @@
                 self.addSection = function () {
                     $scope.app.showHideMask(true,'pages/sectionAdd.html');
                     $scope.app.maskParams = {hospital : self.hospitalData};
-                }
+                };
 
                 //修改大分区
                 self.editSction = function (section) {
@@ -2546,11 +2546,6 @@
                     $state.go('app.user.section.small',{id:sec.ID});
                 };
 
-                //添加子科室
-                self.addSmallSection = function () {
-                    $scope.app.showHideMask(true,'pages/samllSectionAdd.html');
-                    $scope.app.maskParams = {section: self.chooseSection};
-                }
                 
             }
         ])
@@ -2846,6 +2841,42 @@
                     });
                 };
 
+                //添加子科室
+                self.addSmallSection = function () {
+                    $scope.app.showHideMask(true,'pages/samllSectionAdd.html');
+                    $scope.app.maskParams = {section: self.chooseSection};
+                };
+                
+                //删除子科室
+                self.del = function (id) {
+                    var datap = $scope.app.data;
+                    datap.action = 'removeLittleSection';
+                    datap.data = {
+                        'ID': id
+                    };
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('删除成功！');
+                            $state.reload($state.current.name);
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+
+                    });
+                };
+
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
                     $scope.app.showHideMask(false);
@@ -2879,10 +2910,12 @@
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
                     self.section = $scope.app.maskParams.section;
-
+                    self.getSmallSectionAvil();
+                    self.chooseIdNumber = 0;
 
                 };
 
+                //获取
                 self.getSmallSectionAvil = function () {
                     self.loading = true;
                     var datap = $scope.app.data;
@@ -2895,7 +2928,64 @@
                     }).then(function successCallback(response){
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            alert('修改成功');
+                            self.smallAvil = msg.data;
+                            if(self.smallAvil){
+                                for(var i=0; i<self.smallAvil.length; i++){
+                                    self.smallAvil[i].isChoosed = false;
+                                }
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    })
+                };
+
+                //改变子科室的选中状态
+                self.changeSmallSecState = function (id) {
+                  for(var i=0; i<self.smallAvil.length; i++){
+                      if(self.smallAvil[i].ID == id){
+                          self.smallAvil[i].isChoosed = self.smallAvil[i].isChoosed ? false : true;
+                          if(self.smallAvil[i].isChoosed){
+                              self.chooseIdNumber++;
+                          }else {
+                              self.chooseIdNumber--;
+                          }
+                      }
+                  }
+                };
+
+                //保存选中子科室
+                self.save = function () {
+                    var chooseIDs = [];
+                    if(self.smallAvil){
+                        for(var i=0; i<self.smallAvil.length; i++){
+                            if(self.smallAvil[i].isChoosed == true){
+                                chooseIDs.push(self.smallAvil[i].ID);
+                            }
+                        }
+                    }
+                    var datap = $scope.app.data;
+                    datap.action = "relateToSection";
+                    datap.data = {
+                        'SectionID': self.section.ID,
+                        'IDs': chooseIDs
+                    };
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response){
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功！');
                             self.cancel();
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -2907,10 +2997,8 @@
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
                         self.loading = false;
-                        self.cancel();
                     })
-                };
-
+                }
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
