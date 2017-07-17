@@ -1,4 +1,4 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div ng-controller="userManageController as userm" ng-init="userm.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
             <i class="glyphicon glyphicon-list-alt"></i>
@@ -6,18 +6,38 @@
         </strong>
     </a>
     <hr>
+    <!--loading-->
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+    <div ng-show="userm.loading">loading...</div>
+    <!--loading-->
+    <div>
+        <label>所属科室: </label>
+        <select ng-model="userm.sectionId" ng-options="x.Name[userm.defaultLang] for x in userm.section" ng-change="userm.changeSection(x.ID)"></select>
+    </div>
+
+    <div>
+        <div class="container">
+            <table ng-table="userm.tableParams" ng-show="!userm.loading" class="table table-hover">
+                <tr ng-repeat="row in $data track by $index">
+                    <td title="'账号'">
+                        {{row.Account}}
+                    </td>
+                    <td title="'姓名'">
+                        {{row.Name}}
+                    </td>
+                    <td title="'所属科室'">
+                        {{row.IP}}
+                    </td>
+                    <td title="'操作'">
+                        <a class="btn btn-default" ng-click="userm.editUser(row)">编辑</a>
+                        <a class="btn btn-default" ng-click="userm.resetPwd(row.ID)">重置密码</a>
+                        <a class="btn btn-default" ng-click="userm.delUser(row.ID)">删除</a>
+                    </td>
+                   
+                </tr>
+            </table>
+        </div>
+    </div>
+
 
 </div>

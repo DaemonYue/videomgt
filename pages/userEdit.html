@@ -1,0 +1,37 @@
+<div class="modal-dialog" ng-controller="editUserController as editUser" ng-init="editUser.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="editUser.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">用户编辑</h4>
+        </div>
+        <form name="userForm" novalidate ng-submit="userForm.$valid && editUser.saveForm()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <span >
+                        <label>姓名：</label>
+                        <input type="text" class="form-control" ng-model="editUser.user.Name" required>
+                    </span>
+                </div>
+                <hr>
+
+                <div class="form-group">
+                <span>
+                    <label>科室: </label>
+                    <select ng-model="editUser.user.sectionName" ng-options="x.Name[editUser.defaultLang] for x in editUser.section"></select>
+                </span>
+                </div>
+                <hr>
+
+
+            </div>
+            <div class="modal-footer">
+                <a ng-click="editUser.cancel()" class="btn">取消</a>
+                <button class="btn btn-primary" type="submit" ng-disabled="userForm.$invalid || editUser.saving ">
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

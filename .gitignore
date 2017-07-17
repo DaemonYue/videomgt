@@ -1,5 +1,7 @@
 node_modules
 
+a
+
 dist/js/app.min.js
 
 dist/style/app.min.css

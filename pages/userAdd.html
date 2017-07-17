@@ -1,4 +1,4 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div ng-controller="userAddController as userAdd" ng-init="userAdd.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
             <i class="glyphicon glyphicon-plus"></i>
@@ -7,17 +7,53 @@
     </a>
     <hr>
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+    <!--loading-->
+    <div ng-show="hosm.loading">loading...</div>
+    <!--loading-->
+    <div class="container">
+        <form name="userAddForm" novalidate ng-submit="userAddForm.$valid && userAdd.saveForm()" class="form-inline">
+
+            <div class="form-group">
+                <span>
+                    <label>账号: </label>
+                    <input type="text" class="form-control" ng-model="userAdd.account" required>
+                </span>
+            </div>
+            <hr>
+
+            <div class="form-group">
+                <span>
+                    <label>密码: </label>
+                    <input type="text" class="form-control" ng-model="userAdd.password"  value="123456" disabled placeholder="123456">
+                </span>
+            </div>
+            <hr>
+
+            <div class="form-group">
+                <span>
+                    <label>用户名: </label>
+                    <input type="text" class="form-control" ng-model="userAdd.name" required>
+                </span>
+            </div>
+            <hr>
+
+            <div class="form-group">
+                <span>
+                    <label>科室: </label>
+                    <select ng-model="userAdd.sectionId" ng-options="x.Name[userAdd.defaultLang] for x in userAdd.section"></select>
+                </span>
+            </div>
+            <hr>
+
+
+
+            <button class="btn btn-primary" type="submit" ng-disabled="userAddForm.$invalid || userAdd.saving ">
+                保存
+            </button>
+        </form>
+
+
+    </div>
+
 
 </div>
