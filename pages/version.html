@@ -1,4 +1,4 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div ng-controller="versionController as v" ng-init="v.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
             <i class="glyphicon glyphicon-send"></i>
@@ -7,17 +7,34 @@
     </a>
     <hr>
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-6">本地版本号</div>
+                <div class="col-xs-6">云端版本号</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <span>版本号：</span>{{v.version.local_version}}
+                </div>
+                <div class="col-xs-6">
+                    <span>版本号：</span>{{v.version.mgt_version}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <span>状态：</span>{{v.localstate}}
+                </div>
+                <div class="col-xs-6">
+                    <span>状态：</span>{{v.mgtstate}}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button ng-click="v.commit()">提交版本</button>
+
+
 
 </div>

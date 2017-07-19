@@ -1,0 +1,66 @@
+<div class="modal-dialog" ng-controller="editUserInfoController as editUserInfo" ng-init="editUserInfo.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="editUserInfo.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">用户编辑</h4>
+        </div>
+        <form name="userForm"  ng-submit="userForm.$valid && editUserInfo.saveForm()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <span >
+                        <label>账号：</label>
+                        <input type="text" class="form-control" ng-model="editUserInfo.user.Account" disabled>
+                    </span>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <span >
+                        <label>原密码：</label>
+                        <input type="password" class="form-control" ng-model="editUserInfo.passwordBefore" required placeholder="必填">
+                    </span>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <span >
+                        <label>新密码：</label>
+                        <input type="password" class="form-control" ng-model="editUserInfo.passwordAfter">
+                    </span>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <span >
+                        <label>确认新密码：</label>
+                        <input type="password" class="form-control" ng-model="editUserInfo.passwordSure" ng-blur="editUserInfo.testNewPwd()">
+                    </span>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <span >
+                        <label>姓名：</label>
+                        <input type="text" class="form-control" ng-model="editUserInfo.user.Name" required>
+                    </span>
+                </div>
+                <hr>
+
+                <div class="form-group">
+                <span>
+                    <label>科室: </label>
+                    <input type="text" class="form-control" ng-model="editUserInfo.secName"  disabled>
+
+                </span>
+                </div>
+                <hr>
+
+
+            </div>
+            <div class="modal-footer">
+                <a ng-click="editUserInfo.cancel()" class="btn">取消</a>
+                <button class="btn btn-primary" type="submit" ng-disabled="userForm.$invalid || editUserInfo.saving ">
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

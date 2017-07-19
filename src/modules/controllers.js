@@ -17,6 +17,7 @@
                 console.log('loginController')
                 var self = this;
                 self.init = function () {
+                    console.log(md5.createHash('dddd'));
 
                 }
 
@@ -35,6 +36,7 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             util.setParams('token', msg.token);
+                            util.setParams('account', self.userName);
                             self.getEditLangs();
                         } else {
                             alert(msg.rescode + ' ' + msg.errInfo);
@@ -70,8 +72,11 @@
                      } else {
                      alert("访问超时，请重新登录")
                      $state.go('login')
-                     }
-                     // app 页面展开desktop*/
+                     }*/
+                    //获取用户账号
+                    self.account = util.getParams('account');
+
+                     // app 页面展开desktop
                     self.showMaskClass = false;
                     if ($state.current.name !== 'app') {
                         self.appPhase = 2;
@@ -2213,6 +2218,7 @@
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
+
                     // 首页面加载页面url
                     self.userInfoUrl = '';
 
@@ -2226,14 +2232,12 @@
                     self.data =  $scope.app.data;
                     self.loading = true;
                     self.defaultLang = util.getDefaultLangCode();
-
-
-
                 };
 
                 //页面跳转
                 self.gotoPage = function (pageName) {
                     if (pageName == 'userInfo') {
+                        self.getUserInfo();
                         // 不是第一次加载
                         if (self.userInfoUrl !== '') {
                         }
@@ -2246,9 +2250,44 @@
                         self.showUserInfo = false;
                         $state.go(pageName);
                     }
+                };
 
+                // 获取用户信息
+                self.getUserInfo = function () {
+                    var datap = $scope.app.data;
+                    datap.action = 'getUserInfoDetail';
+                    datap.data = {
+                        "Account": util.getParams('account')
+                    };
+                    var data = JSON.stringify(datap);
 
-                }
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('user_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.userInfo = msg.data[0];
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //编辑个人信息
+                self.edit = function () {
+                    $scope.app.showHideMask(true,'pages/userInfoEdit.html');
+                    $scope.app.maskParams = {user: self.userInfo, section: self.chooseSection};
+                };
 
                 self.UploadLists = function() {
                     this.data = [
@@ -2474,53 +2513,99 @@
             }
         ])
 
-        //个人信息
-        .controller('userInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+
+        //个人信息编辑
+        .controller('editUserInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', '$filter', 'md5',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, $filter, md5) {
                 var self = this;
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
+                    self.user = $scope.app.maskParams.user;
+                    self.secName = self.user.SName[self.defaultLang];
+                    self.section = $scope.app.maskParams.section;
                 };
 
                 // 保存编辑
-                self.searchSmallSection = function () {
-                    self.data1 = $scope.app.data;
-                    self.data1.action = "getLittleSectionByID";
-                    self.data1.data = {
-                        "ID": self.chooseSection.ID
+                self.saveForm = function () {
+
+                    if(!self.passwordBefore && self.passwordAfter){
+                        alert("请输入原密码！");
+                        return;
+                    }
+                    if(self.passwordBefore && self.passwordAfter && !self.passwordSure){
+                        alert("请确认新密码！")
+                        return;
+                    }
+                    if(self.passwordBefore && !self.passwordAfter && self.passwordSure){
+                        alert("请输入新密码！")
+                        return;
                     }
 
-                    var data = JSON.stringify(self.data1);
+                    var oldPwd, newPwd = undefined;
+                    if(self.passwordBefore){
+                       oldPwd = md5.createHash(self.passwordBefore);
+                    }
+                    if(self.passwordAfter){
+                        newPwd = md5.createHash(self.passwordAfter);
+                    }
+
+                    var datap = $scope.app.data;
+                    datap.action = "UpdateUserInfo";
+                    datap.data = {
+                        "Account": self.user.Account,
+                        "Name": self.user.Name,
+                        "OldPassword": oldPwd,
+                        "Password": newPwd,
+                        "SectionID": self.user.sectionID
+                    };
+                    var data = JSON.stringify(datap);
+
                     $http({
                         method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        url: util.getApiUrl('user_info_original', '', 'server1'),
                         data: data
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            self.smallSctions = msg.data;
-                            if (!self.smallSctions) {
-                                self.noSmall = true;
+
+                            if(self.passwordAfter){
+                                alert('保存成功,请重新登录！');
+                                $state.go('login');
+                            }else {
+                                alert('保存成功！');
+                                self.cancel();
+                                //$state.reload('app.user.section', $stateParams, {reload: true})
+
                             }
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
                         } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
+                            alert(msg.rescode + ' ' + msg.errorInfo);
                         }
                     }, function errorCallback(response) {
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
-                        self.loading = false;
+                        self.saving = false;
+
                     });
+                }
+
+                //确认新密码
+                self.testNewPwd = function () {
+                    if(self.passwordAfter && self.passwordSure && self.passwordAfter != self.passwordSure){
+                        alert('两遍新密码输入不同！');
+                    }
                 };
 
-                //添加子科室
-                self.addSmallSection = function () {
-                    $scope.app.showHideMask(true,'pages/samllSectionAdd.html');
-                    $scope.app.maskParams = {section: self.chooseSection};
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+
+
                 };
+
             }
         ])
 
@@ -2589,10 +2674,11 @@
                         if (msg.rescode == '200') {
                             self.section = msg.data.Section;
                             var hos = {
-                                'Name': {'zh-CN':'医院'},
-                                'ID': -1
+                                'Name': {'zh-CN':''},
+                                'ID': undefined
                             };
                             self.section.unshift(hos);
+                            self.sectionOne = self.section[0];
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -2617,8 +2703,10 @@
                     $scope.user.showUserInfo = false;
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
+                    self.sectionName = '医院';
+
                     self.getSection();
-                    self.getUsers(-1);
+                    self.getUsers();
                 };
 
                 // 保存编辑
@@ -2627,18 +2715,16 @@
                     self.loading = true;
                     self.tableParams = new NgTableParams({
                         page: 1,
-                        count: 15,
+                        count: 10,
                         url: ''
                     }, {
                         counts: [],
                         getData: function (params) {
                             var datap = $scope.app.data;
-                            datap.action = "addUser";
-                            datap.data = {
-                                "SectionID": id
-                            };
+                            datap.action = "getUserInfo";
                             var paramsUrl = params.url();
-                            datap.Pager = {
+                            datap.data = {
+                                "SectionID": id,
                                 "total":-1,
                                 "per_page": paramsUrl.count - 0,
                                 "page": paramsUrl.page - 0,
@@ -2647,7 +2733,6 @@
                                 "keyword":"",
                                 "status":""
                             };
-
                             var data = JSON.stringify(datap);
 
                             return $http({
@@ -2656,16 +2741,19 @@
                                 data: data
                             }).then(function successCallback(data, status, headers, config) {
                                 if (data.data.rescode == '200') {
-                                    if (data.data.total == 0) {
+                                    if (data.data.TotalCount == 0) {
                                         self.noData = true;
+                                        return;
                                     }
-                                    params.total(data.data.total);
-                                    return data.data.devlist;
+                                    params.total(data.data.TotalCount);
+                                    self.users = data.data.data;
+
+                                    return data.data.data;
                                 } else if (data.tata.rescode == '401') {
                                     alert('访问超时，请重新登录');
                                     $location.path("pages/login.html");
                                 } else {
-                                    alert(data.rescode + ' ' + data.errInfo);
+                                    alert(data.rescode + ' ' + data.errorInfo);
                                 }
 
                             }, function errorCallback(response) {
@@ -2692,11 +2780,14 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.section = msg.data.Section;
+                            self.sectionOriginal = (msg.data.Section).concat();
+                            //self.sectionName = self.section[0];
                             var hos = {
-                                'Name': {'zh-CN':'医院'},
-                                'ID': -1
+                                'Name': {'zh-CN':'全部'},
+                                'ID': undefined
                             };
                             self.section.unshift(hos);
+                            self.sectionName = self.section[0]
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -2712,14 +2803,15 @@
                 };
 
                 //转变科室
-                self.changeSection = function (id) {
-                    self.getUsers(id);
+                self.changeSection = function () {
+                    console.log(self.sectionName);
+                    self.getUsers(self.sectionName.ID);
                 };
 
                 //编辑用户信息
                 self.editUser = function (user) {
                     $scope.app.showHideMask(true,'pages/userEdit.html');
-                    $scope.app.maskParams = {user : user, section: self.section};
+                    $scope.app.maskParams = {user : user, section: self.sectionOriginal};
                 };
 
                 //重置用户密码
@@ -2769,7 +2861,8 @@
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                          alert("删除成功")
+                          alert("删除成功");
+                            $state.reload();
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -2796,6 +2889,11 @@
                     self.defaultLang = util.getDefaultLangCode();
                     self.user = $scope.app.maskParams.user;
                     self.section = $scope.app.maskParams.section;
+                    for(var i=0; i<self.section.length; i++){
+                        if(self.user.SectionID == self.section[i].ID){
+                            self.sectionName = self.section[i];
+                        }
+                    }
                 };
 
                 // 保存编辑
@@ -2805,9 +2903,9 @@
                     datap.data = {
                         "ID": self.user.ID,
                         "Name": self.user.Name,
-                        "SectionID": self.user.sectionName
+                        "SectionID": self.sectionName?self.sectionName.ID:undefined
                     };
-                    var data = JSON.stringify(self.data);
+                    var data = JSON.stringify(datap);
 
                     $http({
                         method: 'POST',
@@ -2818,7 +2916,7 @@
                         if (msg.rescode == '200') {
                             alert('保存成功')
                             self.cancel();
-                            // $state.reload('app.user.section', $stateParams, {reload: true})
+                            $state.reload('app.user.section', $stateParams, {reload: true})
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -2831,7 +2929,8 @@
                         self.saving = false;
                         self.cancel();
                     });
-                }
+                };
+
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
@@ -2904,7 +3003,37 @@
                     $scope.app.maskParams = {hospital : self.hospitalData, section: section};
                 };
                 //删除大分区
-                self.deleteSection = function () {
+                self.deleteSection = function (id) {
+                    var datap = $scope.app.data;
+                    datap.action = "removeSection";
+                    datap.data = {
+                        'ID': id
+                    };
+                    var data = JSON.stringify(datap);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("删除成功！");
+                            self.showData();
+                            $state.go('app.user.section');
+
+                            //$state.reload('app.user.section', $stateParams, {reload: true})
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
 
                 };
 
@@ -2929,7 +3058,7 @@
                     self.defaultLang = util.getDefaultLangCode();
                     self.hospital = $scope.app.maskParams.hospital;
                     self.data = $scope.app.data;
-                }
+                };
 
                 // 保存编辑
                 self.saveForm = function () {
@@ -3212,7 +3341,7 @@
 
                 //添加子科室
                 self.addSmallSection = function () {
-                    $scope.app.showHideMask(true,'pages/samllSectionAdd.html');
+                    $scope.app.showHideMask(true,'pages/smallSectionAdd.html');
                     $scope.app.maskParams = {section: self.chooseSection};
                 };
                 
@@ -3375,6 +3504,90 @@
                     $state.reload('app.user.section', $stateParams, {reload: true})
 
                 };
+
+
+            }
+        ])
+
+        //版本管理
+        .controller('versionController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    //初始化数据
+                    $scope.user.showUserInfo = false;
+                    self.loading = true;
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.showData();
+                };
+
+                //获取版本信息
+                self.showData = function () {
+                    var datap =$scope.app.data;
+                    datap.action = "getVersionInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('version_control', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.version = msg.data;
+                            if (self.version) {
+                                if(self.version.local == 0){
+                                    self.localstate = '更新中'
+                                }else {
+                                    self.localstate = '更新完成'
+                                }
+
+                                if(self.version.local == 0){
+                                    self.mgtstate = '更新中'
+                                }else {
+                                    self.mgtstate = '更新完成'
+                                }
+
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //修改医院名称
+                self.commit = function () {
+                    var datap =$scope.app.data;
+                    datap.action = "submitVersion";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('version_control', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("提交成功！")
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+
 
 
             }

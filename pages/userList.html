@@ -12,7 +12,7 @@
     <!--loading-->
     <div>
         <label>所属科室: </label>
-        <select ng-model="userm.sectionId" ng-options="x.Name[userm.defaultLang] for x in userm.section" ng-change="userm.changeSection(x.ID)"></select>
+        <select ng-model="userm.sectionName" ng-options="x.Name[userm.defaultLang] for x in userm.section" ng-change="userm.changeSection()"></select>
     </div>
 
     <div>
@@ -26,7 +26,7 @@
                         {{row.Name}}
                     </td>
                     <td title="'所属科室'">
-                        {{row.IP}}
+                        {{row.SName[userm.defaultLang]}}
                     </td>
                     <td title="'操作'">
                         <a class="btn btn-default" ng-click="userm.editUser(row)">编辑</a>

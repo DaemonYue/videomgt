@@ -4,11 +4,11 @@
     var app = angular.module('openvod', [
         'ui.router',
         'pascalprecht.translate',
+        'angular-md5',
         'app.controllers',
         'app.filters',
         'app.directives',
         'app.services',
-        'angular-md5',
         'ngCookies',
         'ngTable'
     ])

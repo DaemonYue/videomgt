@@ -1,10 +1,8 @@
 <div ng-controller="hospitalManageController as hosm" ng-init="hosm.init()" class="col-sm-9 page col-right">
-    <a>
         <strong>
             <!--<i class="glyphicon glyphicon-th-large"></i>-->
             医院管理
         </strong>
-    </a>
     <hr>
     <!--loading-->
     <div ng-show="hosm.loading">loading...</div>
@@ -23,12 +21,12 @@
                 <div class="row">
                     <div>
                         <ul class="">
-                            <li ng-repeat="section in hosm.hospitalData.Section" class="list-group-item">
+                            <li ng-repeat="section in hosm.hospitalData.Section" class="list-group-item" ng-if="section.ID != -1">
                                 {{section.Name[hosm.defaultLang]}}
                                 <a ng-click="hosm.showSections(section)"  class="pull-right">分区</a>
 
-                                <a ng-click="hosm.deleteSection(hotel.ID)"  class="pull-right">删除</a>
-                                <a ng-click="hosm.editSction(section, hotel.ID)" class="pull-right">编辑</a>
+                                <a ng-click="hosm.deleteSection(section.ID)"  class="pull-right"> &nbsp;删除&nbsp;</a>
+                                <a ng-click="hosm.editSction(section)" class="pull-right">编辑</a>
                                 <br>
                             </li>
                         </ul>

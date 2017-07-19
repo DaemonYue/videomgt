@@ -1,23 +1,35 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div class="col-sm-9 page col-right">
     <a>
         <strong>
             <i class="glyphicon glyphicon-user"></i>
             个人信息
         </strong>
     </a>
-    <hr>
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+
+    <div>
+        <hr>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-3">账号：</div>
+                <div class="col-xs-9">{{user.userInfo.Account}}</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3">密码：</div>
+                <div class="col-xs-9">******</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3">姓名：</div>
+                <div class="col-xs-9">{{user.userInfo.Name}}</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3">科室：</div>
+                <div class="col-xs-9">{{user.userInfo.SName[user.defaultLang]}}</div>
+            </div>
+        </div>
+    </div>
+    <button ng-click="user.edit()">编辑</button>
+
+
 
 </div>
