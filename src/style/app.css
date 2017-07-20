@@ -22,11 +22,11 @@ body {
 .login-outline {
     background-image: url("../../dist/imgs/login.png");
     background-size: 100% 100%;
-    width: 480px;
-    height: 400px;
+    width: 470px;
+    height: 420px;
     padding-top: 20px;
-    padding-left: 50px;
-    padding-right: 50px;
+    padding-left: 66px;
+    padding-right: 66px;
 }
 
 .login-top {
@@ -258,7 +258,8 @@ td {
 }
 
 .controls {
-    margin-bottom: 15px;
+    #margin-bottom: 15px;
+    margin-left: 35px;
 }
 
 .required-info:before {
@@ -280,7 +281,7 @@ td {
     width: 180px !important;
     float: left;
     background-color: #0e2534;
-    padding-top:20px;
+    padding-top:50px;
 }
 
 .col-right {
@@ -796,6 +797,66 @@ body, .app {
     width: 100%;
     cursor: pointer;
 
+}
+/*----------------------基础样式   YXX------------------------------------------------*/
+/*input中的图标*/
+.span-input{
+    width: 24px;
+    height: 24px;
+    background-size: 100% 100%;
+    position:absolute;
+    left:10px;
+
+}
+.like-input{
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 30px;
+    padding: 6px 12px;
+    padding-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.input-nostyle{
+    border: none;
+    height: 28px;
+    font-size: 16px;
+    width: 100%;
+
+}
+/*----------------------基础样式   YXX------------------------------------------------*/
+
+/*----------------------login------------------------------------------------*/
+
+.login-form{
+    margin-top: 45px;
+}
+
+.login-btn{
+    height: 48px;
+    background-color: #5cb2ee;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 10px;
+}
+
+.login-btn:hover{
+    background-color: #4c93c4;
+    color: white;
 }
 
 /*----------------------app------------------------------------------------*/
