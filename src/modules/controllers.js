@@ -4571,53 +4571,21 @@
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
                     self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+
                 };
 
                 // 保存编辑
                 self.saveForm = function () {
-                    if (self.uploadList.data.length == 0) {
-                        alert('请上传图片');
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    if (self.uploadList.data[0].img.percentComplete != 100) {
-                        alert('上传中，请稍等');
-                        return;
-                    }
+                    console.log(times);
 
-                    self.data.action = "addSection";
-                    self.data.data = {
-                        'Name': self.sectionName,
-                        "IconURL": self.uploadList.data[0].img.src,
-                        "IconSize":self.uploadList.data[0].img.size,
-                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
-                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
-                        "HospitalID": self.hospital.ID
-                    };
-                    var data = JSON.stringify(self.data);
-                    self.saving = true;
-
-                    $http({
-                        method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
-                        data: data
-                    }).then(function successCallback(response) {
-                        var msg = response.data;
-                        if (msg.rescode == '200') {
-                            alert('添加成功')
-                            self.cancel();
-                        } else if (msg.rescode == "401") {
-                            alert('访问超时，请重新登录');
-                            $state.go('login');
-                        } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
-                        }
-                    }, function errorCallback(response) {
-                        alert(response.status + ' 服务器出错');
-                    }).finally(function (value) {
-                        self.saving = false;
-                        self.cancel();
-                    });
-                }
+                };
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
@@ -4629,8 +4597,63 @@
                 //换页
                 self.changePage = function () {
                     self.page = self.page?0:1;
-                }
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource.ID){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
 
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg',
+                            'Size': 122345,
+                            'Duration': 60
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg',
+                            'Size': 1111,
+                            'Duration': 224
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                self.initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    if(self.resource){
+                        var duration = self.resource.Duration;
+                        var t = currTime.getTime();
+                        t += duration*1000;  //结束时间设为1小时后
+                        var afterTime = new Date(t);
+                        self.stopTime = util.setFormatTime(afterTime);
+                    }
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
             }
         ])
 
@@ -4642,53 +4665,21 @@
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
                     self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    initTime();
                 };
 
                 // 保存编辑
                 self.saveForm = function () {
-                    if (self.uploadList.data.length == 0) {
-                        alert('请上传图片');
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    if (self.uploadList.data[0].img.percentComplete != 100) {
-                        alert('上传中，请稍等');
-                        return;
-                    }
+                    console.log(times);
 
-                    self.data.action = "addSection";
-                    self.data.data = {
-                        'Name': self.sectionName,
-                        "IconURL": self.uploadList.data[0].img.src,
-                        "IconSize":self.uploadList.data[0].img.size,
-                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
-                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
-                        "HospitalID": self.hospital.ID
-                    };
-                    var data = JSON.stringify(self.data);
-                    self.saving = true;
-
-                    $http({
-                        method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
-                        data: data
-                    }).then(function successCallback(response) {
-                        var msg = response.data;
-                        if (msg.rescode == '200') {
-                            alert('添加成功')
-                            self.cancel();
-                        } else if (msg.rescode == "401") {
-                            alert('访问超时，请重新登录');
-                            $state.go('login');
-                        } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
-                        }
-                    }, function errorCallback(response) {
-                        alert(response.status + ' 服务器出错');
-                    }).finally(function (value) {
-                        self.saving = false;
-                        self.cancel();
-                    });
-                }
+                };
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
@@ -4700,8 +4691,59 @@
                 //换页
                 self.changePage = function () {
                     self.page = self.page?0:1;
-                }
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
 
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg',
+                            'Url': 'www'
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg',
+                            'Url': 'www'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
             }
         ])
 
@@ -4713,53 +4755,21 @@
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
                     self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    initTime();
                 };
 
                 // 保存编辑
                 self.saveForm = function () {
-                    if (self.uploadList.data.length == 0) {
-                        alert('请上传图片');
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    if (self.uploadList.data[0].img.percentComplete != 100) {
-                        alert('上传中，请稍等');
-                        return;
-                    }
+                    console.log(times);
 
-                    self.data.action = "addSection";
-                    self.data.data = {
-                        'Name': self.sectionName,
-                        "IconURL": self.uploadList.data[0].img.src,
-                        "IconSize":self.uploadList.data[0].img.size,
-                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
-                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
-                        "HospitalID": self.hospital.ID
-                    };
-                    var data = JSON.stringify(self.data);
-                    self.saving = true;
-
-                    $http({
-                        method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
-                        data: data
-                    }).then(function successCallback(response) {
-                        var msg = response.data;
-                        if (msg.rescode == '200') {
-                            alert('添加成功')
-                            self.cancel();
-                        } else if (msg.rescode == "401") {
-                            alert('访问超时，请重新登录');
-                            $state.go('login');
-                        } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
-                        }
-                    }, function errorCallback(response) {
-                        alert(response.status + ' 服务器出错');
-                    }).finally(function (value) {
-                        self.saving = false;
-                        self.cancel();
-                    });
-                }
+                };
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
@@ -4771,8 +4781,57 @@
                 //换页
                 self.changePage = function () {
                     self.page = self.page?0:1;
-                }
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
 
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg'
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
             }
         ])
 
