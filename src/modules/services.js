@@ -115,6 +115,27 @@
                     }
                 },
 
+                //格式化时间 2017-07-25T09:45
+                'setFormatTime': function (date) {
+                    //格式化时间 +0
+                    function format(n) {
+                        if(n<10) { n = '0' + n }
+                        return n;
+                    }
+
+                    var year = date.getFullYear();
+                    var month = date.getMonth();
+                    var day = date.getDay();
+                    var hour = date.getHours();
+                    var minute = date.getMinutes()+2;
+                    var second = date.getSeconds();
+                    var dStr = year + '-' + format(month) + '-' + format(day) + 'T' + format(hour) + ':' + format(minute) + ':' + format(second);
+                    var formatDate = new Date(dStr);
+                    return formatDate;
+                },
+
+
+
                 /*
                  * actionType: "normal" 普通上传, "transcode" 转码上传
                  */

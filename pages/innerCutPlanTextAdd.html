@@ -1,0 +1,30 @@
+<div class="modal-dialog" ng-controller="addPlanTextController as addPlan" ng-init="addPlan.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="addPlan.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">添加计划</h4>
+        </div>
+        <form name="PicForm" novalidate ng-submit="PicForm.$valid && addPlan.saveForm()">
+            <div class="modal-body">
+                <div ng-show="addPlan.page == 0">
+                    第一页
+                </div>
+                <div ng-show="addPlan.page == 1">
+                    第二页
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default" ng-click="addPlan.changePage()" ng-show="addPlan.page == 0">下一步</a>
+                <a class="btn btn-default" ng-click="addPlan.changePage()" ng-show="addPlan.page == 1">上一步</a>
+
+                <!--<a ng-click="addPlan.cancel()" class="btn">取消</a>-->
+                <button class="btn btn-primary" type="submit" ng-show="addPlan.page == 1" ng-disabled="PicForm.$invalid || addPlan.saving " >
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

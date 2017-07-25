@@ -1,7 +1,15 @@
 {
-  "data":{
+  "data":
+{
+  "id": 4,
+  "name": "医嘱提醒",
+  "icon": "dist/imgs/app-icon-new-04.png",
+  "icon_focus": "dist/imgs/app-icon-new-focus-04.png",
+  "icon_top": "dist/imgs/app-icon-top-04.png",
+  "bgColor": "#097dc2",
+  "themeColor":"#097dc2"
+},
 
-  },
   "rescode": "200",
   "errInfo": "None"
 }

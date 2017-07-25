@@ -94,7 +94,7 @@
                     //初始化ajax的数控
                     self.data = {
                         "token": util.getParams('token'),
-                        "user": ""
+                        "user": self.account
                     };
 
                     // 读取applists
@@ -244,12 +244,13 @@
                         self.showMaskClass = false;
                     }
 
-                }
+                };
 
+                //图片上传
                 self.uploadLists = function() {
                     this.data = [];
                     this.maxId = 0;
-                }
+                };
 
                 self.uploadLists.prototype = {
                     add: function (img) {
@@ -334,7 +335,230 @@
                             }
                         );
                     }
+                };
+
+                //视频上传
+                function UploadLists() {
+                    this.data = [
+                        /*{
+                         "id":0,
+                         "video":{
+                         "name": "星际迷航", "size": 1111, "percentComplete": 40, "xhr":"xhr", "src":"xx"
+                         },
+                         "subtitle":{
+                         "name": "星际迷航－字幕", "size": 1111, "percentComplete": 40, "xhr":"xhr", "src":"xx"
+                         }
+                         }*/
+                    ];
+                    this.maxId = 0;
                 }
+
+                UploadLists.prototype = {
+                    add: function (video, subtitle) {
+                        this.data.push({"video": video, "subtitle": subtitle, "id": this.maxId});
+                        return this.maxId++;
+                    },
+                    setPercentById: function (type, id, percentComplete) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].percentComplete = percentComplete;
+                                break;
+                            }
+                        }
+                    },
+                    setSrcSizeById: function (type, id, src, size) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].src = src;
+                                this.data[i][type].size = size;
+                                break;
+                            }
+                        }
+                    },
+                    deleteById: function (id) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果正在上传，取消上传
+                                // 视频
+                                if (l[i].video.percentComplete < 100 && l[i].video.percentComplete != '失败') {
+                                    l[i].video.xhr.abort();
+                                }
+                                // 字幕
+                                if (l[i].subtitle.percentComplete != undefined && l[i].subtitle.percentComplete < 100 && l[i].subtitle.percentComplete != '失败') {
+                                    l[i].subtitle.xhr.abort();
+                                }
+                                // 删除data
+                                l.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    judgeCompleted: function (id, o) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果视频和字幕都上传完毕
+                                if ((l[i].video.percentComplete >= 100 && l[i].subtitle.percentComplete == undefined) ||
+                                    (l[i].video.percentComplete >= 100 && l[i].subtitle.percentComplete >= 100)) {
+                                    o.transcode(id, o);
+                                }
+                                break;
+                            }
+                        }
+                    },
+                    transcode: function (id, o) {
+                        var o = o;
+                        var id = id;
+                        var l = this.data;
+                        var source = {};
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                source = l[i];
+                                break;
+                            }
+                        }
+                        // 转码
+                        var data = JSON.stringify({
+                            "action": "submitTranscodeTask",
+                            "token": util.getParams('token'),
+                            "rescode": "200",
+                            "data": {
+                                "movie": {
+                                    "oriFileName": source.video.name,
+                                    "filePath": source.video.src
+                                },
+                                "subtitle": {
+                                    "oriFileName": source.subtitle.name,
+                                    "filePath": source.subtitle.src
+                                }
+                            }
+                        })
+                        console && console.log(data);
+                        $http({
+                            method: 'POST',
+                            url: util.getApiUrl('tanscodetask', '', 'server'),
+                            data: data
+                        }).then(function successCallback(response) {
+                            var msg = response.data;
+                            if (msg.rescode == '200') {
+                                console && console.log('转码 ' + id);
+                                // 从列表中删除
+                                o.deleteById(id);
+                            }
+                            else if (msg.rescode == '401') {
+                                alert('访问超时，请重新登录');
+                                $state.go('login');
+                            }
+                            else {
+                                // 转码申请失败后再次调用
+                                console && console.log('转码申请失败后再次调用');
+                                setTimeout(function () {
+                                    o.transcode(id, o);
+                                }, 5000);
+
+                            }
+                        }, function errorCallback(response) {
+                            // 转码申请失败后再次调用
+                            console && console.log('转码申请失败后再次调用');
+                            console && console.log(response);
+                            setTimeout(function () {
+                                o.transcode(id, o);
+                            }, 5000);
+                        });
+                    },
+                    uploadFile: function (videoFile, subtitleFile, o) {
+                        // 上传后台地址
+                        var uploadUrl = CONFIG.uploadVideoUrl;
+
+                        // 电影对象
+                        var videoXhr = new XMLHttpRequest();
+                        var video = {
+                            "name": videoFile.name,
+                            "size": videoFile.size,
+                            "percentComplete": 0,
+                            "xhr": videoXhr
+                        };
+
+                        // 字幕对象
+                        var subtitle = {};
+                        if (subtitleFile) {
+                            var subtitleXhr = new XMLHttpRequest();
+                            subtitle = {
+                                "name": subtitleFile.name,
+                                "size": subtitleFile.size,
+                                "percentComplete": 0,
+                                "xhr": subtitleXhr
+                            };
+                        }
+
+                        // 添加data，并获取id
+                        var id = this.add(video, subtitle);
+
+                        // 上传视频
+                        util.uploadFileToUrl(videoXhr, videoFile, uploadUrl, 'normal',
+                            // 上传中
+                            function (evt) {
+                                $scope.$apply(function () {
+                                    if (evt.lengthComputable) {
+                                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                        // 更新上传进度
+                                        o.setPercentById('video', id, percentComplete);
+                                    }
+                                });
+                            },
+                            // 上传成功
+                            function (xhr) {
+                                var ret = JSON.parse(xhr.responseText);
+                                console && console.log(ret);
+                                $scope.$apply(function () {
+                                    o.setSrcSizeById('video', id, ret.filePath, ret.size);
+                                    o.judgeCompleted(id, o);
+                                });
+                            },
+                            // 上传失败
+                            function (xhr) {
+                                $scope.$apply(function () {
+                                    o.setPercentById('video', id, '失败');
+                                });
+                                xhr.abort();
+                            }
+                        );
+
+                        // 上传字幕
+                        if (subtitle.percentComplete != undefined) {
+                            util.uploadFileToUrl(subtitle.xhr, subtitleFile, uploadUrl, 'normal',
+                                // 上传中
+                                function (evt) {
+                                    $scope.$apply(function () {
+                                        if (evt.lengthComputable) {
+                                            var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                            // 更新上传进度
+                                            o.setPercentById('subtitle', id, percentComplete);
+                                        }
+                                    });
+                                },
+                                // 上传成功
+                                function (xhr) {
+                                    var ret = JSON.parse(xhr.responseText);
+                                    console && console.log(ret);
+                                    $scope.$apply(function () {
+                                        o.setSrcSizeById('subtitle', id, ret.filePath, ret.size);
+                                        o.judgeCompleted(id, o);
+                                    });
+                                },
+                                // 上传失败
+                                function (xhr) {
+                                    $scope.$apply(function () {
+                                        o.setPercentById('subtitle', id, '失败');
+                                    });
+                                    xhr.abort();
+                                }
+                            );
+                        }
+                    }
+                }
+
             }
         ])
 
@@ -2513,7 +2737,6 @@
             }
         ])
 
-
         //个人信息编辑
         .controller('editUserInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', '$filter', 'md5',
             function ($http, $scope, $state, $stateParams, util, CONFIG, $filter, md5) {
@@ -3594,36 +3817,35 @@
         ])
 
         //插播main
-        .controller('innerCutController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+        .controller('innerCutController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
 
                     // 上传页面加载页面url
                     self.resourceUrl = '';
-
                     // 不显示上传页面
                     self.showResource = false;
-
                     // 显示上传页面
                     self.gotoPage('innerCutResource');
-
+                    self.defaultLang = util.getDefaultLangCode();
                     // 弹窗层
                     self.maskUrl = '';
                     self.maskParams = {};
-
                     // 初始化上传列表对象
                     self.uploadList = new UploadLists();
+                    self.getSection();
 
+                    self.getResBtn();
 
-                }
+                };
 
                 self.gotoPage = function (pageName) {
                     // 上传列表页
                     if (pageName == 'innerCutResource') {
                         // 不是第一次加载
                         if (self.resourceUrl !== '') {
-
+                            self.getResBtn();
                         }
                         // 第一次加载
                         else {
@@ -3631,26 +3853,135 @@
                         }
                         self.showResource = true;
                     }
-
                     //其他页
                     else {
                         self.showResource = false;
                         $state.go(pageName);
                     }
-
-
-                }
+                };
 
                 self.logout = function (event) {
                     util.setParams('token', '');
                     $state.go('login');
-                }
+                };
 
                 self.upload = function () {
                     // self.maskUrl = "pages/addMovie.html";
                     $scope.app.showHideMask(true, "pages/addMovie.html");
+                };
 
-                }
+                //获取科室
+                self.getSection = function () {
+                    self.section = [];
+                    var datap = $scope.app.data;
+                    datap.action = "getHospitalInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.section = msg.data.Section;
+                            self.sectionOriginal = (msg.data.Section).concat();
+                            //self.sectionName = self.section[0];
+                            var hos = {
+                                'Name': {'zh-CN':'全部'},
+                                'ID': undefined
+                            };
+                            self.section.unshift(hos);
+                            self.sectionName = self.section[0]
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取资源信息
+                self.getResource = function (id) {
+
+                };
+
+                //获取资源分类
+                self.getResBtn = function () {
+                    $http({
+                        method: 'GET',
+                        url: util.getApiUrl('', 'resourceButton.json', 'local')
+                    }).then(function successCallback(data, status, headers, config) {
+                        self.btns = data.data.resource;
+                        self.resourceChoose = self.btns[0];
+                    }, function errorCallback(data, status, headers, config) {
+
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //添加资源
+                self.addResource = function (id) {
+                    switch (id){
+                        case 1:
+                            $scope.app.showHideMask(true,'pages/innerCutResourcePicAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 2:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceVideoAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 3:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceLiveAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 4:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceTextAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        default:
+                            break;
+                    }
+
+                };
+
+                //编辑资源
+                self.editResource = function (res) {
+                    switch (self.resourceChoose.ID){
+                        case 1:
+                            $scope.app.showHideMask(true,'pages/innerCutResourcePicEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 2:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceVideoEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 3:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceLiveEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 4:
+                            $scope.app.showHideMask(true,'pages/innerCutResourceTextEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        default:
+                            break;
+
+                    }
+                    $scope.app.maskParams = {resource: res};
+                };
+                
+                //转换资源类型
+                self.changeResource = function (res) {
+                    self.resourceChoose = res;
+                };
+
 
                 function UploadLists() {
                     this.data = [
@@ -3871,6 +4202,575 @@
                             );
                         }
                     }
+                }
+
+            }
+        ])
+
+        //添加插播图片
+        .controller('addInnerCutPicController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('addSectionController')
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+
+                    self.uploadList = new $scope.app.uploadLists();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                   // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                // 上传图片
+                self.addCoverImg = function (a) {
+                        if (!$scope.myCoverImg) {
+                            alert('请先选择图片');
+                            return;
+                        }
+                        self.uploadList.uploadFile($scope.myCoverImg, a);
+                }
+
+            }
+        ])
+
+        //添加插播直播频道
+        .controller('addInnerCutLiveController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+                };
+
+            }
+        ])
+
+        //添加插播文本
+        .controller('addInnerCutTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+                };
+
+            }
+        ])
+
+        //插播计划
+        .controller('innerCutPlanController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
+                var self = this;
+                self.init = function () {
+                    $scope.cut.showResource = false;
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.getResBtn();
+                };
+
+                //添加计划
+                self.addPlan = function (id) {
+                    switch (id){
+                        case 1:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanPicAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 2:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanVideoAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 3:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanLiveAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 4:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanTextAdd.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        default:
+                            break;
+                    }
+
+                };
+
+                //获取资源分类
+                self.getResBtn = function () {
+                    $http({
+                        method: 'GET',
+                        url: util.getApiUrl('', 'resourceButton.json', 'local')
+                    }).then(function successCallback(data, status, headers, config) {
+                        self.btns = data.data.resource;
+                        self.resourceChoose = self.btns[0];
+                    }, function errorCallback(data, status, headers, config) {
+
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //转换资源类型
+                self.changeResource = function (res) {
+                    self.resourceChoose = res;
+                };
+
+
+
+            }
+        ])
+
+        //添加图片的插播计划
+        .controller('addPlanPicController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    initTime();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
+                        return;
+                    }
+                    console.log(times);
+
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
+
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Size': 11,
+                            'Name': 'test1.jpg'
+                        },
+                        {
+                            'ID': 2,
+                            'Size': 12,
+                            'Name': 'test2.jpg'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+               /* self.chooseResource = function (ele) {
+                    console.log(ele);
+                    var box = ele.row.Status;
+                    if(box){
+                        self.resourceChoosen++;
+                    }else {
+                        self.resourceChoosen--;
+                    }
+
+                };*/
+
+            }
+        ])
+
+        //添加视频的插播计划
+        .controller('addPlanVideoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                }
+
+            }
+        ])
+
+        //添加直播的插播计划
+        .controller('addPlanLiveController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                }
+
+            }
+        ])
+
+        //添加文本的插播计划
+        .controller('addPlanTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    if (self.uploadList.data.length == 0) {
+                        alert('请上传图片');
+                        return;
+                    }
+                    if (self.uploadList.data[0].img.percentComplete != 100) {
+                        alert('上传中，请稍等');
+                        return;
+                    }
+
+                    self.data.action = "addSection";
+                    self.data.data = {
+                        'Name': self.sectionName,
+                        "IconURL": self.uploadList.data[0].img.src,
+                        "IconSize":self.uploadList.data[0].img.size,
+                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
+                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
+                        "HospitalID": self.hospital.ID
+                    };
+                    var data = JSON.stringify(self.data);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功')
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
                 }
 
             }

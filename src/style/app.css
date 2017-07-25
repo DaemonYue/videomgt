@@ -874,3 +874,40 @@ body, .app {
 .hospital-edit{
     cursor: pointer;
 }
+
+/*---------------------innercut--------------------------------------------*/
+.resource-card{
+    display: inline;
+}
+
+.resource-options-out{
+    position: relative;
+}
+
+.resource-options{
+    display: inline;
+}
+
+.input-search{
+    width: 30%;
+}
+
+.span-search{
+    left: 92%;
+    top: 5px;
+}
+
+.like-input-search{
+    width: 300px;
+    position: absolute;
+    right: 20px;
+}
+
+.list-checkbox{
+    min-width: 0 !important;
+    width: 14px !important;
+}
+
+.btn-choosed{
+    background-color: lightblue;
+}

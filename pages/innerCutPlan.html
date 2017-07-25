@@ -1,4 +1,4 @@
-<div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
+<div ng-controller="innerCutPlanController as plan" ng-init="plan.init()" class="col-sm-9 page col-right">
     <a>
         <strong>
             <i class="glyphicon glyphicon-list"></i>
@@ -7,17 +7,66 @@
     </a>
     <hr>
 
-    <!--搜索框-->
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="input-group">
-                <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-                <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+    <div class="container">
+        <div class="resource-card row">
+            <button class="btn" ng-repeat="x in plan.btns" ng-class="{'btn-choosed':(x.ID == plan.resourceChoose.ID)}"  ng-click="plan.changeResource(x)">{{x.Name}}</button>
+        <!--    <button class="btn">图片</button>
+            <button class="btn">视频</button>
+            <button class="btn">直播</button>
+            <button class="btn">文本</button>-->
+        </div>
+        <hr>
+        <div class="resource-options">
+            <button class="btn resource-options" ng-click="plan.addPlan(plan.resourceChoose.ID)">添加计划</button>
+            <button class="btn resource-options">删除计划</button>
+            <div class="like-input resource-options like-input-search" >
+                <input ng-model="plan.resourceName" placeholder="计划名称" class="input-nostyle input-search">
+                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"></span>
+            </div>
+        </div>
+        <hr>
+        <table ng-table="plan.tableParams"  class="table table-hover  table-striped table-bordered">
 
+            <div style="overflow-x: auto">
+
+                <tr ng-repeat="row in $data">
+
+                    <td class="list-checkbox" header="'headerCheckbox.html'">
+
+                        <input type="checkbox" ng-model="plan.checkboxes.items[row.id]">
+
+                    </td>
+
+                    <td title="'序号'">{{row.mac}}</td>
+
+                    <td title="'计划名称'">{{row.ip}}</td>
+
+                    <td title="'开始时间'">{{视频、图片}}</td>
+
+                    <td title="'结束时间'">{{视频}}</td>
+
+                    <td title="'编辑者'">{{直播}}</td>
+
+                    <td title="'发布终端'">已发布到{{}}个终端</td>
+
+                    <td title="'操作'">
+                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                            编辑
+                        </button>
+                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                            取消
+                        </button>
+                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+            </div>
+        </table>
+    </div>
 </div>
+<script type="text/ng-template" id="headerCheckbox.html">
+
+    <input type="checkbox" ng-model="plan.checkboxes.checked"  value="" />
+
+</script>
