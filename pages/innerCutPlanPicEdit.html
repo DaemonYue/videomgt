@@ -1,0 +1,93 @@
+<div class="modal-dialog" ng-controller="editPlanPicController as editPlan" ng-init="editPlan.init()">
+    <div class="modal-content" style="width: 700px">
+        <div class="modal-header">
+            <button ng-click="editPlan.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">添加计划</h4>
+        </div>
+        <form name="PicForm" novalidate ng-submit="PicForm.$valid && editPlan.saveForm()">
+            <div class="modal-body" >
+                <!--第一页-->
+                <div ng-show="editPlan.page == 0">
+                    <div>
+                        <span>选择资源：</span><!--<span class="btn btn-default">已选{{editPlan.resourceChoosen}}个</span>-->
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>序号</th>
+                            <th>资源名称</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="row in editPlan.resourceList">
+                            <td>
+                                <!--多选的情况
+                                <input type="checkbox" ng-model="row.Status" ng-change="editPlan.chooseResource(this)">-->
+                                <input type="radio" ng-value="row.ID" ng-model="editPlan.resource" required>
+                            </td>
+                            <td>{{$index}}</td>
+                            <td>{{row.Name}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--第一页-->
+                <!--第二页-->
+                <div ng-show="editPlan.page == 1">
+                    <div class="form-group">
+                        <label>计划名称：</label>
+                        <input type="text" ng-model="editPlan.planName" required>
+                    </div>
+                    <hr>
+                    <div>资源</div>
+                    <div ng-show="!editPlan.resChoosed">请在上页选择资源</div>
+                    <table ng-if="editPlan.resChoosed && editPlan.resChoosed.length != 0">
+                        <thead>
+                        <tr>
+                            <th style="width: 100px">资源名称</th>
+                            <th style="width: 100px">大小</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{editPlan.resChoosed.Name}}</td>
+                            <td>{{editPlan.resChoosed.Size}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div>定时设置</div>
+                    <div class="">
+                        <div class="row">
+                            <div class="col-xs-6">开始时间</div>
+                            <div class="col-xs-6">结束时间</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input type="datetime-local" ng-model="editPlan.startTime" required class="form-control" style="padding-right: 0">
+                            </div>
+                            <div class="col-xs-6">
+                                <input type="datetime-local" ng-model="editPlan.stopTime" required class="form-control" style="padding-right: 0">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--第二页-->
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default" ng-click="editPlan.changePage()" ng-show="editPlan.page == 0">下一步</a>
+                <a class="btn btn-default" ng-click="editPlan.changePage()" ng-show="editPlan.page == 1">上一步</a>
+
+                <!--<a ng-click="editPlan.cancel()" class="btn">取消</a>-->
+                <button class="btn btn-primary" type="submit" ng-show="editPlan.page == 1"
+                        ng-disabled="PicForm.$invalid || editPlan.saving ">
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

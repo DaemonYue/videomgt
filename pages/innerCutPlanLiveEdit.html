@@ -1,0 +1,98 @@
+<div class="modal-dialog" ng-controller="addPlanLiveController as addPlan" ng-init="addPlan.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="addPlan.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">添加计划</h4>
+        </div>
+        <form name="PicForm" novalidate ng-submit="PicForm.$valid && addPlan.saveForm()">
+            <div class="modal-body">
+                <!--第一页-->
+                <div ng-show="addPlan.page == 0">
+                    <div>
+                        <span>选择资源：</span><!--<span class="btn btn-default">已选{{addPlan.resourceChoosen}}个</span>-->
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th style="width: 100px">序号</th>
+                            <th style="width: 100px">资源名称</th>
+                            <th style="width: 100px">直播地址</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="row in addPlan.resourceList">
+                            <td>
+                                <!--多选的情况
+                                <input type="checkbox" ng-model="row.Status" ng-change="addPlan.chooseResource(this)">-->
+                                <input type="radio" ng-value="row.ID" ng-model="addPlan.resource" required>
+                            </td>
+                            <td>{{$index}}</td>
+                            <td>{{row.Name}}</td>
+                            <td>{{row.Url}}</td>
+
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--第一页-->
+                <!--第二页-->
+                <div ng-show="addPlan.page == 1">
+                    <div class="form-group">
+                        <label>计划名称：</label>
+                        <input type="text" ng-model="addPlan.planName" required>
+                    </div>
+                    <hr>
+                    <div>资源</div>
+                    <div ng-show="!addPlan.resChoosed">请在上页选择资源</div>
+                    <table ng-if="addPlan.resChoosed && addPlan.resChoosed.length != 0">
+                        <thead>
+                        <tr>
+                            <th style="width: 100px">资源名称</th>
+                            <th style="width: 100px">地址</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{addPlan.resChoosed.Name}}</td>
+                            <td>{{addPlan.resChoosed.Url}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div>定时设置</div>
+                    <div class="">
+                        <div class="row">
+                            <div class="col-xs-6">开始时间</div>
+                            <div class="col-xs-6">结束时间</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input type="datetime-local" ng-model="addPlan.startTime" required class="form-control" style="padding-right: 0">
+                            </div>
+                            <div class="col-xs-6">
+                                <input type="datetime-local" ng-model="addPlan.stopTime" required class="form-control" style="padding-right: 0">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--第二页-->
+
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default" ng-click="addPlan.changePage()" ng-show="addPlan.page == 0">下一步</a>
+                <a class="btn btn-default" ng-click="addPlan.changePage()" ng-show="addPlan.page == 1">上一步</a>
+
+                <!--<a ng-click="addPlan.cancel()" class="btn">取消</a>-->
+                <button class="btn btn-primary" type="submit" ng-show="addPlan.page == 1" ng-disabled="PicForm.$invalid || addPlan.saving " >
+                    保存
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>

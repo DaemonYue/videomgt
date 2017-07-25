@@ -37,17 +37,17 @@
 
                     </td>
 
-                    <td title="'序号'">{{row.mac}}</td>
+                    <td title="'序号'">{{$index}}</td>
 
-                    <td title="'计划名称'">{{row.ip}}</td>
+                    <td title="'计划名称'">{{row.Name}}</td>
 
-                    <td title="'开始时间'">{{视频、图片}}</td>
+                    <td title="'开始时间'">{{row.startTime}}</td>
 
-                    <td title="'结束时间'">{{视频}}</td>
+                    <td title="'结束时间'">{{row.stopTime}}</td>
 
-                    <td title="'编辑者'">{{直播}}</td>
+                    <td title="'编辑者'">{{row.editor}}</td>
 
-                    <td title="'发布终端'">已发布到{{}}个终端</td>
+                    <td title="'发布终端'">已发布到<a> {{self.terPublished}}0 </a>个终端</td>
 
                     <td title="'操作'">
                         <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">

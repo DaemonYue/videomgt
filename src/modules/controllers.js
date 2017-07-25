@@ -4420,6 +4420,64 @@
                     $scope.cut.showResource = false;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getResBtn();
+                    self.getPlanList();
+                };
+
+                //获取计划列表
+                self.getPlanList = function () {
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 1,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var datap = $scope.app.data;
+                            datap.action = "getUserInfo";
+                            var paramsUrl = params.url();
+                            datap.data = {
+                                "SectionID": '',
+                                "total":-1,
+                                "per_page": paramsUrl.count - 0,
+                                "page": paramsUrl.page - 0,
+                                "orderby":"",
+                                "sortby":"desc",
+                                "keyword":"",
+                                "status":""
+                            };
+                            var data = JSON.stringify(datap);
+
+                            return $http({
+                                method: 'POST',
+                                url: util.getApiUrl('', 'plans.json', 'local'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    if (data.data.TotalCount == 0) {
+                                        self.noData = true;
+                                        return;
+                                    }
+                                    params.total(data.data.TotalCount);
+                                    self.users = data.data.data;
+
+                                    return data.data.data;
+                                } else if (data.tata.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errorInfo);
+                                }
+
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
+                        }
+                    });
+
                 };
 
                 //添加计划
@@ -4445,6 +4503,31 @@
                             break;
                     }
 
+                };
+
+                //修改计划
+                self.editResource = function (res) {
+                    switch (self.resourceChoose.ID){
+                        case 1:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanPicEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 2:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanVideoEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 3:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanLiveEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        case 4:
+                            $scope.app.showHideMask(true,'pages/innerCutPlanTextEdit.html');
+                            //$scope.app.maskParams = {section: self.chooseSection};
+                            break;
+                        default:
+                            break;
+                    }
+                    $scope.app.maskParams = {resource: res};
                 };
 
                 //获取资源分类
@@ -4563,8 +4646,195 @@
             }
         ])
 
+        //编辑图片的插播计划
+        .controller('editPlanPicController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    self.resource = $scope.app.maskParams.resource;
+                    console.log(self.resource);
+                    initTime();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
+                        return;
+                    }
+                    console.log(times);
+
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
+
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Size': 11,
+                            'Name': 'test1.jpg'
+                        },
+                        {
+                            'ID': 2,
+                            'Size': 12,
+                            'Name': 'test2.jpg'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
+
+            }
+        ])
+
         //添加视频的插播计划
         .controller('addPlanVideoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
+                        return;
+                    }
+                    console.log(times);
+
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource.ID){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
+
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg',
+                            'Size': 122345,
+                            'Duration': 60
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg',
+                            'Size': 1111,
+                            'Duration': 224
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                self.initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    if(self.resource){
+                        var duration = self.resource.Duration;
+                        var t = currTime.getTime();
+                        t += duration*1000;  //结束时间设为1小时后
+                        var afterTime = new Date(t);
+                        self.stopTime = util.setFormatTime(afterTime);
+                    }
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
+            }
+        ])
+
+        //编辑视频的插播计划
+        .controller('editPlanVideoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
@@ -4747,6 +5017,96 @@
             }
         ])
 
+        //编辑直播的插播计划
+        .controller('editPlanLiveController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    initTime();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
+                        return;
+                    }
+                    console.log(times);
+
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
+
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg',
+                            'Url': 'www'
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg',
+                            'Url': 'www'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
+            }
+        ])
+
         //添加文本的插播计划
         .controller('addPlanTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
@@ -4834,6 +5194,95 @@
                  };*/
             }
         ])
+
+        //编辑文本的插播计划
+        .controller('editPlanTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.page = 0;
+                    self.getResourceList();
+                    //self.startTime = new Date('2017-07-11 12:30');
+                    initTime();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var times = self.stopTime - self.startTime;
+                    if(times <= 0){
+                        alert('开始时间必须必须在结束时间之前！');
+                        return;
+                    }
+                    console.log(times);
+
+                };
+
+                self.cancel = function () {
+                    //$scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                    // $state.reload('app.user.section', $stateParams, {reload: true})
+
+                };
+
+                //换页
+                self.changePage = function () {
+                    self.page = self.page?0:1;
+                    if(self.page){
+                        for(var i=0; i<self.resourceList.length; i++){
+                            if(self.resourceList[i].ID == self.resource){
+                                self.resChoosed = self.resourceList[i];
+                            }
+                        }
+                    }
+                };
+
+                //获取资源
+                self.getResourceList =function () {
+                    //self.resourceChoosen = 0;  //用于选择多个资源时计数
+                    self.resourceList = [
+                        {
+                            'ID': 1,
+                            'Name': 'test1.jpg'
+                        },
+                        {
+                            'ID': 2,
+                            'Name': 'test2.jpg'
+                        }
+                    ]
+                };
+
+                self.chooseResource = function () {
+                    console.log(self.resource);
+                };
+
+                //初始化时间
+                var initTime = function () {
+                    var currTime = new Date();
+                    self.startTime = util.setFormatTime(currTime);
+                    var t = currTime.getTime();
+                    t += 3600000;  //结束时间设为1小时后
+                    var afterTime = new Date(t);
+                    self.stopTime = util.setFormatTime(afterTime);
+
+                };
+
+
+                //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
+                /* self.chooseResource = function (ele) {
+                 console.log(ele);
+                 var box = ele.row.Status;
+                 if(box){
+                 self.resourceChoosen++;
+                 }else {
+                 self.resourceChoosen--;
+                 }
+
+                 };*/
+            }
+        ])
+
 
 
 })();
