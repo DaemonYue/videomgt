@@ -5283,6 +5283,221 @@
             }
         ])
 
+        //终端main
+        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
 
+                self.init = function () {
+                    self.form = {};
+                    self.data =  $scope.app.data;
+                    self.loading = true;
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.getSection();
+                };
+
+                //获取科室
+                self.getSection = function () {
+                    self.section = [];
+                    var datap = $scope.app.data;
+                    datap.action = "getHospitalInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.section = msg.data.Section;
+                            self.sectionOriginal = (msg.data.Section).concat();
+                            //self.sectionName = self.section[0];
+                            var hos = {
+                                'Name': {'zh-CN':'全部'},
+                                'ID': undefined
+                            };
+                            self.section.unshift(hos);
+                            self.sectionName = self.section[0]
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+              /*  // 获取某分区终端列表 带搜索和分页
+                self.getSectionDevList = function () {
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 15,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var data = {
+                                "action": "getDevList",
+                                "token": util.getParams("token"),
+                                "lang": self.langStyle,
+                                "Online": self.form.Online,
+                                "SectionID": self.form.sectionID,
+                                "RoomID": self.form.RoomID
+                            }
+                            var paramsUrl = params.url();
+                            data.per_page = paramsUrl.count - 0;
+                            data.page = paramsUrl.page - 0;
+                            data = JSON.stringify(data);
+                            return $http({
+                                method: $filter('ajaxMethod')(),
+                                url: util.getApiUrl('devinfo', 'shopList', 'server'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    if (data.data.total == 0) {
+                                        self.noData = true;
+                                    }
+                                    params.total(data.data.total);
+                                    return data.data.devlist;
+                                } else if (msg.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errInfo);
+                                }
+
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
+                        }
+                    });
+                }
+
+                // 获取某分区终端状态 总数目
+                self.getSectionDevNum = function (ID) {
+                    // self.form.HotelName = self.hotelList[index].Name[self.defaultLangCode];
+                    self.form.sectionID = ID;
+
+                    self.getSectionDevList();
+                    var data = {
+                        "action": "getDevNum",
+                        "token": util.getParams("token"),
+                        "lang": self.langStyle,
+                        "SectionID": self.form.sectionID
+                    }
+
+                    data = JSON.stringify(data);
+                    $http({
+                        method: $filter('ajaxMethod')(),
+                        url: util.getApiUrl('devinfo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(data, status, headers, config) {
+                        if (data.data.rescode == '200') {
+                            self.form.total = data.data.total;
+                            self.form.online = data.data.online;
+                        } else if (msg.rescode == '401') {
+                            alert('访问超时，请重新登录');
+                            $location.path("pages/login.html");
+                        } else {
+                            alert(data.rescode + ' ' + data.errInfo);
+                        }
+                    }, function errorCallback(data, status, headers, config) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    })
+
+
+                }*/
+
+
+                self.delTerm = function (id) {
+                    var conf = confirm('确认删除？');
+                    if (!conf) {
+                        return;
+                    }
+                    var data = {
+                        "action": "delDev",
+                        "token": util.getParams("token"),
+                        "lang": self.langStyle,
+                        "ID": id
+                    }
+
+                    data = JSON.stringify(data);
+                    $http({
+                        method: $filter('ajaxMethod')(),
+                        url: util.getApiUrl('devinfo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(data, status, headers, config) {
+                        if (data.data.rescode == '200') {
+                            self.getDevList();
+                            self.getDevNum(self.form.HotelID, self.hotelListIndex);
+                        } else if (msg.rescode == '401') {
+                            alert('访问超时，请重新登录');
+                            $location.path("pages/login.html");
+                        } else {
+                            alert(data.data.errInfo);
+                        }
+                    }, function errorCallback(data, status, headers, config) {
+                        alert('连接服务器出错');
+                    })
+                }
+
+                // 授权操作
+                // todo 未做批量操作
+                self.validDev = function (ID, Registered) {
+                    // return;
+                    var data = {
+                        "action": "validDev",
+                        "token": util.getParams("token"),
+                        "lang": self.langStyle,
+                        "ID": [ID]
+                    };
+                    if (Registered) {
+                        data.status = 0;
+                    } else {
+                        data.status = 1;
+                    }
+                    data = JSON.stringify(data);
+                    $http({
+                        method: $filter('ajaxMethod')(),
+                        url: util.getApiUrl('devinfo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(data, status, headers, config) {
+                        if (data.data.rescode == "200") {
+                            alert('操作成功');
+                            $state.reload($state.current.name, $stateParams, true)
+                        } else if (data.data.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login')
+                        } else {
+                            alert('操作失败， ' + data.data.errInfo);
+                        }
+
+                    }, function errorCallback(data, status, headers, config) {
+                        alert('操作失败， ' + data.data.errInfo);
+                    }).finally(function (value) {
+                    });
+                }
+
+                self.addDev = function () {
+                    $scope.app.maskParams = {'HotelID': self.form.HotelID};
+                    $scope.app.showHideMask(true, 'pages/addDev.html');
+                }
+
+
+
+
+            }
+        ])
 
 })();
