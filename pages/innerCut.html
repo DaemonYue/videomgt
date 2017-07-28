@@ -5,14 +5,12 @@
         <div class="row height100">
             <!--左侧导航栏-->
             <div class="col-sm-3 col-left height100">
-                <a ng-click="cut.gotoPage('innerCutResource')" class="font-bold no-underline cursor-default">
+                <a ng-click="cut.gotoPage('innerCutResource')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(cut.current == 0)}">
                    &nbsp&nbsp插播资源
                 </a>
-                <hr>
-                <a ng-click="cut.gotoPage('app.innerCut.plan')" class="font-bold no-underline cursor-default">
+                <a ng-click="cut.gotoPage('app.innerCut.plan')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(cut.current == 1)}">
                     &nbsp&nbsp插播计划
                 </a>
-                <hr>
             <!--    <a ng-click="cut.gotoPage('app.innerCut.search')" class="font-bold no-underline cursor-default">
                     <i class="glyphicon glyphicon-search" style="font-size:14px"></i>&nbsp&nbsp计划查询
                 </a>

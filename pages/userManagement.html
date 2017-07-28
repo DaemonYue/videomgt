@@ -5,26 +5,21 @@
         <div class="row height100">
             <!--左侧导航栏-->
             <div class="col-sm-3 col-left height100">
-                <a ng-click="user.gotoPage('userInfo')" class="font-bold no-underline cursor-default">
+                <a ng-click="user.gotoPage('userInfo')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(user.current == 0)}">
                     <!--<i class="glyphicon glyphicon-user"></i>-->&nbsp&nbsp个人信息
                 </a>
-                <hr>
-                <a ng-click="user.gotoPage('app.user.add')" class="font-bold no-underline cursor-default" ng-show="app.account == 'root'">
-                   <!-- <i class="glyphicon glyphicon-plus" style="font-size:14px">--></i>&nbsp&nbsp用户创建
+           <!--     <a ng-click="user.gotoPage('app.user.add')" class="font-bold no-underline cursor-default" ng-show="app.account == 'root'">
+                   &lt;!&ndash; <i class="glyphicon glyphicon-plus" style="font-size:14px">&ndash;&gt;</i>&nbsp&nbsp用户创建
                 </a>
-                <hr ng-show="app.account == 'root'">
                 <a ng-click="user.gotoPage('app.user.list')" class="font-bold no-underline cursor-default" ng-show="app.account == 'root'">
-                    <!--<i class="glyphicon glyphicon-list-alt" style="font-size:14px"></i>-->&nbsp&nbsp用户管理
-                </a>
-                <hr ng-show="app.account == 'root'">
-                <a ng-click="user.gotoPage('app.user.section')" class="font-bold no-underline cursor-default" ng-show="app.account == 'root'">
+                    &lt;!&ndash;<i class="glyphicon glyphicon-list-alt" style="font-size:14px"></i>&ndash;&gt;&nbsp&nbsp用户管理
+                </a>-->
+                <a ng-click="user.gotoPage('app.user.section')" class="font-bold no-underline  navigation-item"  ng-class="{'navigation-item-choose':(user.current == 1)}">
                     <!--<i class="glyphicon glyphicon-th-large" style="font-size:14px"></i>-->&nbsp&nbsp医院管理
                 </a>
-                <hr ng-show="app.account == 'root'">
-                <a ng-click="user.gotoPage('app.user.version')" class="font-bold no-underline cursor-default" ng-show="app.account == 'root'">
+                <a ng-click="user.gotoPage('app.user.version')" class="font-bold no-underline cursor-default navigation-item"  ng-class="{'navigation-item-choose':(user.current == 2)}">
                    <!-- <i class="glyphicon glyphicon-send" style="font-size:14px"></i>-->&nbsp&nbsp版本管理
                 </a>
-                <hr ng-show="app.account == 'root'">
 
 
             </div>

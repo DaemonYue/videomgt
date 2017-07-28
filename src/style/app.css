@@ -281,7 +281,7 @@ td {
     width: 180px !important;
     float: left;
     background-color: #0e2534;
-    padding-top:50px;
+    padding-top:60px;
 }
 
 .col-right {
@@ -836,6 +836,26 @@ body, .app {
     font-size: 16px;
     width: 100%;
 
+}
+
+.navigation-item{
+    display: block;
+    height: 67px;
+    padding: 23px 45px;
+    margin: 0 -14px;
+    color: white;
+}
+
+.navigation-item:hover{
+    background-color: #1c313f;
+    color: white;
+    border-left: 4px solid #2384c4;
+}
+
+.navigation-item-choose{
+    background-color: #1c313f;
+    color: white;
+    border-left: 4px solid #2384c4;
 }
 /*----------------------基础样式   YXX------------------------------------------------*/
 

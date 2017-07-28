@@ -2456,11 +2456,13 @@
                     self.data =  $scope.app.data;
                     self.loading = true;
                     self.defaultLang = util.getDefaultLangCode();
+                    self.current = 0;
                 };
 
                 //页面跳转
                 self.gotoPage = function (pageName) {
                     if (pageName == 'userInfo') {
+                        self.current = 0;
                         self.getUserInfo();
                         // 不是第一次加载
                         if (self.userInfoUrl !== '') {
@@ -2471,6 +2473,11 @@
                         }
                         self.showUserInfo = true;
                     }else {
+                        if(pageName == 'app.user.section'){
+                            self.current = 1
+                        }else if(pageName == 'app.user.version'){
+                            self.current = 2
+                        }
                         self.showUserInfo = false;
                         $state.go(pageName);
                     }
@@ -3742,6 +3749,7 @@
                     self.loading = true;
                     self.defaultLang = util.getDefaultLangCode();
                     self.showData();
+
                 };
 
                 //获取版本信息
@@ -3843,6 +3851,7 @@
                 self.gotoPage = function (pageName) {
                     // 上传列表页
                     if (pageName == 'innerCutResource') {
+                        self.current = 0;
                         // 不是第一次加载
                         if (self.resourceUrl !== '') {
                             self.getResBtn();
@@ -3855,6 +3864,7 @@
                     }
                     //其他页
                     else {
+                        self.current = 1;
                         self.showResource = false;
                         $state.go(pageName);
                     }
@@ -3909,6 +3919,7 @@
                 //获取资源信息
                 self.getResource = function (id) {
 
+
                 };
 
                 //获取资源分类
@@ -3929,11 +3940,11 @@
                 //添加资源
                 self.addResource = function (id) {
                     switch (id){
-                        case 1:
+                        case 2:
                             $scope.app.showHideMask(true,'pages/innerCutResourcePicAdd.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
-                        case 2:
+                        case 1:
                             $scope.app.showHideMask(true,'pages/innerCutResourceVideoAdd.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
@@ -3948,17 +3959,18 @@
                         default:
                             break;
                     }
+                    $scope.app.maskParams = {resourceId: id};
 
                 };
 
                 //编辑资源
                 self.editResource = function (res) {
                     switch (self.resourceChoose.ID){
-                        case 1:
+                        case 2:
                             $scope.app.showHideMask(true,'pages/innerCutResourcePicEdit.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
-                        case 2:
+                        case 1:
                             $scope.app.showHideMask(true,'pages/innerCutResourceVideoEdit.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
@@ -4210,17 +4222,18 @@
         //添加插播图片
         .controller('addInnerCutPicController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
-                console.log('addSectionController')
+                console.log('addSectionController');
                 var self = this;
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
-
                     self.uploadList = new $scope.app.uploadLists();
+                    self.resId = $scope.app.maskParams.resourceId;
                 };
 
                 // 保存编辑
                 self.saveForm = function () {
+
                     if (self.uploadList.data.length == 0) {
                         alert('请上传图片');
                         return;
@@ -4229,15 +4242,15 @@
                         alert('上传中，请稍等');
                         return;
                     }
+                    var datap = $scope.app.data;
+                    datap.action = "addSection";
+                    datap.data = {
+                        "name": self.sectionName,
+                        "path_abs": self.uploadList.data[0].img.src,
+                        "size":self.uploadList.data[0].img.size,
+                        "type": self.resId
 
-                    self.data.action = "addSection";
-                    self.data.data = {
-                        'Name': self.sectionName,
-                        "IconURL": self.uploadList.data[0].img.src,
-                        "IconSize":self.uploadList.data[0].img.size,
-                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
-                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
-                        "HospitalID": self.hospital.ID
+
                     };
                     var data = JSON.stringify(self.data);
                     self.saving = true;
@@ -4483,11 +4496,11 @@
                 //添加计划
                 self.addPlan = function (id) {
                     switch (id){
-                        case 1:
+                        case 2:
                             $scope.app.showHideMask(true,'pages/innerCutPlanPicAdd.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
-                        case 2:
+                        case 1:
                             $scope.app.showHideMask(true,'pages/innerCutPlanVideoAdd.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
@@ -4508,11 +4521,11 @@
                 //修改计划
                 self.editResource = function (res) {
                     switch (self.resourceChoose.ID){
-                        case 1:
+                        case 2:
                             $scope.app.showHideMask(true,'pages/innerCutPlanPicEdit.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
-                        case 2:
+                        case 1:
                             $scope.app.showHideMask(true,'pages/innerCutPlanVideoEdit.html');
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
@@ -5294,6 +5307,7 @@
                     self.loading = true;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getSection();
+
                 };
 
                 //获取科室
