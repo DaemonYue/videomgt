@@ -25,6 +25,11 @@
                 </div>
                 <hr>
 
+                <div class="resource-options">
+                <span>资源所属：</span>
+                <select ng-model="addPic.sectionName" ng-options="x.Name[addPic.defaultLang] for x in addPic.section"></select>
+            </div>
+
 
             </div>
             <div class="modal-footer">

@@ -18,19 +18,22 @@
         <div class="resource-options-out">
             <div class="resource-options">
                 <span>资源所属：</span>
-                <select ng-model="cut.sectionName" ng-options="x.Name[cut.defaultLang] for x in cut.section"></select>
+                <select ng-model="cut.sectionName" ng-options="x.Name[cut.defaultLang] for x in cut.section" ng-change="cut.changeSection()"></select>
             </div>
-            <button class="btn resource-options" ng-click="cut.addResource(cut.resourceChoose.ID)" ng-if="cut.resourceChoose.ID != 2">添加{{cut.resourceChoose.Name}}</button>
+            <button class="btn resource-options" ng-click="cut.addResource(cut.resourceChoose.ID)" ng-if="cut.resourceChoose.ID != 1">添加{{cut.resourceChoose.Name}}</button>
 
             <button class="btn resource-options">删除{{cut.resourceChoose.Name}}</button>
-            <span ng-if="cut.resourceChoose.ID == 2">视频上传请到本地视频库</span>
+            <span ng-if="cut.resourceChoose.ID == 1">视频上传请到本地视频库</span>
            <!-- <button class="btn resource-options">添加视频</button>-->
             <div class="like-input resource-options like-input-search" >
                 <input ng-model="cut.resourceName" placeholder="资源名称" class="input-nostyle input-search">
-                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"></span>
+                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search" ng-click="cut.getResource()"></span>
             </div>
         </div>
         <hr>
+        <div ng-show="cut.noData == true">暂无资源</div>
+        <div ng-show="cut.loading == true">loading...</div>
+
         <table ng-table="cut.tableParams"  class="table table-hover  table-striped table-bordered">
 
             <div style="overflow-x: auto">
@@ -43,23 +46,23 @@
 
                     </td>
 
-                    <td title="'序号'">{{row.mac}}</td>
+                    <td title="'序号'">{{$index}}</td>
 
-                    <td title="'资源名称'">{{row.ip}}</td>
+                    <td title="'资源名称'">{{row.name}}</td>
 
-                    <td title="'大小'">{{视频、图片}}</td>
+                    <td title="'大小'" ng-if="cut.resourceChoose.ID==1 || cut.resourceChoose.ID==2">{{row.size}}</td>
 
-                    <td title="'时长'">{{视频}}</td>
+                    <td title="'时长'"  ng-if="cut.resourceChoose.ID==1">{{row.duration}}</td>
 
-                    <td title="'直播地址'">{{直播}}</td>
+                    <td title="'直播地址'" ng-if="cut.resourceChoose.ID==3">{{row.path_abs}}</td>
 
-                    <td title="'创建人'">{{row.mac}}</td>
+                    <td title="'创建人'">{{row.creator}}</td>
 
-                    <td title="'创建时间'">{{row.statusCN}}</td>
+                    <td title="'创建时间'">{{row.createtime}}</td>
 
-                    <td title="'状态'">{{视频}}</td>
+                    <td title="'状态'" ng-if="cut.resourceChoose.ID==1">视频</td>
 
-                    <td title="'资源所属'">{{row.upload_speed}}</td>
+                    <td title="'资源所属'">{{row.section}}</td>
 
                     <td title="'操作'">
                         <button class="btn btn-xs btn-default"  ng-click="cut.editAP(row)" data-toggle="modal" title="编辑">

@@ -909,7 +909,7 @@ body, .app {
 }
 
 .input-search{
-    width: 30%;
+    width: 87%;   /*原来是30*/
 }
 
 .span-search{

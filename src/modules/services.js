@@ -10,16 +10,22 @@
                  * @param url 服务器接口名称
                  * @param testUrl 测试接口名称
                  * @param forceType 强制读取服务器or本地接口 server or local
+                 * 此方法还需优化，提高可重用性
                  */
                 'getApiUrl': function (url, testUrl, forceType) {
                     if (forceType) {
-                        if (forceType == 'server') {
-                            return CONFIG.serverUrlVideo + url;    //视频库的接口
-                        }else if(forceType == 'server1'){
-                            return CONFIG.serverUrlOther + url;    //
-                        }
-                        else {
-                            return CONFIG.testUrl + testUrl;
+                        switch (forceType){
+                            case 'server':
+                                return CONFIG.serverUrlVideo + url;    //视频库的接口
+                                break;
+                            case 'server1':
+                                return CONFIG.serverUrlOther + url;    //用户与科室的接口
+                                break;
+                            case 'server2':
+                                return CONFIG.serverUrlCommon + url;   //插播接口
+                                break;
+                            default:
+                                return CONFIG.testUrl + testUrl;
                         }
                     }
                     else {

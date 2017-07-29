@@ -97,6 +97,8 @@
                         "user": self.account
                     };
 
+                    util.setObject('ajaxData',self.data);
+
                     // 读取applists
                     self.loading = true;
                     $http({
@@ -2442,7 +2444,7 @@
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
                 self.init = function () {
-
+                    console.log($scope.app.data);
                     // 首页面加载页面url
                     self.userInfoUrl = '';
 
@@ -3846,6 +3848,8 @@
 
                     self.getResBtn();
 
+
+
                 };
 
                 self.gotoPage = function (pageName) {
@@ -3896,12 +3900,20 @@
                             self.section = msg.data.Section;
                             self.sectionOriginal = (msg.data.Section).concat();
                             //self.sectionName = self.section[0];
+                            /*-----第一项为空的科室分组-------*/
+                            var undef = {
+                                'Name': {'zh-CN':''},
+                                'ID': undefined
+                            };
+                            self.sectionOriginal.unshift(undef);
+                            /*------第一项为全部的科室分组------*/
                             var hos = {
                                 'Name': {'zh-CN':'全部'},
                                 'ID': undefined
                             };
                             self.section.unshift(hos);
-                            self.sectionName = self.section[0]
+                            self.sectionName = self.section[0];
+                            self.getResource();
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -3917,9 +3929,68 @@
                 };
 
                 //获取资源信息
-                self.getResource = function (id) {
+                self.getResource = function () {
+                    console.log(self.sectionName);
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 10,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var datap = $scope.app.data;
+                            datap.action = "GetPage";
+                            datap.type = self.resourceChoose.ID;
+                            datap.category = self.sectionName.ID;
+                            var paramsUrl = params.url();
+                            datap.pager = {
+                                "total":-1,
+                                "per_page": paramsUrl.count - 0,
+                                "page": paramsUrl.page - 0,
+                                "orderby":"",
+                                "sortby":"desc",
+                                "keyword":self.resourceName?self.resourceName:'',
+                                "status":""
+                            };
+                            var data = JSON.stringify(datap);
 
+                            return $http({
+                                method: 'POST',
+                                url: util.getApiUrl('material', '', 'server2'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    var page = data.data.Pager;
+                                    var res = data.data.Materials;
+                                    if (page.total == 0) {
+                                        self.noData = true;
+                                        return;
+                                    }
+                                    params.total(page.total);
+                                    return res;
+                                } else if (data.tata.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errorInfo);
+                                }
 
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
+                        }
+                    });
+
+                };
+
+                //转换科室
+                self.changeSection = function () {
+                    console.log(self.sectionName);
+                    self.getResource();
                 };
 
                 //获取资源分类
@@ -3959,7 +4030,7 @@
                         default:
                             break;
                     }
-                    $scope.app.maskParams = {resourceId: id};
+                    $scope.app.maskParams = {resourceId: id, section: self.sectionOriginal};
 
                 };
 
@@ -3992,6 +4063,7 @@
                 //转换资源类型
                 self.changeResource = function (res) {
                     self.resourceChoose = res;
+                    self.getResource();
                 };
 
 
@@ -4225,10 +4297,15 @@
                 console.log('addSectionController');
                 var self = this;
                 self.init = function () {
+                    console.log($scope.app.data);
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
                     self.uploadList = new $scope.app.uploadLists();
                     self.resId = $scope.app.maskParams.resourceId;
+                    self.section = $scope.app.maskParams.section;
+
+                    self.sectionName = self.section[0];
+
                 };
 
                 // 保存编辑
@@ -4242,27 +4319,28 @@
                         alert('上传中，请稍等');
                         return;
                     }
-                    var datap = $scope.app.data;
-                    datap.action = "addSection";
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "AddMateril";
                     datap.data = {
-                        "name": self.sectionName,
+                        "name": self.PicName,
                         "path_abs": self.uploadList.data[0].img.src,
                         "size":self.uploadList.data[0].img.size,
-                        "type": self.resId
-
-
+                        "type": self.resId,
+                        "category": self.sectionName.ID,
+                        "md5": '',
+                        'user': 'root'
                     };
-                    var data = JSON.stringify(self.data);
+                    var data = JSON.stringify(datap);
                     self.saving = true;
 
                     $http({
                         method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        url: util.getApiUrl('material', '', 'server2'),
                         data: data
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            alert('添加成功')
+                            alert('添加成功!');
                             self.cancel();
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -4274,9 +4352,9 @@
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
                         self.saving = false;
-                        self.cancel();
+                        //self.cancel();
                     });
-                }
+                };
 
                 self.cancel = function () {
                     //$scope.video.maskUrl = "";
@@ -4430,6 +4508,7 @@
             function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
+                    console.log($scope.app.data);
                     $scope.cut.showResource = false;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getResBtn();
