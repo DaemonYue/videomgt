@@ -1,13 +1,13 @@
 <div ng-controller="hospitalManageController as hosm" ng-init="hosm.init()" class="col-sm-9 page col-right">
-        <strong>
+        <h4>
             <!--<i class="glyphicon glyphicon-th-large"></i>-->
             医院管理
-        </strong>
+        </h4>
     <hr>
     <!--loading-->
     <div ng-show="hosm.loading">loading...</div>
     <!--loading-->
-    <div>
+    <div class="container-right">
         <div class="row">
             <h4 class="one_row">{{hosm.hospitalData.Name[hosm.defaultLang]}}</h4><img src="dist/imgs/edit-icon.png" ng-click="hosm.editHospital()" class="hospital-edit">
             <button class="btn" ng-click="hosm.addSection()">添加分区</button>
@@ -23,7 +23,7 @@
                         <ul class="">
                             <li ng-repeat="section in hosm.hospitalData.Section" class="list-group-item" ng-if="section.ID != -1">
                                 {{section.Name[hosm.defaultLang]}}
-                                <a ng-click="hosm.showSections(section)"  class="pull-right">分区</a>
+                         <!--       <a ng-click="hosm.showSections(section)"  class="pull-right">分区</a>-->
 
                                 <a ng-click="hosm.deleteSection(section.ID)"  class="pull-right"> &nbsp;删除&nbsp;</a>
                                 <a ng-click="hosm.editSction(section)" class="pull-right">编辑</a>

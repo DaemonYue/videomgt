@@ -282,12 +282,15 @@ td {
     float: left;
     background-color: #0e2534;
     padding-top:60px;
+    height: 100%;
+    position: fixed;
 }
 
 .col-right {
     width: calc(100% - 180px) !important;
     float: right;
-    padding-top:20px;
+    padding-top: 25px;
+    padding-left: 40px;
 }
 
 /* private */
@@ -857,6 +860,38 @@ body, .app {
     color: white;
     border-left: 4px solid #2384c4;
 }
+
+.background-right{
+    background-color: #ecf0f5;
+}
+
+.container-right{
+    width:100%;
+    padding: 10px 15px 80px;
+    background-color: #f9f9f9;
+    border-radius: 2px;
+}
+
+
+.container-right > div{
+    padding: 10px 20px;
+}
+
+.contain-span span{
+    margin-right: 2%;
+}
+
+.btn-container-bottom{
+    margin: 37px 47%;
+    background-color: #198ad1;
+    color: white;
+}
+
+.btn-container-bottom:hover{
+    background-color: #136da5;
+    color: white;
+}
+
 /*----------------------基础样式   YXX------------------------------------------------*/
 
 /*----------------------login------------------------------------------------*/
@@ -893,6 +928,11 @@ body, .app {
 
 .hospital-edit{
     cursor: pointer;
+}
+
+.info > div > div{
+    width: 93% !important;
+    display: inline-block;
 }
 
 /*---------------------innercut--------------------------------------------*/

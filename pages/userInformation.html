@@ -1,35 +1,26 @@
 <div class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-user"></i>
-            个人信息
-        </strong>
-    </a>
-
-
-    <div>
+    <h4>个人信息</h4>
+    <div class="container-right contain-span info">
         <hr>
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-3">账号：</div>
-                <div class="col-xs-9">{{user.userInfo.Account}}</div>
-            </div>
-            <div class="row">
-                <div class="col-xs-3">密码：</div>
-                <div class="col-xs-9">******</div>
-            </div>
-            <div class="row">
-                <div class="col-xs-3">姓名：</div>
-                <div class="col-xs-9">{{user.userInfo.Name}}</div>
-            </div>
-            <div class="row">
-                <div class="col-xs-3">科室：</div>
-                <div class="col-xs-9">{{user.userInfo.SName[user.defaultLang]}}</div>
-            </div>
+        <div>
+            <span>账号：</span>
+            <div class="form-control">{{user.userInfo.Account}}</div>
+        </div>
+        <div>
+            <span class="">密码：</span>
+            <div class="form-control">******</div>
+        </div>
+        <div>
+            <span class="">姓名：</span>
+            <div class="form-control">{{user.userInfo.Name}}</div>
+        </div>
+        <div>
+            <span class="">科室：</span>
+            <div class="form-control">{{user.userInfo.SName[user.defaultLang]}}</div>
         </div>
     </div>
-    <button ng-click="user.edit()">编辑</button>
-
-
-
+    <button ng-click="user.edit()" class="btn btn-container-bottom">编辑</button>
 </div>
+
+
+

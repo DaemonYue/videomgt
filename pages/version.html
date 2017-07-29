@@ -1,14 +1,12 @@
 <div ng-controller="versionController as v" ng-init="v.init()" class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-send"></i>
+        <h4>
             版本管理
-        </strong>
-    </a>
+        </h4>
+
     <hr>
 
-    <div>
-        <div class="container">
+    <div >
+        <div class="container-right">
             <div class="row">
                 <div class="col-xs-6">本地版本号</div>
                 <div class="col-xs-6">云端版本号</div>
@@ -33,7 +31,7 @@
         </div>
     </div>
 
-    <button ng-click="v.commit()">提交版本</button>
+    <button ng-click="v.commit()" class="btn btn-container-bottom">提交版本</button>
 
 
 
