@@ -1,30 +1,27 @@
 <div ng-controller="innerCutPlanController as plan" ng-init="plan.init()" class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-list"></i>
+    <h4 class="subtitle">
             插播计划
-        </strong>
-    </a>
-    <hr>
-
-    <div class="container">
+    </h4>
+    <div class="container-right">
         <div class="resource-card row">
-            <button class="btn" ng-repeat="x in plan.btns" ng-class="{'btn-choosed':(x.ID == plan.resourceChoose.ID)}"  ng-click="plan.changeResource(x)">{{x.Name}}</button>
+            <button class="res-btn" ng-repeat="x in plan.btns" ng-class="{'btn-choosed':(x.ID == plan.resourceChoose.ID)}"  ng-click="plan.changeResource(x)">{{x.Name}}</button>
         <!--    <button class="btn">图片</button>
             <button class="btn">视频</button>
             <button class="btn">直播</button>
             <button class="btn">文本</button>-->
         </div>
-        <hr>
-        <div class="resource-options">
-            <button class="btn resource-options" ng-click="plan.addPlan(plan.resourceChoose.ID)">添加计划</button>
-            <button class="btn resource-options">删除计划</button>
-            <div class="like-input resource-options like-input-search" >
-                <input ng-model="plan.resourceName" placeholder="计划名称" class="input-nostyle input-search">
-                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"></span>
+        <div class="blue-line"></div>
+        <div class="resource-options-out">
+            <div class="resource-options" style="width: 100%;">
+                <button class="btn resource-options btn-add" ng-click="plan.addPlan(plan.resourceChoose.ID)">添加计划</button>
+                <button class="btn resource-options btn-del">删除计划</button>
+                <div class="like-input  like-input-search" style="display: inline">
+                    <input ng-model="plan.resourceName" placeholder="计划名称" class="input-nostyle input-search">
+                    <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"></span>
+                </div>
             </div>
         </div>
-        <hr>
+
         <table ng-table="plan.tableParams"  class="table table-hover  table-striped table-bordered">
 
             <div style="overflow-x: auto">

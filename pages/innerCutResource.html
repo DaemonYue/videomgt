@@ -1,40 +1,41 @@
 <div class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-upload"></i>
-            插播资源
-        </strong>
-    </a>
-    <hr>
+    <h4 class="subtitle">
+        插播资源
+    </h4>
 
-    <div class="container">
+    <div class="container-right">
         <div class="resource-card row">
-            <button class="btn" ng-repeat="x in cut.btns"  ng-click="cut.changeResource(x)" ng-class="{'btn-choosed':(x.ID == cut.resourceChoose.ID)}">{{x.Name}}</button>
-          <!--  <button class="btn">视频</button>
-            <button class="btn">直播</button>
-            <button class="btn">文本</button>-->
+            <button class="res-btn" ng-repeat="x in cut.btns" ng-click="cut.changeResource(x)"
+                    ng-class="{'res-btn-choose':(x.ID == cut.resourceChoose.ID)}">{{x.Name}}
+            </button>
+            <!--  <button class="btn">视频</button>
+              <button class="btn">直播</button>
+              <button class="btn">文本</button>-->
         </div>
-        <hr>
+        <div class="blue-line"></div>
         <div class="resource-options-out">
-            <div class="resource-options">
-                <span>资源所属：</span>
-                <select ng-model="cut.sectionName" ng-options="x.Name[cut.defaultLang] for x in cut.section" ng-change="cut.changeSection()"></select>
+            <div class="resource-options section-select">
+                <span class="select-span">资源所属：</span>
+                <select class="select section-select-right" ng-model="cut.sectionName" ng-options="x.Name[cut.defaultLang] for x in cut.section"
+                        ng-change="cut.changeSection()"></select>
             </div>
-            <button class="btn resource-options" ng-click="cut.addResource(cut.resourceChoose.ID)" ng-if="cut.resourceChoose.ID != 1">添加{{cut.resourceChoose.Name}}</button>
+            <button class="btn resource-options btn-add" ng-click="cut.addResource(cut.resourceChoose.ID)"
+                    ng-if="cut.resourceChoose.ID != 1">添加{{cut.resourceChoose.Name}}
+            </button>
 
-            <button class="btn resource-options">删除{{cut.resourceChoose.Name}}</button>
+            <button class="btn resource-options btn-del">删除{{cut.resourceChoose.Name}}</button>
             <span ng-if="cut.resourceChoose.ID == 1">视频上传请到本地视频库</span>
-           <!-- <button class="btn resource-options">添加视频</button>-->
-            <div class="like-input resource-options like-input-search" >
+            <!-- <button class="btn resource-options">添加视频</button>-->
+            <div class="like-input resource-options like-input-search">
                 <input ng-model="cut.resourceName" placeholder="资源名称" class="input-nostyle input-search">
-                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search" ng-click="cut.getResource()"></span>
+                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"
+                      ng-click="cut.getResource()"></span>
             </div>
         </div>
-        <hr>
         <div ng-show="cut.noData == true">暂无资源</div>
         <div ng-show="cut.loading == true">loading...</div>
 
-        <table ng-table="cut.tableParams"  class="table table-hover  table-striped table-bordered">
+        <table ng-table="cut.tableParams" class="table table-hover  table-striped table-bordered">
 
             <div style="overflow-x: auto">
 
@@ -52,7 +53,7 @@
 
                     <td title="'大小'" ng-if="cut.resourceChoose.ID==1 || cut.resourceChoose.ID==2">{{row.size}}</td>
 
-                    <td title="'时长'"  ng-if="cut.resourceChoose.ID==1">{{row.duration}}</td>
+                    <td title="'时长'" ng-if="cut.resourceChoose.ID==1">{{row.duration}}</td>
 
                     <td title="'直播地址'" ng-if="cut.resourceChoose.ID==3">{{row.path_abs}}</td>
 
@@ -65,18 +66,19 @@
                     <td title="'资源所属'">{{row.section}}</td>
 
                     <td title="'操作'">
-                        <button class="btn btn-xs btn-default"  ng-click="cut.editAP(row)" data-toggle="modal" title="编辑">
+                        <button class="btn btn-xs btn-default" ng-click="cut.editAP(row)" data-toggle="modal"
+                                title="编辑">
                             编辑
                         </button>
                     </td>
                 </tr>
-                </div>
-            </table>
+            </div>
+        </table>
     </div>
 
 </div>
 <script type="text/ng-template" id="headerCheckbox.html">
 
-    <input type="checkbox" ng-model="cut.checkboxes.checked"  value="" />
+    <input type="checkbox" ng-model="cut.checkboxes.checked" value=""/>
 
 </script>

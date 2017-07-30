@@ -67,7 +67,7 @@ body {
     /*box-shadow: 0 5px 24px 8px rgba(0,0,0,.125);*/
     -webkit-box-shadow: none;
     box-shadow: none;
-    border-radius: 24px;
+    border-radius: 8px;
     background-color: rgba(255, 255, 255, .88)
 }
 
@@ -873,10 +873,6 @@ body, .app {
 }
 
 
-.container-right > div{
-    padding: 10px 20px;
-}
-
 .contain-span span{
     margin-right: 2%;
 }
@@ -892,6 +888,53 @@ body, .app {
     color: white;
 }
 
+.blue-line{
+    padding: 0!important;
+    #border-bottom: 3px solid;
+    #border-left: 3px solid transparent;
+    #border-right: 3px solid transparent;
+    height: 5px;
+    border-radius:35px 35px 1px 1px;
+    background:linear-gradient(to bottom, #f9f9f9, #064eb9);
+    width: 100%;
+}
+
+.subtitle{
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-family: 'Microsoft YaHei';
+}
+
+.modal-title{
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 12px;
+
+}
+
+.modal-header{
+    background-color: #f4f4f4;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-content{
+    background-color: #fff;
+}
+
+.inline-form label{
+    width: 100px;
+    font-weight: 500;
+}
+
+.inline-form .form-group, .inline-form span{
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.inline-form input{
+    width: 80% !important;
+}
 /*----------------------基础样式   YXX------------------------------------------------*/
 
 /*----------------------login------------------------------------------------*/
@@ -930,22 +973,35 @@ body, .app {
     cursor: pointer;
 }
 
+.user > div{
+    padding: 10px 20px;
+}
+
 .info > div > div{
     width: 93% !important;
     display: inline-block;
+    background-color: #f9f9f9;
+}
+
+.version-title{
+    font-size: 16px;
+    color: #2a6cc7;
 }
 
 /*---------------------innercut--------------------------------------------*/
 .resource-card{
-    display: inline;
+    margin: 7px 10px 10px;
 }
 
 .resource-options-out{
     position: relative;
+    margin-top: 12px;
+    margin-left: 7px;
+    margin-bottom: 10px;
 }
 
 .resource-options{
-    display: inline;
+    display: inline-block;
 }
 
 .input-search{
@@ -955,6 +1011,7 @@ body, .app {
 .span-search{
     left: 92%;
     top: 5px;
+    cursor: pointer;
 }
 
 .like-input-search{
@@ -968,6 +1025,84 @@ body, .app {
     width: 14px !important;
 }
 
-.btn-choosed{
-    background-color: lightblue;
+.res-btn{
+    border: 1px solid #dbdbdb;
+    height: 45px;
+    width: 89px;
+    background-color: #ffffff;
+}
+
+.res-btn:hover{
+    border-top: 2px solid #2a6cc7;
+    background-color: #f9f9f9;
+}
+
+.res-btn-choose{
+    border-top: 2px solid #2a6cc7;
+    background-color: #f9f9f9;
+}
+
+.section-select{
+    position: relative;
+    display: inline-block;
+    width: 210px;
+    height: 50px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+}
+
+.select-span{
+    display: inline-block;
+    height: 100%;
+    padding : 15px 19px;
+}
+
+.section-select-right{
+    height: 100%;
+    margin-left: -5px;
+    position: absolute;
+    right: 0;
+    border: none;
+    border-left: 1px solid #dbdbdb;
+    padding: 6px 7px;
+    background-color: #f9f9f9;
+    color: #2a6cc7;
+
+}
+
+.btn-add{
+    height: 34px;
+    background-color: #198ad1;
+    color: white;
+    margin-left: 10px;
+    margin-bottom: 8px;
+}
+
+.btn-add:hover{
+    background-color: #136da5;
+    color: white;
+
+}
+
+.btn-del{
+    height: 34px;
+    background-color: #efefef;
+    color: black;
+    margin-left: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #d8d8d8;
+}
+
+.btn-del:hover{
+    background-color: #d1cfcf;
 }

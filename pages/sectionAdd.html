@@ -5,7 +5,7 @@
             </button>
             <h4 class="modal-title">添加分区</h4>
         </div>
-        <form name="sectionForm" novalidate ng-submit="sectionForm.$valid && addSection.saveForm()">
+        <form name="sectionForm" novalidate class="form-inline inline-form" ng-submit="sectionForm.$valid && addSection.saveForm()">
             <div class="modal-body">
                 <div class="form-group">
                             <span ng-repeat="lang in addSection.editLangs track by $index">
