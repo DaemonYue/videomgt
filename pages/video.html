@@ -1,31 +1,30 @@
-<div ng-controller="videoController as video" ng-init="video.init()" class="height100">
+<div ng-controller="videoController as video" ng-init="video.init()" class="height100 background-right">
 
     <!--body-->
     <div class="container-fluid height100">
         <div class="row height100">
             <!--左侧导航栏-->
             <div class="col-sm-3 col-left height100">
-                <a ng-click="video.gotoPage('uploadList')" class="font-bold no-underline cursor-default">
-                    <i class="glyphicon glyphicon-upload"></i>&nbsp&nbsp上传
+              <!--  <a ng-click="video.gotoPage('uploadList')" class="font-bold no-underline cursor-default">
+                    &nbsp&nbsp上传
+                </a>-->
+
+                <a ng-click="video.gotoPage('app.video.transcodingList')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(video.current == 1)}">
+                   &nbsp&nbsp转码
                 </a>
-                <hr>
-                <a ng-click="video.gotoPage('app.video.transcodingList')" class="font-bold no-underline cursor-default">
-                    <i class="glyphicon glyphicon-random" style="font-size:14px"></i>&nbsp&nbsp转码
+
+                <a ng-click="video.gotoPage('app.video.notEditedList')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(video.current == 2)}">
+                   &nbsp&nbsp待入库
                 </a>
-                <hr>
-                <a ng-click="video.gotoPage('app.video.notEditedList')" class="font-bold no-underline cursor-default">
-                    <i class="glyphicon glyphicon-import" style="font-size:14px"></i>&nbsp&nbsp待入库
+
+                <a ng-click="video.gotoPage('app.video.editedList')" class="font-bold no-underline cursor-default navigation-item" ng-class="{'navigation-item-choose':(video.current == 3)}">
+                    &nbsp&nbsp已入库
                 </a>
-                <hr>
-                <a ng-click="video.gotoPage('app.video.editedList')" class="font-bold no-underline cursor-default">
-                    <i class="glyphicon glyphicon-film"></i>&nbsp&nbsp已入库
-                </a>
-                <hr>
-                <hr>
-                <a ng-click="video.gotoPage('app.video.musicLibrary')" class="font-bold no-underline cursor-default">
-                    <i class="glyphicon glyphicon-music"></i>&nbsp&nbsp音乐库
-                </a>
-                <hr>
+
+           <!--     <a ng-click="video.gotoPage('app.video.musicLibrary')" class="font-bold no-underline cursor-default">
+                    &nbsp&nbsp音乐库
+                </a>-->
+
 
             </div>
             <!--左侧导航栏-->

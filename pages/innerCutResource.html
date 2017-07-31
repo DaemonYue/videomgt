@@ -63,7 +63,7 @@
 
                     <td title="'状态'" ng-if="cut.resourceChoose.ID==1">视频</td>
 
-                    <td title="'资源所属'">{{row.section}}</td>
+                    <td title="'资源所属'">{{row.section[cut.defaultLang]}}</td>
 
                     <td title="'操作'">
                         <button class="btn btn-xs btn-default" ng-click="cut.editAP(row)" data-toggle="modal"

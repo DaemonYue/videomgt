@@ -1,19 +1,27 @@
 <div ng-controller="transcodingListController as tl" ng-init="tl.init()" class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-random"></i>
+    <h4 class="subtitle">
             转码模块
-         </strong>
-    </a>
-    <hr>
-    <div class="btn-group">
-        <button type="button" class="btn btn-default btn-sm" ng-click="tl.refresh();"><i class="glyphicon glyphicon-refresh"></i > 刷新列表</button>
-    </div>
-    <hr class="break-space">
-    <div ng-show="tl.loading">loading....</div>
-    <table class="table table-hover table-condensed width-progress ">
-        <thead>
-            <tr>
+    </h4>
+    <div class="container-right">
+        <div class="resource-options-out">
+            <div class="btn-group">
+                <a class="resource-options video-option btn" ng-class="{'video-option-choose':(tl.current == 1)}" ng-click="tl.getTranscodeTaskList(1)">电影资源</a>
+                <a class="resource-options video-option btn" ng-class="{'video-option-choose':(tl.current == 2)}" ng-click="tl.getTranscodeTaskList(2)">宣教资源</a>
+            </div>
+            <div class="btn-group btn-float">
+                <button type="button" class="btn btn-upload" ng-click="tl.refresh();">上传</button>
+
+            </div>
+            <div class="btn-group btn-float">
+                <button type="button" class="btn btn-refresh" ng-click="tl.refresh();">刷新列表</button>
+
+            </div>
+        </div>
+        <div class="blue-line"></div>
+        <div ng-show="tl.loading">loading....</div>
+        <table class="table table-hover table-condensed width-progress ">
+            <thead>
+            <tr class="video-table-head">
                 <th>名称</th>
                 <th>大小</th>
                 <th>进度</th>
@@ -21,8 +29,8 @@
                 <th>描述</th>
                 <!-- <th>操作</th> -->
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr ng-repeat= "task in tl.taskList track by $index">
                 <td>{{task.FileOrigName}}</td>
                 <td>{{task.Size}} 字节</td>
@@ -42,7 +50,9 @@
                     </button>
                 </td> -->
             </tr>
-        </tbody>
-    </table>
-    <div ng-show="tl.noData">查无数据</div>
+            </tbody>
+        </table>
+        <div ng-show="tl.noData">查无数据</div>
+    </div>
+
 </div>

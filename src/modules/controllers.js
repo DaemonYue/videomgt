@@ -576,7 +576,7 @@
                     self.showUploadList = false;
 
                     // 显示上传页面
-                    self.gotoPage('uploadList');
+                    self.gotoPage('app.video.transcodingList');
 
                     // 弹窗层
                     self.maskUrl = '';
@@ -590,7 +590,7 @@
 
                 self.gotoPage = function (pageName) {
                     // 上传列表页
-                    if (pageName == 'uploadList') {
+                 /*   if (pageName == 'uploadList') {
                         // 上传页面不是第一次加载
                         if (self.uploadListUrl !== '') {
 
@@ -599,7 +599,7 @@
                         else {
                             self.uploadListUrl = 'pages/uploadList.html';
                         }
-                        self.showUploadList = true;
+                        self.showUploadList = false;
                     }
 
                     //其他页
@@ -607,9 +607,23 @@
                         self.showUploadList = false;
                         $state.go(pageName);
                     }
+*/                  switch (pageName){
+                        case 'app.video.transcodingList':
+                            self.current = 1;
+                            break;
+                        case 'app.video.notEditedList':
+                            self.current = 2;
+                            break;
+                        case 'app.video.editedList':
+                            self.current = 3;
+                            break;
+                        default:
+                            break;
+                    }
+                    self.showUploadList = false;
 
-
-                }
+                    $state.go(pageName);
+                };
 
                 self.logout = function (event) {
                     util.setParams('token', '');
@@ -702,7 +716,7 @@
                             }
                         }
                         // 转码
-                        var data = JSON.stringify({
+                        var data = JSON.stringify({          //加type
                             "action": "submitTranscodeTask",
                             "token": util.getParams('token'),
                             "rescode": "200",
@@ -852,17 +866,18 @@
                 self.init = function () {
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
-                    self.getTranscodeTaskList();
+                    self.getTranscodeTaskList(1);
                     console.log($scope.video.test)
                 }
 
                 //  获取正在转码的列表
-                self.getTranscodeTaskList = function () {
+                self.getTranscodeTaskList = function (id) {
+                    self.current = id;
                     self.loading = true;
                     var data = JSON.stringify({
                         "token": util.getParams('token'),
                         "action": "getTranscodeTaskList",
-                        "status": "working"
+                        "status": "working"             //type   1是电影，2是视频
                     })
                     $http({
                         method: 'POST',
@@ -903,7 +918,7 @@
                 self.init = function () {
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
-                    self.getTranscodeTaskList();
+                    self.getTranscodeTaskList(1);
                 }
 
                 self.add = function (task) {
@@ -912,7 +927,8 @@
                     $scope.app.maskParams = task;
                 }
                 // 获取转码完成的列表
-                self.getTranscodeTaskList = function () {
+                self.getTranscodeTaskList = function (id) {
+                    self.current = id;
                     self.loading = true;
                     var data = JSON.stringify({
                         "token": util.getParams('token'),
@@ -994,6 +1010,7 @@
 
                     self.defaultLang = util.getDefaultLangCode();
                     self.getTags();
+                    self.getSection()
                 }
 
                 self.edit = function (movieID) {
@@ -1061,10 +1078,11 @@
 
                 // 监听 分类 产地 的变化
                 $scope.$watch('arr', function (value) {
-                    self.getMovieList();
+                    self.getMovieList(1);
                 }, true)
 
-                self.getMovieList = function () {
+                self.getMovieList = function (id) {
+                    self.current = id;
                     self.loading = true;
                     self.noData = false;
                     self.tableParams = new NgTableParams({
@@ -1142,6 +1160,55 @@
                     });
 
 
+                };
+
+                //获取科室
+                self.getSection = function () {
+                    self.section = [];
+                    var datap = $scope.app.data;
+                    datap.action = "getHospitalInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.section = msg.data.Section;
+                            self.sectionOriginal = (msg.data.Section).concat();
+                            //self.sectionName = self.section[0];
+                            /*-----第一项为空的科室分组-------*/
+                            var undef = {
+                                'Name': {'zh-CN':''},
+                                'ID': undefined
+                            };
+                            self.sectionOriginal.unshift(undef);
+                            /*------第一项为全部的科室分组------*/
+                            var hos = {
+                                'Name': {'zh-CN':'全部'},
+                                'ID': undefined
+                            };
+                            self.section.unshift(hos);
+                            self.sectionName = self.section[0];
+                            self.getResource();
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取宣教视频
+                self.getVideos = function (id) {
+                    self.current = id;
                 }
 
 
@@ -3969,6 +4036,9 @@
                                         return;
                                     }
                                     params.total(page.total);
+                                    for(var i=0; i<res.length; i++){
+                                        res[i].section = JSON.parse(res[i].section)
+                                    }
                                     return res;
                                 } else if (data.tata.rescode == '401') {
                                     alert('访问超时，请重新登录');
@@ -4328,7 +4398,7 @@
                         "type": self.resId,
                         "category": self.sectionName.ID,
                         "md5": '',
-                        'user': 'root'
+                        'creator': util.getParams('account')
                     };
                     var data = JSON.stringify(datap);
                     self.saving = true;

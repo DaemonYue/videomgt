@@ -1,21 +1,29 @@
 <div ng-controller="notEditedListController as notEditedList" ng-init="notEditedList.init()" class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-import"></i>
+    <h4 class="subtitle">
             待入库
-        </strong>
-    </a>
-    <hr>
-    <table class="table table-hover table-condensed">
-        <thead>
-            <tr>
+    </h4>
+    <div class="container-right">
+        <div class="resource-options-out">
+            <div class="btn-group">
+                <a class="resource-options video-option btn" ng-class="{'video-option-choose':(notEditedList.current == 1)}" ng-click="notEditedList.getTranscodeTaskList(1)">电影资源</a>
+                <a class="resource-options video-option btn" ng-class="{'video-option-choose':(notEditedList.current == 2)}" ng-click="notEditedList.getTranscodeTaskList(2)">宣教资源</a>
+            </div>
+            <div class="btn-group btn-float">
+                <button type="button" class="btn btn-upload" ng-click="">上传</button>
+
+            </div>
+        </div>
+        <div class="blue-line"></div>
+        <table class="table table-hover table-condensed width-progress">
+            <thead>
+            <tr class="video-table-head">
                 <th>名称</th>
                 <th>大小</th>
                 <th>操作</th>
             </tr>
-        </thead>
-        <div ng-show="notEditedList.loading">loading....</div>
-        <tbody>
+            </thead>
+            <div ng-show="notEditedList.loading">loading....</div>
+            <tbody>
             <tr data-copy="10" ng-repeat="task in notEditedList.taskList track by $index">
                 <td>{{task.FileOrigName}}</td>
                 <td>{{task.Size}} 字节</td>
@@ -28,7 +36,10 @@
                     </button>
                 </td>
             </tr>
-        </tbody>
-        <div ng-show="notEditedList.noData">查无数据</div>
-    </table>
+            </tbody>
+            <div ng-show="notEditedList.noData">查无数据</div>
+        </table>
+    </div>
+
+
 </div>

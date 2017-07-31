@@ -1,81 +1,113 @@
 <div ng-controller="editedListController as editedList" ng-init="editedList.init()" class="col-sm-9 page col-right">
-    <a>
-        <strong>
-            <i class="glyphicon glyphicon-film"></i>
-            已入库
-        </strong>
-    </a>
-    <hr>
-    
-    <!--搜索框-->
-    <div class="row">
-      <div class="col-lg-3">
-        <div class="input-group">
-          <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
-          <span class="input-group-btn">
-            <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
-          </span>
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-    <!--搜索框-->
+    <h4 class="subtitle">
+        已入库
+    </h4>
+    <div class="container-right">
+        <div class="resource-options-out">
+            <div class="btn-group">
+                <a class="resource-options video-option btn"
+                   ng-class="{'video-option-choose':(editedList.current == 1)}" ng-click="editedList.getMovieList(1)">电影资源</a>
+                <a class="resource-options video-option btn"
+                   ng-class="{'video-option-choose':(editedList.current == 2)}"
+                   ng-click="editedList.getVideos(2)">宣教资源</a>
+            </div>
+            <div class="btn-group btn-float">
+                <button type="button" class="btn btn-upload" ng-click="">上传</button>
 
-    <hr class="break-space">
+            </div>
+        </div>
+        <div class="blue-line"></div>
+        <div class="resource-options-out">
+            <div class="resource-options section-select" ng-if="editedList.current == 2">
+                <span class="select-span">资源所属：</span>
+                <select class="select section-select-right" ng-model="editedList.sectionName"
+                        ng-options="x.Name[editedList.defaultLang] for x in editedList.section"
+                        ng-change="editedList.changeSection()"></select>
+            </div>
+            <div class="like-input resource-options like-input-search" ng-if="editedList.current == 2">
+                <input  placeholder="请输入视频名称" class="input-nostyle input-search">
+                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"
+                      ng-click="editedList.getVideos(2)"></span>
+            </div>
+            <div class="like-input resource-options like-input-search" ng-if="editedList.current == 1">
+                <input ng-model="editedList.keywords" placeholder="请输入电影名称" class="input-nostyle input-search">
+                <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"
+                      ng-click="editedList.getMovieList(1)"></span>
+            </div>
+        </div>
 
-    <div class="form-group">
-        <label>类型</label><br>
-        <div ng-show="editedList.noCategotyData">查无数据</div>
-        <span ng-repeat="category in editedList.categoryList track by $index">
-            <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseCateory(category.ID,this.value)" ng-disabled="editedList.loading"> {{category.CategoryName[editedList.defaultLang]}} 
-        </span>
+        <!--搜索框-->
+        <!--   <div class="row">
+               <div class="col-lg-3">
+                   <div class="input-group">
+                       <input ng-model="editedList.keywords" type="text" class="form-control" placeholder="请输入视频名称" />
+                       <span class="input-group-btn">
+               <button class="btn btn-primary" ng-click="editedList.getMovieList()" ng-disabled="editedList.loading" class="btn btn-primary">搜索</button>
+             </span>
+                   </div>&lt;!&ndash; /input-group &ndash;&gt;
+               </div>&lt;!&ndash; /.col-lg-6 &ndash;&gt;
+           </div> /.row -->
+        <!--搜索框-->
+
+        <div ng-if="editedList.current == 1" class="">
+            <div class="form-group">
+                <label class="video-table-head">类型</label><br>
+                <div ng-show="editedList.noCategotyData">查无数据</div>
+                <span ng-repeat="category in editedList.categoryList track by $index">
+                    <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseCateory(category.ID,this.value)"
+                   ng-disabled="editedList.loading"> {{category.CategoryName[editedList.defaultLang]}}
+                </span>
+            </div>
+            <div class="form-group">
+                <label class="video-table-head">产地</label><br>
+                <div ng-show="editedList.noLocationData">查无数据</div>
+                <span ng-repeat="location in editedList.locationList track by $index">
+                     <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseLocation(location.ID,this.value)"
+                   ng-disabled="editedList.loading"> {{location.LocationName[editedList.defaultLang]}}
+                </span>
+            </div>
+            <hr>
+            <table class="table table-hover table-condensed" ng-table="editedList.tableParams">
+                <thead>
+                <tr class="video-table-head">
+                    <th>序号</th>
+                    <th>名称</th>
+                    <th>类型</th>
+                    <th>产地</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <div ng-show="editedList.loading">loading...</div>
+                <tr ng-repeat="movie in $data track by $index">
+                    <td data-title="'序号'">{{movie.Seq}}</td>
+                    <td data-title="'名称'">{{movie.Name[editedList.defaultLang]}}</td>
+                    <td data-title="'类型'"><span ng-repeat="category in movie.CategoryName track by $index">{{category[editedList.defaultLang]}}</span>
+                    </td>
+                    <td data-title="'产地'"><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span>
+                    </td>
+                    <!--
+                                    <td data-title="'类型'" ><span ng-repeat="category in editedList.categoryList track by $index"> {{category[editedList.defaultLang]}}</span> </td>
+                                    <td data-title="'产地'" ><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span> </td> -->
+
+
+                    <td data-title="'操作'">
+                        <button ng-click="editedList.edit(movie.ID)" class="btn btn-xs btn-default" title="编辑">
+                            <i class="glyphicon glyphicon-pencil"></i>
+                        </button>
+                        <button ng-click="editedList.delMovie(movie.ID)" class="btn btn-xs btn-default" title="删除">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div ng-show="editedList.noData">查无数据</div>
+        </div>
+
+
     </div>
 
-    <div class="form-group">
-        <label>产地</label><br>
-        <div ng-show="editedList.noLocationData">查无数据</div>
-        <span ng-repeat="location in editedList.locationList track by $index">
-            <input type="checkbox" ng-model="this.value" ng-click="editedList.chooseLocation(location.ID,this.value)" ng-disabled="editedList.loading"> {{location.LocationName[editedList.defaultLang]}} 
-        </span>
-    </div>
-    <hr class="break-space">
-    <button ng-click="editedList.addMoreMovie()" class="btn btn-default">添加</button>
-    <hr class="break-space">
-    <table class="table table-hover table-condensed" ng-table="editedList.tableParams">
-        <thead>
-            <tr>
-                <th>序号</th>
-                <th>名称</th>
-                <th>类型</th>
-                <th>产地</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            <div ng-show="editedList.loading">loading...</div>
-            <tr ng-repeat="movie in $data track by $index">
-                <td data-title="'序号'" >{{movie.Seq}}</td>
-                <td data-title="'名称'" >{{movie.Name[editedList.defaultLang]}}</td>
-                <td data-title="'类型'" ><span ng-repeat="category in movie.CategoryName track by $index">{{category[editedList.defaultLang]}}</span> </td>
-                <td data-title="'产地'" ><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span> </td>
-<!-- 
-                <td data-title="'类型'" ><span ng-repeat="category in editedList.categoryList track by $index"> {{category[editedList.defaultLang]}}</span> </td>
-                <td data-title="'产地'" ><span ng-repeat="location in movie.LocationName track by $index">{{location[editedList.defaultLang]}}</span> </td> -->
 
-
-
-
-
-                <td data-title="'操作'">
-                    <button ng-click="editedList.edit(movie.ID)" class="btn btn-xs btn-default" title="编辑">
-                        <i class="glyphicon glyphicon-pencil"></i>
-                    </button>
-                    <button ng-click="editedList.delMovie(movie.ID)" class="btn btn-xs btn-default" title="删除">
-                        <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                    
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div ng-show="editedList.noData">查无数据</div>
 </div>
