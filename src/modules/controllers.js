@@ -8,7 +8,19 @@
                 var self = this;
                 self.init = function () {
                     this.maskUrl = '';
-                }
+                    console.log('index');
+
+                    //上传层
+                    self.showUpload = false;
+                    self.uploadMaskUrl = 'pages/videoUpload.html';
+                    self.maskParams = {};
+                };
+
+                //显示上传页面
+                self.showUploadHideMask = function (bool) {
+                    self.showUpload = bool
+                };
+
             }
         ])
 
@@ -247,6 +259,7 @@
                     }
 
                 };
+                
 
                 //图片上传
                 self.uploadLists = function() {
@@ -564,6 +577,190 @@
             }
         ])
 
+        //视频上传
+        .controller('videoUploadController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', '$filter', 'md5',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, $filter, md5) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    // 初始化上传列表对象
+                    self.uploadList = new UploadLists();
+
+
+                };
+
+                self.cancel = function () {
+                    $scope.index.showUploadHideMask(false);
+                };
+
+                self.add = function () {
+                    //self.uploadList = new UploadLists();
+                    var Type = $scope.index.maskParams.type
+                    self.uploadList.uploadFile($scope.myFileMovie,  self.uploadList, Type);
+                };
+
+                function UploadLists() {
+                    this.data = [];
+                    this.maxId = 0;
+                }
+
+                UploadLists.prototype = {
+                    add: function (video) {
+                        this.data.push({"video": video, "id": this.maxId});
+                        return this.maxId++;
+                    },
+                    setPercentById: function (type, id, percentComplete) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].percentComplete = percentComplete;
+                                break;
+                            }
+                        }
+                    },
+                    setSrcSizeById: function (type, id, src, size) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].src = src;
+                                this.data[i][type].size = size;
+                                break;
+                            }
+                        }
+                    },
+                    deleteById: function (id) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果正在上传，取消上传
+                                // 视频
+                                if (l[i].video.percentComplete < 100 && l[i].video.percentComplete != '失败') {
+                                    l[i].video.xhr.abort();
+                                }
+                                // 删除data
+                                l.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    judgeCompleted: function (id, o, type) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果视频和字幕都上传完毕
+                                if (l[i].video.percentComplete >= 100)  {
+                                    o.transcode(id, o, type);
+                                }
+                                break;
+                            }
+                        }
+                    },
+                    transcode: function (id, o, type) {
+                        var l = this.data;
+                        var source = {};
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                source = l[i];
+                                break;
+                            }
+                        }
+                        // 转码
+                        var data = JSON.stringify({          //加type
+                            "action": "submitTranscodeTask",
+                            "token": util.getParams('token'),
+                            "rescode": "200",
+                            "data": {
+                                "Type": type,
+                                "movie": {
+                                    "oriFileName": source.video.name,
+                                    "filePath": source.video.src
+                                }
+                            }
+                        })
+                        console && console.log(data);
+                        $http({
+                            method: 'POST',
+                            url: util.getApiUrl('tanscodetask', '', 'server'),
+                            data: data
+                        }).then(function successCallback(response) {
+                            var msg = response.data;
+                            if (msg.rescode == '200') {
+                                console && console.log('转码 ' + id);
+                                // 从列表中删除
+                                o.deleteById(id);
+                            }
+                            else if (msg.rescode == '401') {
+                                alert('访问超时，请重新登录');
+                                $state.go('login');
+                            }
+                            else {
+                                // 转码申请失败后再次调用
+                                console && console.log('转码申请失败后再次调用');
+                                setTimeout(function () {
+                                    o.transcode(id, o, type);
+                                }, 5000);
+
+                            }
+                        }, function errorCallback(response) {
+                            // 转码申请失败后再次调用
+                            console && console.log('转码申请失败后再次调用');
+                            console && console.log(response);
+                            setTimeout(function () {
+                                o.transcode(id, o, type);
+                            }, 5000);
+                        });
+                    },
+                    uploadFile: function (videoFile, o, type) {
+                        // 上传后台地址
+                        var uploadUrl = CONFIG.uploadVideoUrl;
+
+                        // 电影对象
+                        var videoXhr = new XMLHttpRequest();
+                        var video = {
+                            "name": videoFile.name,
+                            "size": videoFile.size,
+                            "percentComplete": 0,
+                            "xhr": videoXhr
+                        };
+
+
+                        // 添加data，并获取id
+                        var id = this.add(video);
+
+                        // 上传视频
+                        util.uploadFileToUrl(videoXhr, videoFile, uploadUrl, 'normal',
+                            // 上传中
+                            function (evt) {
+                                $scope.$apply(function () {
+                                    if (evt.lengthComputable) {
+                                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                        // 更新上传进度
+                                        o.setPercentById('video', id, percentComplete);
+                                    }
+                                });
+                            },
+                            // 上传成功
+                            function (xhr) {
+                                var ret = JSON.parse(xhr.responseText);
+                                console && console.log(ret);
+                                $scope.$apply(function () {
+                                    o.setSrcSizeById('video', id, ret.filePath, ret.size);
+                                    o.judgeCompleted(id, o, type);
+                                });
+                            },
+                            // 上传失败
+                            function (xhr) {
+                                $scope.$apply(function () {
+                                    o.setPercentById('video', id, '失败');
+                                });
+                                xhr.abort();
+                            }
+                        );
+                    }
+                }
+
+            }
+        ])
+
         .controller('videoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 var self = this;
@@ -633,7 +830,7 @@
                 self.upload = function () {
                     self.maskUrl = "pages/addMovie.html";
                     // $scope.app.showHideMask(true, "pages/addMovie.html");
-                }
+                };
 
                 function UploadLists() {
                     this.data = [
@@ -861,23 +1058,25 @@
 
         .controller('transcodingListController', ['$http', '$scope', '$state', '$stateParams', 'util',
             function ($http, $scope, $state, $stateParams, util) {
-                console.log('transcodingListController')
+                console.log('transcodingListController');
                 var self = this;
                 self.init = function () {
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
                     self.getTranscodeTaskList(1);
-                    console.log($scope.video.test)
-                }
+                };
 
                 //  获取正在转码的列表
                 self.getTranscodeTaskList = function (id) {
                     self.current = id;
+                    self.taskList = [];
+                    self.noData = false;
                     self.loading = true;
                     var data = JSON.stringify({
                         "token": util.getParams('token'),
                         "action": "getTranscodeTaskList",
-                        "status": "working"             //type   1是电影，2是视频
+                        "status": "working",
+                        "Type": id  //type   1是电影，2是视频
                     })
                     $http({
                         method: 'POST',
@@ -906,7 +1105,14 @@
 
                 // 刷新当前state
                 self.refresh = function () {
-                    $state.reload('app.video.transcodingList');
+                    self.getTranscodeTaskList(self.current);
+                   // $state.reload('app.video.transcodingList');
+                };
+                
+                // 上传视频
+                self.upload = function () {
+                    $scope.index.showUploadHideMask(true);
+                    $scope.index.maskParams = {'type':self.current}
                 }
             }
         ])
@@ -921,6 +1127,13 @@
                     self.getTranscodeTaskList(1);
                 }
 
+                // 上传视频
+                self.upload = function () {
+                    $scope.index.showUploadHideMask(true);
+                    $scope.index.maskParams = {'type':self.current}
+
+                }
+
                 self.add = function (task) {
                     //$scope.video.maskUrl = "pages/addMovieInfo.html";
                     $scope.app.showHideMask(true, "pages/addMovieInfo.html");
@@ -933,7 +1146,8 @@
                     var data = JSON.stringify({
                         "token": util.getParams('token'),
                         "action": "getTranscodeTaskList",
-                        "status": "Completed"
+                        "status": "Completed",
+                        "Type": id
                     })
                     $http({
                         method: 'POST',
@@ -1011,6 +1225,13 @@
                     self.defaultLang = util.getDefaultLangCode();
                     self.getTags();
                     self.getSection()
+                }
+
+                // 上传视频
+                self.upload = function () {
+                    $scope.index.showUploadHideMask(true);
+                    $scope.index.maskParams = {'type':self.current}
+
                 }
 
                 self.edit = function (movieID) {
@@ -1244,19 +1465,17 @@
                 var self = this;
                 self.init = function () {
                     console.log($scope.video.test);
-                }
+                };
 
                 self.cancel = function () {
                     // $scope.app.showHideMask(false);
                     $scope.video.maskUrl = "";
-
-                }
+                };
 
 
                 self.add = function () {
                     $scope.video.uploadList.uploadFile($scope.myFileMovie, $scope.myFileSubtitle, $scope.video.uploadList);
                     $scope.video.maskUrl = "";
-
                 }
             }
         ])
@@ -5662,5 +5881,7 @@
 
             }
         ])
+
+
 
 })();
