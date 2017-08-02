@@ -1,0 +1,69 @@
+<!--fix my css-->
+
+<div class="modal-dialog" ng-controller="addVideoInfoController as addV" ng-init="addV.init()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button ng-click="addV.cancel()" type="button" class="close" data-dismiss="modal"
+                    aria-hidden="true">×
+            </button>
+            <h4 class="modal-title">编辑信息</h4>
+        </div>
+        <form name="movieForm" class="form-inline inline-form" novalidate ng-submit="movieForm.$valid && addV.addMovie()">
+            <div class="modal-body">
+                <!--<div class="form-group">
+                            <span ng-repeat="lang in addV.editLangs track by $index">
+                                <label>名称-{{lang.name}}</label>
+                                <input type="text" class="form-control"
+                                       ng-model="addV.movieInfo.Name[lang.code]" value="星际迷航" required>
+                            </span>
+
+                </div>-->
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" class="form-control" ng-model="addV.videoInfo.name[addV.defaultLang]" required>
+                </div>
+                <div class="form-group">
+                    <label>主讲人</label>
+                    <input type="text" class="form-control" ng-model="addV.videoInfo.Lecturer[addV.defaultLang]">
+                </div>
+                <div class="form-group">
+                <span>
+                    <label>资源所属: </label>
+                    <select ng-model="addV.sectionOne" class="form-control" ng-options="x.Name[addV.defaultLang] for x in addV.section"></select>
+                </span>
+                </div>
+                <div class="form-group">
+                <span>
+                    <label>类型: </label>
+                    <select ng-model="addV.liTypeOne" class="form-control" ng-options="x.Name for x in addV.littleType"></select>
+                </span>
+                </div>
+
+                <div class="form-group">
+                    <label>封面</label><br>
+                    <input type="file" file-model="myCoverImg" data-e="none" required>
+                    <div ng-repeat="img in addV.uploadList.data">
+                        <img width="100%" src="{{img.img.src}}">
+                        上传进度：{{img.img.percentComplete}}
+                    </div>
+                    <hr class="break-space">
+                    <div ng-click="addV.addCoverImg()" class="btn btn-primary">上传</div>
+                </div>
+
+                <div class="form-group">
+                        <span>
+                            <label>简介</label>
+                            <textarea style="height: 150px;" type="text" ng-trim="false"  ng-model="addV.videoInfo.Introduce[addV.defaultLang]" class="form-control"></textarea>
+                        </span>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <a ng-click="addV.cancel()" class="btn">取消</a>
+                <button class="btn btn-primary" type="submit" ng-disabled="movieForm.$invalid || addV.saving ">
+                    保存修改
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

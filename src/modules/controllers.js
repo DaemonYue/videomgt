@@ -782,7 +782,6 @@
                     // 初始化上传列表对象
                     self.uploadList = new UploadLists();
 
-                    self.test = "哈哈哈哈"
                 }
 
                 self.gotoPage = function (pageName) {
@@ -1056,6 +1055,7 @@
             }
         ])
 
+        //转码
         .controller('transcodingListController', ['$http', '$scope', '$state', '$stateParams', 'util',
             function ($http, $scope, $state, $stateParams, util) {
                 console.log('transcodingListController');
@@ -1117,6 +1117,7 @@
             }
         ])
 
+        //待入库
         .controller('notEditedListController', ['$http', '$scope', '$state', '$stateParams', 'util',
             function ($http, $scope, $state, $stateParams, util) {
                 console.log('notEditedListController')
@@ -1124,7 +1125,12 @@
                 self.init = function () {
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
-                    self.getTranscodeTaskList(1);
+                    self.current = util.getParams('currentVideoType');
+
+                    if(!self.current){
+                        self.current = 1
+                    }
+                    self.getTranscodeTaskList(self.current);
                 }
 
                 // 上传视频
@@ -1135,8 +1141,14 @@
                 }
 
                 self.add = function (task) {
-                    //$scope.video.maskUrl = "pages/addMovieInfo.html";
-                    $scope.app.showHideMask(true, "pages/addMovieInfo.html");
+                    console.log(task);
+                    if(self.current == 1){
+                        //$scope.video.maskUrl = "pages/addMovieInfo.html";
+                        $scope.app.showHideMask(true, "pages/addMovieInfo.html");
+                    }else if(self.current == 2){
+                        $scope.app.showHideMask(true, "pages/addVideoInfo.html");
+                    }
+
                     $scope.app.maskParams = task;
                 }
                 // 获取转码完成的列表
@@ -1194,7 +1206,7 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             alert('删除成功');
-                            $state.reload($state.current.name);
+                            self.getTranscodeTaskList(self.current);
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -1211,20 +1223,21 @@
             }
         ])
 
+        //已入库
         .controller('editedListController', ['$http', '$scope', '$state', '$filter', '$stateParams', 'NgTableParams', 'util',
             function ($http, $scope, $state, $filter, $stateParams, NgTableParams, util) {
                 console.log('editedListController')
                 var self = this;
                 self.init = function () {
-                    // 选中分类
-                    $scope.arr = {};
-
-                    $scope.arr.catrgoryArr = [];
-                    $scope.arr.LocationArr = [];
 
                     self.defaultLang = util.getDefaultLangCode();
+
+                    $scope.arr = {};
+                    $scope.arr.catrgoryArr = [];
+                    $scope.arr.LocationArr = [];
                     self.getTags();
-                    self.getSection()
+                    self.getSection();
+                    self.getVideoLittelType();
                 }
 
                 // 上传视频
@@ -1400,19 +1413,61 @@
                             self.sectionOriginal = (msg.data.Section).concat();
                             //self.sectionName = self.section[0];
                             /*-----第一项为空的科室分组-------*/
-                            var undef = {
+                          /*  var undef = {
                                 'Name': {'zh-CN':''},
                                 'ID': undefined
                             };
-                            self.sectionOriginal.unshift(undef);
+                            self.sectionOriginal.unshift(undef);*/
                             /*------第一项为全部的科室分组------*/
                             var hos = {
                                 'Name': {'zh-CN':'全部'},
-                                'ID': undefined
+                                'ID': ''
                             };
                             self.section.unshift(hos);
                             self.sectionName = self.section[0];
-                            self.getResource();
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //转换科室
+                self.changeSection = function () {
+
+                    self.getVideos(2);
+                }
+
+                //获取宣教视频类型
+                self.getVideoLittelType = function (ite) {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "GetLittleTypeList";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.littleType = msg.TypeList;
+                            var all = {
+                                "ID": '',
+                                "Name":'全部'
+                            };
+                           // all.Name[self.defaultLang] = '全部';
+                            self.littleType.unshift(all);
+                            if(!ite){
+                                self.typeBtnChoose = self.littleType[0].ID;
+                            }
+
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -1430,7 +1485,115 @@
                 //获取宣教视频
                 self.getVideos = function (id) {
                     self.current = id;
+                    self.loading1 = true;
+                    self.noVideo = false;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 10,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var paramsUrl = params.url();
+                            var data = {
+                                "action": "GetVideoList",
+                                "token": util.getParams("token"),
+                                "keywords": self.searName?self.searName:'',
+                                "pager":{
+                                    "total":-1,
+                                    "per_page":paramsUrl.count - 0,
+                                    "page":paramsUrl.page - 0,
+                                    "orderby":"",
+                                    "sortby":"desc"
+                                },
+                                "SectionID": self.sectionName.ID,
+                                "LittleTypeID": self.typeBtnChoose
+
+                            }
+
+                            data = JSON.stringify(data);
+                            return $http({
+                                method: $filter('ajaxMethod')(),
+                                url: util.getApiUrl('educationalvideo', '', 'server'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                var page = data.data.Pager;
+                                var list = data.data.VideoList;
+                                if (page.total == 0) {
+                                    self.noVideo = true;
+                                    return;
+                                }
+                                params.total(data.data.total);
+                                for(var i=0; i<list.length; i++){
+                                    list[i].Name = JSON.parse(list[i].Name);
+                                }
+                                return list;
+                            }, function errorCallback(data, status, headers, config) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading1 = false;
+                            })
+                        }
+                    });
                 }
+
+                //添加宣教视频种类
+                self.addLiType = function () {
+                    self.maskUrl = "pages/videoTypeAdd.html";
+                }
+
+                //编辑宣教视频种类
+                self.editLiType = function () {
+                    self.maskUrl = "pages/videoTypeEdit.html";
+                };
+
+
+                //转换选中的视频类型
+                self.changeType = function (type) {
+                    self.typeBtnChoose = type.ID;
+                    self.typeName = type.Name;
+                    self.getVideos(2);
+                };
+
+                //删除宣教视频种类
+                self.delLiType = function () {
+                    var s = confirm('确定删除该类型吗？');
+                    if(s){
+                        var datap = util.getObject('ajaxData');
+                        datap.action = "DelType";
+                        datap.LittleTypeID = self.typeBtnChoose
+                        var data = JSON.stringify(datap);
+                        $http({
+                            method: 'POST',
+                            url: util.getApiUrl('educationalvideo', '', 'server'),
+                            data: data
+                        }).then(function successCallback(response) {
+                            var msg = response.data;
+                            if (msg.rescode == '200') {
+                                alert("删除成功！");
+                                self.getVideoLittelType();
+
+                            } else if (msg.rescode == "401") {
+                                alert('访问超时，请重新登录');
+                                $state.go('login');
+                            } else {
+                                alert(msg.rescode + ' ' + msg.errInfo);
+                            }
+                        }, function errorCallback(response) {
+                            alert(response.status + ' 服务器出错');
+                        }).finally(function (value) {
+                            self.loading = false;
+                        });
+                    }
+                }
+
+                //编辑宣教视频信息
+                self.editVideo = function (item) {
+                    self.maskUrl = "pages/editVideoInfo.html";
+                    console.log(item);
+                    self.video = item;
+                }
+
 
 
                 // // 监测电影分类，如果有，返回true
@@ -1458,6 +1621,112 @@
             }
         ])
 
+        //添加视频类型
+        .controller('addVideoTypeController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', '$filter', 'md5',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, $filter, md5) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "AddType";
+                    datap.Type = {
+                        "Name": self.name
+                    };
+                    var data = JSON.stringify(datap);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("保存成功！");
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errorInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+
+                    });
+                };
+
+                self.cancel = function () {
+                    $scope.editedList.maskUrl = "";
+                    $scope.editedList.getVideoLittelType();
+
+
+                };
+
+            }
+        ])
+
+        //编辑视频类型
+        .controller('editVideoTypeController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', '$filter', 'md5',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, $filter, md5) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.id = $scope.editedList.typeBtnChoose;
+                    self.name = $scope.editedList.typeName;
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "UpdateTypeName";
+                    datap.LittleTypeID = self.id;
+                    datap.Type = {
+                        "Name": self.name
+                    };
+                    var data = JSON.stringify(datap);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("保存成功！");
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errorInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+
+                    });
+                };
+
+                self.cancel = function () {
+                    $scope.editedList.maskUrl = "";
+                    $scope.editedList.getVideoLittelType(true);
+
+
+                };
+
+            }
+        ])
+
+        //上传影片
         .controller('addMovieController', ['$http', '$scope', '$state', '$stateParams', 'util',
             function ($http, $scope, $state, $stateParams, util) {
                 console.log('addMovieController');
@@ -1480,6 +1749,7 @@
             }
         ])
 
+        //编辑影片信息，将其入库
         .controller('addMovieInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $stateParams, util, CONFIG) {
                 console.log('addMovieInfoController')
@@ -1709,7 +1979,289 @@
 
                             alert('添加成功')
                             self.cancel();
+                            util.setParams('currentVideoType',1);
                             $state.reload('app.video.notEditedList')
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+            }
+        ])
+
+        //编辑视频信息，将其入库
+        .controller('addVideoInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+
+                    self.videoInfoT = $scope.app.maskParams;
+                    // 电影分类 初始化 数组 电影产地 初始化 数组
+                    self.videoInfo = {};
+                    self.videoInfo.name = {};
+                    self.videoInfo.name[self.defaultLang] = self.videoInfoT.FileOrigName;
+                    self.uploadList = new $scope.app.uploadLists();
+
+                    self.getSection();
+                    self.getVideoLittelType();
+                }
+
+                self.cancel = function () {
+                    // $scope.video.maskUrl = "";
+                    $scope.app.showHideMask(false);
+                }
+
+                // 上传图片
+                self.addCoverImg = function () {
+                    self.uploadList.uploadFile($scope.myCoverImg, self.uploadList);
+                }
+
+
+                //获取科室
+                self.getSection = function () {
+                    self.section = [];
+                    var datap = $scope.app.data;
+                    datap.action = "getHospitalInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.section = msg.data.Section;
+                            var hos = {
+                                'Name': {'zh-CN':'未分区'},
+                                'ID': undefined
+                            };
+                            self.section.unshift(hos);
+                            self.sectionOne = self.section[0];
+                            console.log(self.section)
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取宣教视频类型
+                self.getVideoLittelType = function () {
+                    self.section = [];
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "GetLittleTypeList";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                           self.littleType = msg.TypeList;
+                            if(self.littleType){
+                                self.liTypeOne = self.littleType[0]
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+
+                // 添加电影入库
+                self.addMovie = function () {
+                    self.saving = true;
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'AddVideo';
+                    datap.taskID = self.videoInfoT.ID;
+                    datap.Video = {
+                        "LittleTypeID": self.liTypeOne.ID,
+                        "SectionID": self.sectionOne.ID,
+                        "Name": self.videoInfo.name,
+                        "Lecturer": self.videoInfo.Lecturer?self.videoInfo.Lecturer:'',
+                        "URL_ABS": self.videoInfoT.URL,
+                        "Duration": self.videoInfoT.Duration,
+                        "VideoSize": self.videoInfoT.Size,
+                        "Introduce": self.videoInfo.Introduce?self.videoInfo.Introduce:'',
+                        "PicURL_ABS":''
+                    };
+
+
+
+
+                    var data = JSON.stringify(datap);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+
+                            alert('添加成功');
+                            util.setParams('currentVideoType',2);
+                            $state.reload('app.video.notEditedList');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        self.cancel();
+                    });
+                }
+            }
+        ])
+
+        //编辑视频信息（已经入库的）
+        .controller('editVideoInfoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.videoInfo = $scope.editedList.video;
+                    console.log(self.videoInfo);
+
+                    self.getSection();
+                    self.getVideoLittelType();
+                }
+
+                self.cancel = function () {
+                     $scope.editedList.maskUrl = "";
+                     $scope.editedList.getVideos(2);
+                }
+
+                //获取科室
+                self.getSection = function () {
+                    self.section = [];
+                    var datap = $scope.app.data;
+                    datap.action = "getHospitalInfo";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.section = msg.data.Section;
+                            var hos = {
+                                'Name': {'zh-CN':'未分区'},
+                                'ID': undefined
+                            };
+                            self.section.unshift(hos);
+                            self.sectionOne = self.section[0];
+                            console.log(self.section)
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取宣教视频类型
+                self.getVideoLittelType = function () {
+                    self.section = [];
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "GetLittleTypeList";
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.littleType = msg.TypeList;
+                            if(self.littleType){
+                                self.liTypeOne = self.littleType[0]
+                            }
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+
+                // 添加电影入库
+                self.addMovie = function () {
+                    self.saving = true;
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'AddVideo';
+                    datap.taskID = self.videoInfoT.ID;
+                    datap.Video = {
+                        "LittleTypeID": self.liTypeOne.ID,
+                        "SectionID": self.sectionOne.ID,
+                        "Name": self.videoInfo.name,
+                        "Lecturer": self.videoInfo.Lecturer?self.videoInfo.Lecturer:'',
+                        "URL_ABS": self.videoInfoT.URL,
+                        "Duration": self.videoInfoT.Duration,
+                        "VideoSize": self.videoInfoT.Size,
+                        "Introduce": self.videoInfo.Introduce?self.videoInfo.Introduce:'',
+                        "PicURL_ABS":''
+                    };
+
+
+
+
+                    var data = JSON.stringify(datap);
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+
+                            alert('添加成功');
+                            util.setParams('currentVideoType',2);
+                            $state.reload('app.video.notEditedList');
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -1971,6 +2523,7 @@
             }
         ])
 
+        //编辑影片信息
         .controller('editMovieInfoController', ['$http', '$scope', '$state', '$filter', '$stateParams', 'util', 'CONFIG',
             function ($http, $scope, $state, $filter, $stateParams, util, CONFIG) {
                 console.log('editMovieInfoController')

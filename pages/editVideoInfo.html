@@ -1,0 +1,72 @@
+<!--fix my css-->
+<div class="modal fade in">
+    <div class="modal-backdrop fade in"></div>
+    <div class="modal-dialog" ng-controller="editVideoInfoController as editV" ng-init="editV.init()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button ng-click="editV.cancel()" type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+                <h4 class="modal-title">编辑信息</h4>
+            </div>
+            <form name="movieForm" class="form-inline inline-form" novalidate
+                  ng-submit="movieForm.$valid && editV.addMovie()">
+                <div class="modal-body">
+                    <!--<div class="form-group">
+                                <span ng-repeat="lang in editV.editLangs track by $index">
+                                    <label>名称-{{lang.name}}</label>
+                                    <input type="text" class="form-control"
+                                           ng-model="editV.movieInfo.Name[lang.code]" value="星际迷航" required>
+                                </span>
+
+                    </div>-->
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" class="form-control" ng-model="editV.videoInfo.Name[editV.defaultLang]"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label>主讲人</label>
+                        <input type="text" class="form-control" ng-model="editV.videoInfo.Lecturer[editV.defaultLang]">
+                    </div>
+                    <div class="form-group">
+                <span>
+                    <label>资源所属: </label>
+                    <select ng-model="editV.videoInfo" class="form-control"
+                            ng-options="x.Name[editV.defaultLang] for x in editV.section"></select>
+                </span>
+                    </div>
+                    <div class="form-group">
+                <span>
+                    <label>类型: </label>
+                    <select ng-model="editV.liTypeOne" class="form-control"
+                            ng-options="x.Name for x in editV.littleType"></select>
+                </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>封面</label><br>
+                        <img width="100%" src="{{editV.PicURL}}">
+
+                    </div>
+
+                    <div class="form-group">
+                        <span>
+                            <label>简介</label>
+                            <textarea style="height: 150px;" type="text" ng-trim="false"
+                                      ng-model="editV.videoInfo.Introduce[editV.defaultLang]"
+                                      class="form-control"></textarea>
+                        </span>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <a ng-click="editV.cancel()" class="btn">取消</a>
+                    <button class="btn btn-primary" type="submit" ng-disabled="movieForm.$invalid || editV.saving ">
+                        保存修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

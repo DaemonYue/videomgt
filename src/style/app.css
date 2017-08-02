@@ -936,7 +936,7 @@ body, .app {
     margin-top: 10px;
 }
 
-.inline-form input{
+.inline-form input, .inline-form select, .inline-form textarea{
     width: 80% !important;
 }
 /*----------------------基础样式   YXX------------------------------------------------*/
@@ -1173,4 +1173,12 @@ body, .app {
 
 td,th{
     border: none!important;
+}
+
+.littleTypeChoose{
+    background-color: lightblue;
+}
+
+.littleTypeBehav a{
+    cursor: pointer;
 }
