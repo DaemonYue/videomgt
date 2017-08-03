@@ -1526,6 +1526,7 @@
                                 params.total(data.data.total);
                                 for(var i=0; i<list.length; i++){
                                     list[i].Name = JSON.parse(list[i].Name);
+                                    list[i].SName = JSON.parse(list[i].SName);
                                 }
                                 return list;
                             }, function errorCallback(data, status, headers, config) {
@@ -2181,9 +2182,12 @@
                                 'ID': undefined
                             };
                             self.section.unshift(hos);
-                            self.sectionOne = self.section[0];
-                            console.log(self.section)
-
+                            var len = self.section.length;
+                            for(var i=0; i<len; i++){
+                                if(self.section[i].ID == self.videoInfo.SectionID){
+                                    self.sectionOne = self.section[i];
+                                }
+                            }
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -2211,9 +2215,13 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.littleType = msg.TypeList;
-                            if(self.littleType){
-                                self.liTypeOne = self.littleType[0]
+                            var len = self.littleType.length;
+                            for(var i=0; i<len; i++){
+                                if(self.littleType[i].ID == self.videoInfo.LittleTypeID){
+                                    self.liTypeOne = self.littleType[i]
+                                }
                             }
+
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -4686,6 +4694,7 @@
                     self.getSection();
 
                     self.getResBtn();
+                    self.notEmpty = false;
 
 
 
@@ -4740,15 +4749,15 @@
                             self.sectionOriginal = (msg.data.Section).concat();
                             //self.sectionName = self.section[0];
                             /*-----第一项为空的科室分组-------*/
-                            var undef = {
+                         /*   var undef = {
                                 'Name': {'zh-CN':''},
                                 'ID': undefined
                             };
-                            self.sectionOriginal.unshift(undef);
+                            self.sectionOriginal.unshift(undef);*/
                             /*------第一项为全部的科室分组------*/
                             var hos = {
                                 'Name': {'zh-CN':'全部'},
-                                'ID': undefined
+                                'ID': -2
                             };
                             self.section.unshift(hos);
                             self.sectionName = self.section[0];
@@ -4769,12 +4778,11 @@
 
                 //获取资源信息
                 self.getResource = function () {
-                    console.log(self.sectionName);
                     self.noData = false;
                     self.loading = true;
                     self.tableParams = new NgTableParams({
                         page: 1,
-                        count: 10,
+                        count: 5,
                         url: ''
                     }, {
                         counts: [],
@@ -4831,7 +4839,6 @@
 
                 //转换科室
                 self.changeSection = function () {
-                    console.log(self.sectionName);
                     self.getResource();
                 };
 
@@ -4854,25 +4861,33 @@
                 self.addResource = function (id) {
                     switch (id){
                         case 2:
-                            $scope.app.showHideMask(true,'pages/innerCutResourcePicAdd.html');
+                           // $scope.app.showHideMask(true,'pages/innerCutResourcePicAdd.html');
+                            self.maskUrl = 'pages/innerCutResourcePicAdd.html';
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
                         case 1:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceVideoAdd.html');
+                            //$scope.app.showHideMask(true,'pages/innerCutResourceVideoAdd.html');
+                            self.maskUrl = 'pages/innerCutResourceVideoAdd.html';
+
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
                         case 3:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceLiveAdd.html');
+                            //$scope.app.showHideMask(true,'pages/innerCutResourceLiveAdd.html');
+                            self.maskUrl = 'pages/innerCutResourceLiveAdd.html';
+
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
                         case 4:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceTextAdd.html');
+                           // $scope.app.showHideMask(true,'pages/innerCutResourceTextAdd.html');
+                            self.maskUrl = 'pages/innerCutResourceTextAdd.html';
                             //$scope.app.maskParams = {section: self.chooseSection};
                             break;
                         default:
                             break;
                     }
-                    $scope.app.maskParams = {resourceId: id, section: self.sectionOriginal};
+                    self.resourceId = id;
+
+                    //$scope.app.maskParams = {resourceId: id, section: self.sectionOriginal};
 
                 };
 
@@ -4880,32 +4895,183 @@
                 self.editResource = function (res) {
                     switch (self.resourceChoose.ID){
                         case 2:
-                            $scope.app.showHideMask(true,'pages/innerCutResourcePicEdit.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            //$scope.app.showHideMask(true,'pages/innerCutResourcePicEdit.html');
+                            self.maskUrl = 'pages/innerCutResourcePicEdit.html';
                             break;
                         case 1:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceVideoEdit.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            //$scope.app.showHideMask(true,'pages/innerCutResourceVideoEdit.html');
+                            self.maskUrl = 'pages/innerCutResourceVideoEdit.html';
                             break;
                         case 3:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceLiveEdit.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            //$scope.app.showHideMask(true,'pages/innerCutResourceLiveEdit.html');
+                            self.maskUrl = 'pages/innerCutResourceLiveEdit.html';
                             break;
                         case 4:
-                            $scope.app.showHideMask(true,'pages/innerCutResourceTextEdit.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            //$scope.app.showHideMask(true,'pages/innerCutResourceTextEdit.html');
+                            self.maskUrl = 'pages/innerCutResourceTextEdit.html';
                             break;
                         default:
                             break;
 
                     }
-                    $scope.app.maskParams = {resource: res};
+                    self.resource = res;
                 };
+
+                //删除资源
+                self.delResource = function () {
+                    if(!self.checkboxes || !self.notEmpty){
+                        alert("请选择要删除的资源！");
+                        return;
+                    }
+                    var s = confirm('确定删除资源吗？');
+                    if(s){
+                        self.ids = [];
+                        var item = self.checkboxes.items;
+                        for (var i in item){
+                            if(item[i] == true){
+                                self.ids.push(i);
+                            }
+                        }
+                        var datap = util.getObject('ajaxData');
+                        datap.action = "DelMaterial";
+                        datap.type = self.resourceChoose.ID;
+                        datap.ids = self.ids;
+
+                        var data = JSON.stringify(datap);
+                        $http({
+                            method: 'POST',
+                            url: util.getApiUrl('material', '', 'server2'),
+                            data: data
+                        }).then(function successCallback(response) {
+                            var msg = response.data;
+                            if (msg.rescode == '200') {
+                                alert('删除成功!');
+                            } else if (msg.rescode == "401") {
+                                alert('访问超时，请重新登录');
+                                $state.go('login');
+                            } else {
+                                alert(msg.rescode + ' ' + msg.errInfo);
+                            }
+                        }, function errorCallback(response) {
+                            alert(response.status + ' 服务器出错');
+                        }).finally(function (value) {
+                            self.getResource();
+                        });
+
+                    }
+
+                };
+
+                //选择资源
+                self.changeCheckBox = function () {
+                    var checks = self.checkboxes;
+                    if(checks){
+                        for(var j in checks.items){
+                            if(checks.items[j] == true){
+                                self.notEmpty = true;
+                                return;
+                            }
+                        }
+                        self.notEmpty = false;
+                    }
+                }
                 
                 //转换资源类型
                 self.changeResource = function (res) {
+                    self.checkboxes = undefined;
                     self.resourceChoose = res;
                     self.getResource();
+                };
+
+                //图片上传
+                self.uploadLists = function() {
+                    this.data = [];
+                    this.maxId = 0;
+                };
+
+                self.uploadLists.prototype = {
+                    add: function (img) {
+                        this.data.push({"img": img, "id": this.maxId});
+                        return this.maxId;
+                    },
+                    changeImg: function (img) {
+                        // 只允许 上传 一张图片
+                        this.data = [];
+                        this.data.push({"img": img, "id": this.maxId});
+                        return this.maxId;
+                    },
+                    setPercentById: function (type, id, percentComplete) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].percentComplete = percentComplete;
+                                break;
+                            }
+                        }
+                    },
+                    setSrcSizeById: function (type, id, src, size) {
+                        for (var i = 0; i < this.data.length; i++) {
+                            if (this.data[i].id == id) {
+                                this.data[i][type].src = src;
+                                this.data[i][type].size = size;
+                                break;
+                            }
+                        }
+                    },
+                    deleteById: function (id) {
+                        var l = this.data;
+                        for (var i = 0; i < l.length; i++) {
+                            if (l[i].id == id) {
+                                // 如果正在上传，取消上传
+                                // 图片
+                                if (l[i].img.percentComplete < 100 && l[i].img.percentComplete != '失败') {
+                                    l[i].video.xhr.abort();
+                                }
+                                // 删除data
+                                l.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    uploadFile: function (imgFile, o) {
+                        // 图片上传后台地址
+                        var uploadUrl = CONFIG.uploadImgUrl;
+
+                        // 图片对象
+                        var imgXhr = new XMLHttpRequest();
+                        var img = {"name": imgFile.name, "size": imgFile.size, "percentComplete": 0, "xhr": imgXhr};
+
+                        var id = this.changeImg(img);
+                        // 上传视频
+                        util.uploadFileToUrl(imgXhr, imgFile, uploadUrl, 'normal',
+                            // 上传中
+                            function (evt) {
+                                $scope.$apply(function () {
+                                    if (evt.lengthComputable) {
+                                        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                                        // 更新上传进度
+                                        o.setPercentById('img', id, percentComplete);
+                                    }
+                                });
+                            },
+
+                            // 上传成功
+                            function (xhr) {
+                                var ret = JSON.parse(xhr.responseText);
+                                console && console.log(ret);
+                                $scope.$apply(function () {
+                                    o.setSrcSizeById('img', id, ret.upload_path, ret.size);
+                                });
+                                // self.movieInfo.PicSize = ret.size;
+                                // alert('上传成功')
+                            },
+                            // 上传失败
+                            function (xhr) {
+                                alert('图片上传失败，请重新上传');
+                                o.deleteById(id);
+                                xhr.abort();
+                            }
+                        );
+                    }
                 };
 
 
@@ -5142,9 +5308,9 @@
                     console.log($scope.app.data);
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
-                    self.uploadList = new $scope.app.uploadLists();
-                    self.resId = $scope.app.maskParams.resourceId;
-                    self.section = $scope.app.maskParams.section;
+                    self.uploadList = new $scope.cut.uploadLists();
+                    self.resId = $scope.cut.resourceId;
+                    self.section = $scope.cut.sectionOriginal;
 
                     self.sectionName = self.section[0];
 
@@ -5199,8 +5365,9 @@
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
+                    $scope.cut.maskUrl = "";
+                    $scope.cut.getResource();
+                    //$scope.app.showHideMask(false);
                    // $state.reload('app.user.section', $stateParams, {reload: true})
 
                 };
@@ -5214,6 +5381,70 @@
                         self.uploadList.uploadFile($scope.myCoverImg, a);
                 }
 
+            }
+        ])
+
+        //编辑插播图片
+        .controller('editInnerCutPicController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                console.log('addSectionController');
+                var self = this;
+                self.init = function () {
+                    console.log($scope.app.data);
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.source = $scope.cut.resource;
+                    self.type = $scope.cut.resourceChoose.ID;
+                    var sec = $scope.cut.sectionOriginal;
+                    var len = sec.length;
+                    for(var i=0; i<len; i++){
+                        if(sec[i].ID == self.source.category){
+                            self.secName = sec[i].Name;
+                        }
+                    }
+
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "UpdateMaterial";
+                    datap.type = self.type;
+                    datap.data = {
+                        "name": self.source.name,
+                        "id": self.source.id,
+                        "content": ''
+                    };
+                    var data = JSON.stringify(datap);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('material', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功!');
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        //self.cancel();
+                    });
+                };
+
+                self.cancel = function () {
+                    $scope.cut.maskUrl = "";
+                    $scope.cut.getResource();
+                };
             }
         ])
 
@@ -5288,39 +5519,37 @@
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
                     self.defaultLang = util.getDefaultLangCode();
+
+                    self.resId = $scope.cut.resourceId;
+                    self.section = $scope.cut.sectionOriginal;
+                    self.sectionName = self.section[0];
                 };
 
                 // 保存编辑
                 self.saveForm = function () {
-                    if (self.uploadList.data.length == 0) {
-                        alert('请上传图片');
-                        return;
-                    }
-                    if (self.uploadList.data[0].img.percentComplete != 100) {
-                        alert('上传中，请稍等');
-                        return;
-                    }
-
-                    self.data.action = "addSection";
-                    self.data.data = {
-                        'Name': self.sectionName,
-                        "IconURL": self.uploadList.data[0].img.src,
-                        "IconSize":self.uploadList.data[0].img.size,
-                        "IconFocusURL": self.uploadListHigh.data[0].img.src,
-                        "IconFocusSize": self.uploadListHigh.data[0].img.size,
-                        "HospitalID": self.hospital.ID
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "AddMateril";
+                    datap.data = {
+                        "name": self.name,
+                        "path_abs": '',
+                        "size":'',
+                        "type": self.resId,
+                        "category": self.sectionName.ID,
+                        "md5": '',
+                        'creator': util.getParams('account'),
+                        "content": self.content
                     };
-                    var data = JSON.stringify(self.data);
+                    var data = JSON.stringify(datap);
                     self.saving = true;
 
                     $http({
                         method: 'POST',
-                        url: util.getApiUrl('hospital_info_original', '', 'server1'),
+                        url: util.getApiUrl('material', '', 'server2'),
                         data: data
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            alert('添加成功')
+                            alert('添加成功!');
                             self.cancel();
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -5332,14 +5561,75 @@
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
                         self.saving = false;
-                        self.cancel();
+                        //self.cancel();
                     });
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
-                    // $state.reload('app.user.section', $stateParams, {reload: true})
+                    $scope.cut.maskUrl = "";
+                    $scope.cut.getResource();
+                };
+
+            }
+        ])
+
+        //编辑插播文本
+        .controller('editInnerCutTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
+            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    self.source = $scope.cut.resource;
+                    self.type = $scope.cut.resourceChoose.ID;
+                    var sec = $scope.cut.sectionOriginal;
+                    var len = sec.length;
+                    for(var i=0; i<len; i++){
+                        if(sec[i].ID == self.source.category){
+                            self.secName = sec[i].Name;
+                        }
+                    }
+                };
+
+                // 保存编辑
+                self.saveForm = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "UpdateMaterial";
+                    datap.type = self.type;
+                    datap.data = {
+                        "name": self.source.name,
+                        "id": self.source.id,
+                        "content": self.source.content
+                    };
+                    var data = JSON.stringify(datap);
+                    self.saving = true;
+
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('material', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功!');
+                            self.cancel();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.saving = false;
+                        //self.cancel();
+                    });
+                };
+
+                self.cancel = function () {
+                    $scope.cut.maskUrl = "";
+                    $scope.cut.getResource();
                 };
 
             }

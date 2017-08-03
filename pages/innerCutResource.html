@@ -4,14 +4,13 @@
     </h4>
 
     <div class="container-right">
+        <!--------------资源类型----------------->
         <div class="resource-card row">
             <button class="res-btn" ng-repeat="x in cut.btns" ng-click="cut.changeResource(x)"
                     ng-class="{'res-btn-choose':(x.ID == cut.resourceChoose.ID)}">{{x.Name}}
             </button>
-            <!--  <button class="btn">视频</button>
-              <button class="btn">直播</button>
-              <button class="btn">文本</button>-->
         </div>
+        <!--------------资源类型----------------->
         <div class="blue-line"></div>
         <div class="resource-options-out">
             <div class="resource-options section-select">
@@ -20,10 +19,10 @@
                         ng-change="cut.changeSection()"></select>
             </div>
             <button class="btn resource-options btn-add" ng-click="cut.addResource(cut.resourceChoose.ID)"
-                    ng-if="cut.resourceChoose.ID != 1">添加{{cut.resourceChoose.Name}}
+                    ng-if="cut.resourceChoose.ID != 1 && cut.resourceChoose.ID != 3">添加{{cut.resourceChoose.Name}}
             </button>
 
-            <button class="btn resource-options btn-del">删除{{cut.resourceChoose.Name}}</button>
+            <button class="btn resource-options btn-del" ng-if="cut.resourceChoose.ID != 3" ng-click="cut.delResource()">删除{{cut.resourceChoose.Name}}</button>
             <span ng-if="cut.resourceChoose.ID == 1">视频上传请到本地视频库</span>
             <!-- <button class="btn resource-options">添加视频</button>-->
             <div class="like-input resource-options like-input-search">
@@ -41,9 +40,10 @@
 
                 <tr ng-repeat="row in $data">
 
-                    <td class="list-checkbox" header="'headerCheckbox.html'">
+                    <td class="list-checkbox" header="'headerCheckbox.html'" ng-if="cut.resourceChoose.ID != 3">
 
-                        <input type="checkbox" ng-model="cut.checkboxes.items[row.id]">
+                        <input type="checkbox" ng-model="cut.checkboxes.items[row.id]"
+                        ng-change="cut.changeCheckBox()">
 
                     </td>
 
@@ -57,16 +57,14 @@
 
                     <td title="'直播地址'" ng-if="cut.resourceChoose.ID==3">{{row.path_abs}}</td>
 
-                    <td title="'创建人'">{{row.creator}}</td>
+                    <td title="'创建人'" ng-if="cut.resourceChoose.ID != 3">{{row.creator}}</td>
 
-                    <td title="'创建时间'">{{row.createtime}}</td>
+                    <td title="'创建时间'" ng-if="cut.resourceChoose.ID != 3">{{row.createtime}}</td>
 
-                    <td title="'状态'" ng-if="cut.resourceChoose.ID==1">视频</td>
+                    <td title="'资源所属'" ng-if="cut.resourceChoose.ID != 3">{{row.section[cut.defaultLang]}}</td>
 
-                    <td title="'资源所属'">{{row.section[cut.defaultLang]}}</td>
-
-                    <td title="'操作'">
-                        <button class="btn btn-xs btn-default" ng-click="cut.editAP(row)" data-toggle="modal"
+                    <td title="'操作'" ng-if="cut.resourceChoose.ID != 3 && cut.resourceChoose.ID != 1">
+                        <button class="btn btn-xs btn-default" ng-click="cut.editResource(row)" data-toggle="modal"
                                 title="编辑">
                             编辑
                         </button>

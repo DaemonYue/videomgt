@@ -18,7 +18,7 @@
         </div>
 
 
-        <div ng-show="editedList.current == 1">
+        <div ng-hide="editedList.current == 2">
             <div class="blue-line"></div>
             <div class="resource-options-out">
                 <div class="like-input resource-options like-input-search" >
@@ -98,7 +98,7 @@
             </div>
         </div>
 
-        <div ng-show="editedList.current == 2">
+        <div ng-hide="editedList.current == 1">
             <div class="blue-line"></div>
             <div class="resource-options-out">
                 <div class="resource-options section-select">
@@ -125,7 +125,7 @@
                 </div>
             </div>
             <div  class="">
-                <table ng-table="editedList.tableParams" ng-show="!editedList.loading" class="table table-hover">
+                <table ng-table="editedList.tableParams" ng-show="!editedList.loading1" class="table table-hover">
                     <tr ng-repeat="row in $data track by $index">
                         <td title="'序号'">
                             {{$index}}
@@ -134,10 +134,10 @@
                             {{row.Name[editedList.defaultLang]}}
                         </td>
                         <td title="'资源所属'">
-
+                            {{row.SName[editedList.defaultLang]}}
                         </td>
                         <td title="'类型'">
-
+                            {{row.LName}}
                         </td>
                         <td title="'操作'">
                             <a class="btn btn-default" ng-click="editedList.editVideo(row)">编辑</a>
