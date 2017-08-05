@@ -5670,11 +5670,9 @@
             function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
-                    console.log($scope.app.data);
                     $scope.cut.showResource = false;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getResBtn();
-                    self.getPlanList();
                 };
 
                 //获取计划列表
@@ -5688,19 +5686,19 @@
                     }, {
                         counts: [],
                         getData: function (params) {
-                            var datap = $scope.app.data;
-                            datap.action = "getUserInfo";
+                            var datap = util.getObject('ajaxData');
+                            datap.action = "GetResouceList";
                             var paramsUrl = params.url();
-                            datap.data = {
-                                "SectionID": '',
+                            datap.type = self.resourceChoose.ID;
+                            datap.pager = {
                                 "total":-1,
-                                "per_page": paramsUrl.count - 0,
-                                "page": paramsUrl.page - 0,
+                                "per_page":paramsUrl.count - 0,
+                                "page":paramsUrl.page - 0,
                                 "orderby":"",
                                 "sortby":"desc",
                                 "keyword":"",
                                 "status":""
-                            };
+                            }
                             var data = JSON.stringify(datap);
 
                             return $http({
@@ -5708,15 +5706,17 @@
                                 url: util.getApiUrl('', 'plans.json', 'local'),
                                 data: data
                             }).then(function successCallback(data, status, headers, config) {
-                                if (data.data.rescode == '200') {
-                                    if (data.data.TotalCount == 0) {
+                                var msg = data.data;
+                                if (msg.rescode == '200') {
+                                    var page = msg.Pager;
+                                    if (page.total == 0) {
                                         self.noData = true;
                                         return;
                                     }
-                                    params.total(data.data.TotalCount);
-                                    self.users = data.data.data;
+                                    var res = msg.Resource;
+                                    params.total(page.total);
 
-                                    return data.data.data;
+                                    return res;
                                 } else if (data.tata.rescode == '401') {
                                     alert('访问超时，请重新登录');
                                     $location.path("pages/login.html");
@@ -5738,20 +5738,17 @@
                 self.addPlan = function (id) {
                     switch (id){
                         case 2:
-                            $scope.app.showHideMask(true,'pages/innerCutPlanPicAdd.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            $scope.cut.maskUrl = "pages/innerCutPlanPicAdd.html";
                             break;
                         case 1:
-                            $scope.app.showHideMask(true,'pages/innerCutPlanVideoAdd.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            $scope.cut.maskUrl = "pages/innerCutPlanVideoAdd.html";
                             break;
                         case 3:
-                            $scope.app.showHideMask(true,'pages/innerCutPlanLiveAdd.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            $scope.cut.maskUrl = "pages/innerCutPlanLiveAdd.html";
+
                             break;
                         case 4:
-                            $scope.app.showHideMask(true,'pages/innerCutPlanTextAdd.html');
-                            //$scope.app.maskParams = {section: self.chooseSection};
+                            $scope.cut.maskUrl = "pages/innerCutPlanTextAdd.html";
                             break;
                         default:
                             break;
@@ -5792,6 +5789,7 @@
                     }).then(function successCallback(data, status, headers, config) {
                         self.btns = data.data.resource;
                         self.resourceChoose = self.btns[0];
+                        self.getPlanList();
                     }, function errorCallback(data, status, headers, config) {
 
                     }).finally(function (value) {
@@ -5834,10 +5832,8 @@
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
-                    // $state.reload('app.user.section', $stateParams, {reload: true})
-
+                    $scope.cut.maskUrl = '';
+                    $scope.cut.getPlanList();
                 };
 
                 //换页
@@ -5855,18 +5851,7 @@
                 //获取资源
                 self.getResourceList =function () {
                     //self.resourceChoosen = 0;  //用于选择多个资源时计数
-                    self.resourceList = [
-                        {
-                            'ID': 1,
-                            'Size': 11,
-                            'Name': 'test1.jpg'
-                        },
-                        {
-                            'ID': 2,
-                            'Size': 12,
-                            'Name': 'test2.jpg'
-                        }
-                    ]
+
                 };
 
                 self.chooseResource = function () {

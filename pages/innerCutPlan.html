@@ -4,7 +4,7 @@
     </h4>
     <div class="container-right">
         <div class="resource-card row">
-            <button class="res-btn" ng-repeat="x in plan.btns" ng-class="{'btn-choosed':(x.ID == plan.resourceChoose.ID)}"  ng-click="plan.changeResource(x)">{{x.Name}}</button>
+            <button class="res-btn" ng-repeat="x in plan.btns" ng-class="{'res-btn-choose':(x.ID == plan.resourceChoose.ID)}"  ng-click="plan.changeResource(x)">{{x.Name}}</button>
         <!--    <button class="btn">图片</button>
             <button class="btn">视频</button>
             <button class="btn">直播</button>
@@ -36,11 +36,11 @@
 
                     <td title="'序号'">{{$index}}</td>
 
-                    <td title="'计划名称'">{{row.Name}}</td>
+                    <td title="'计划名称'">{{row.name}}</td>
 
-                    <td title="'开始时间'">{{row.startTime}}</td>
+                    <td title="'开始时间'">{{row.starttime}}</td>
 
-                    <td title="'结束时间'">{{row.stopTime}}</td>
+                    <td title="'结束时间'">{{row.endtime}}</td>
 
                     <td title="'编辑者'">{{row.editor}}</td>
 

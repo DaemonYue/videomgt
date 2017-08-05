@@ -55,9 +55,11 @@
         <div ng-class="{'blur':(app.showMaskClass)}">
             <!-- app title -->
             <div class="app-title" style="background-color: {{app.activeAppBgColor}}">
-                <i class="app-icon" style="background-image: url({{app.activeAppIcon}})" ng-show="app.appFramePhase==1"></i>
-                <!-- background: -webkit-radial-gradient(0% 110%, rgba(216,156,44,1) 11%,rgba(211,157,116,0) 70%); {{app.activeAppThemeColor}}-->
-                <h4 class="app-name" style="color: white" ng-show="app.appFramePhase==1">{{app.activeAppName}} </h4>
+                <div  ng-class="{'top-left-block':(app.appFramePhase==1)}">
+                    <i class="app-icon" style="background-image: url({{app.activeAppIcon}})" ng-show="app.appFramePhase==1"></i>
+                    <!-- background: -webkit-radial-gradient(0% 110%, rgba(216,156,44,1) 11%,rgba(211,157,116,0) 70%); {{app.activeAppThemeColor}}-->
+                    <h4 class="app-name" style="color: white" ng-show="app.appFramePhase==1">{{app.activeAppName}} </h4>
+                </div>
             </div>
             <!-- launcher -->
             <div class="app-launcher">

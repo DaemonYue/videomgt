@@ -513,6 +513,15 @@ body, .app {
 
 /*app*/
 
+.top-left-block{
+    position: absolute;
+    height: 56px;
+    width: 180px;
+    top: 0;
+    left: 0;
+    background-color: #1374b1;
+}
+
 .app-frame {
     position: absolute;
     top: 0;
@@ -530,7 +539,7 @@ body, .app {
     height: 112px;
 }
 
-.app-title > .app-icon {
+.app-title  .app-icon {
     position: absolute;
     left: 10px;
     top: 10px;
@@ -543,7 +552,7 @@ body, .app {
     /*border: solid 1px rgba(255,255,255,.28);*/
 }
 
-.app-title > .app-name {
+.app-title  .app-name {
     position: absolute;
     margin: 0;
     left: 64px;
