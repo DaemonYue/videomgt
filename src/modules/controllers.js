@@ -618,11 +618,13 @@
                             }
                         }
                     },
-                    setSrcSizeById: function (type, id, src, size) {
+                    setSrcSizeById: function (type, id, src, size, picHttpUrl, picUrl) {
                         for (var i = 0; i < this.data.length; i++) {
                             if (this.data[i].id == id) {
                                 this.data[i][type].src = src;
                                 this.data[i][type].size = size;
+                                this.data[i][type].phu = picHttpUrl;
+                                this.data[i][type].pu = picUrl;
                                 break;
                             }
                         }
@@ -672,7 +674,9 @@
                                 "Type": type,
                                 "movie": {
                                     "oriFileName": source.video.name,
-                                    "filePath": source.video.src
+                                    "filePath": source.video.src,
+                                    "PicURL": source.video.pu,
+                                    "PicURL_ABS": source.video.phu
                                 }
                             }
                         })
@@ -743,7 +747,7 @@
                                 var ret = JSON.parse(xhr.responseText);
                                 console && console.log(ret);
                                 $scope.$apply(function () {
-                                    o.setSrcSizeById('video', id, ret.filePath, ret.size);
+                                    o.setSrcSizeById('video', id, ret.filePath, ret.size, ret.thumbnail_http_path, ret.thumbnail_path);
                                     o.judgeCompleted(id, o, type);
                                 });
                             },
@@ -1170,7 +1174,6 @@
                         if (msg.rescode == '200') {
                             if (msg.data.taskList.length == 0) {
                                 self.noData = true;
-                                return;
                             }
                             self.taskList = msg.data.taskList;
                         } else if (msg.rescode == "401") {
@@ -1527,7 +1530,11 @@
                                 for(var i=0; i<list.length; i++){
                                     list[i].Name = JSON.parse(list[i].Name);
                                     list[i].SName = JSON.parse(list[i].SName);
+                                    list[i].Lecturer = JSON.parse(list[i].Lecturer);
+                                    list[i].Introduce = JSON.parse(list[i].Introduce);
+
                                 }
+                                console.log(list);
                                 return list;
                             }, function errorCallback(data, status, headers, config) {
                                 alert(response.status + ' 服务器出错');
@@ -1546,6 +1553,33 @@
                 //编辑宣教视频种类
                 self.editLiType = function () {
                     self.maskUrl = "pages/videoTypeEdit.html";
+                };
+
+                //删除宣教视频
+                self.delVideo = function (id) {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "DelVideo";
+                    datap.VideoID = id;
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('educationalvideo', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("删除成功！")
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.getVideos(2);
+                    });
                 };
 
 
@@ -2102,14 +2136,14 @@
                     datap.taskID = self.videoInfoT.ID;
                     datap.Video = {
                         "LittleTypeID": self.liTypeOne.ID,
-                        "SectionID": self.sectionOne.ID,
+                        "SectionID": self.sectionOne.ID?self.sectionOne.ID:{},
                         "Name": self.videoInfo.name,
-                        "Lecturer": self.videoInfo.Lecturer?self.videoInfo.Lecturer:'',
+                        "Lecturer": self.videoInfo.Lecturer?self.videoInfo.Lecturer:{},
                         "URL_ABS": self.videoInfoT.URL,
                         "Duration": self.videoInfoT.Duration,
                         "VideoSize": self.videoInfoT.Size,
-                        "Introduce": self.videoInfo.Introduce?self.videoInfo.Introduce:'',
-                        "PicURL_ABS":''
+                        "Introduce": self.videoInfo.Introduce?self.videoInfo.Introduce:{},
+                        "PicURL_ABS":self.videoInfoT.PicURL_ABS?self.videoInfoT.PicURL_ABS:''
                     };
 
 
@@ -2240,23 +2274,19 @@
                 self.addMovie = function () {
                     self.saving = true;
                     var datap = util.getObject('ajaxData');
-                    datap.action = 'AddVideo';
-                    datap.taskID = self.videoInfoT.ID;
+                    datap.action = 'UpdateVideo';
+                    datap.VideoID = self.videoInfo.ID;
                     datap.Video = {
                         "LittleTypeID": self.liTypeOne.ID,
                         "SectionID": self.sectionOne.ID,
-                        "Name": self.videoInfo.name,
-                        "Lecturer": self.videoInfo.Lecturer?self.videoInfo.Lecturer:'',
-                        "URL_ABS": self.videoInfoT.URL,
-                        "Duration": self.videoInfoT.Duration,
-                        "VideoSize": self.videoInfoT.Size,
-                        "Introduce": self.videoInfo.Introduce?self.videoInfo.Introduce:'',
-                        "PicURL_ABS":''
+                        "Name": self.videoInfo.Name,
+                        "Lecturer": self.videoInfo.Lecturer,
+                        "URL_ABS": self.videoInfo.URL,
+                        "Duration": self.videoInfo.Duration,
+                        "VideoSize": self.videoInfo.Size,
+                        "Introduce": self.videoInfo.Introduce,
+                        "PicURL_ABS":self.videoInfo.PicURL_ABS
                     };
-
-
-
-
                     var data = JSON.stringify(datap);
 
                     $http({
