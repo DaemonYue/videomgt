@@ -42,7 +42,7 @@
                                 <tr ng-repeat="row in $data">
 
                                     <td>
-                                        <input type="radio" ng-value="row.id" ng-model="addPlan.resource">
+                                        <input type="radio" ng-value="row.id" ng-model="addPlan.resource" required>
                                     </td>
                                     
                                     <td title="'序号'">{{$index}}</td>

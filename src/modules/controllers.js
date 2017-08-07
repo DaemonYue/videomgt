@@ -5819,7 +5819,6 @@
                     self.getResourceList();
                     //self.startTime = new Date('2017-07-11 12:30');
                     initTime();
-                    self.resource = [];
                 };
 
                 // 保存编辑
@@ -5829,7 +5828,7 @@
                         alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    console.log(self.resource);
+
                     var datap = util.getObject('ajaxData');
                     datap.action = 'AddPlan';
                     datap.type = $scope.plan.resourceChoose.ID;
@@ -5860,9 +5859,6 @@
                         self.loading = false;
                         self.cancel();
                     });
-
-
-
 
                 };
 
@@ -5947,10 +5943,6 @@
 
                 };
 
-
-                self.clickRadio = function (row) {
-
-                };
 
                 //初始化时间
                 var initTime = function () {
@@ -6073,8 +6065,8 @@
         ])
 
         //添加视频的插播计划
-        .controller('addPlanVideoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+        .controller('addPlanVideoController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
@@ -6092,14 +6084,44 @@
                         alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    console.log(times);
+
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'AddPlan';
+                    datap.type = $scope.plan.resourceChoose.ID;
+                    datap.data = {
+                        'name': self.planName,
+                        'starttime': self.startTime,
+                        'endtime': self.stopTime,
+                        'id': self.resource
+                    }
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功！');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                        self.cancel();
+                    });
+
 
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
-                    // $state.reload('app.user.section', $stateParams, {reload: true})
+                    $scope.plan.maskUrlPlan = '';
+                    $scope.plan.getPlanList();
 
                 };
 
@@ -6108,31 +6130,77 @@
                     self.page = self.page?0:1;
                     if(self.page){
                         for(var i=0; i<self.resourceList.length; i++){
-                            if(self.resourceList[i].ID == self.resource.ID){
+                            if(self.resourceList[i].id == self.resource){
                                 self.resChoosed = self.resourceList[i];
                             }
                         }
                     }
                 };
 
-                //获取资源
-                self.getResourceList =function () {
+                //获取资源信息
+                self.getResourceList = function () {
                     //self.resourceChoosen = 0;  //用于选择多个资源时计数
-                    self.resourceList = [
-                        {
-                            'ID': 1,
-                            'Name': 'test1.jpg',
-                            'Size': 122345,
-                            'Duration': 60
-                        },
-                        {
-                            'ID': 2,
-                            'Name': 'test2.jpg',
-                            'Size': 1111,
-                            'Duration': 224
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 5,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var datap = util.getObject('ajaxData');
+                            datap.action = "GetPage";
+                            datap.type = $scope.plan.resourceChoose.ID;
+                            datap.category = -2;
+                            var paramsUrl = params.url();
+                            datap.pager = {
+                                "total":-1,
+                                "per_page": paramsUrl.count - 0,
+                                "page": paramsUrl.page - 0,
+                                "orderby":"",
+                                "sortby":"desc",
+                                "keyword":'',
+                                "status":""
+                            };
+                            var data = JSON.stringify(datap);
+
+                            return $http({
+                                method: 'POST',
+                                url: util.getApiUrl('material', '', 'server2'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    var page = data.data.Pager;
+                                    var res = data.data.Materials;
+                                    self.resourceList = res;
+                                    if (page.total == 0) {
+                                        self.noData = true;
+                                        return;
+                                    }
+                                    params.total(page.total);
+                                    for(var i=0; i<res.length; i++){
+                                        res[i].section = JSON.parse(res[i].section)
+                                        res[i].duration = 60;
+                                    }
+                                    return res;
+                                } else if (data.tata.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errorInfo);
+                                }
+
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
                         }
-                    ]
+                    });
+
                 };
+
 
                 self.chooseResource = function () {
                     console.log(self.resource);
@@ -6143,9 +6211,9 @@
                     var currTime = new Date();
                     self.startTime = util.setFormatTime(currTime);
                     if(self.resource){
-                        var duration = self.resource.Duration;
+                        var duration = self.resChoosed.duration;
                         var t = currTime.getTime();
-                        t += duration*1000;  //结束时间设为1小时后
+                        t += duration*1000;  //结束时间设为播一遍的时长
                         var afterTime = new Date(t);
                         self.stopTime = util.setFormatTime(afterTime);
                     }
@@ -6261,8 +6329,8 @@
         ])
 
         //添加直播的插播计划
-        .controller('addPlanLiveController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+        .controller('addPlanLiveController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
@@ -6280,15 +6348,43 @@
                         alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    console.log(times);
+
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'AddPlan';
+                    datap.type = $scope.plan.resourceChoose.ID;
+                    datap.data = {
+                        'name': self.planName,
+                        'starttime': self.startTime,
+                        'endtime': self.stopTime,
+                        'id': self.resource
+                    }
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功！');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                        self.cancel();
+                    });
 
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
-                    // $state.reload('app.user.section', $stateParams, {reload: true})
-
+                    $scope.plan.maskUrlPlan = '';
+                    $scope.plan.getPlanList();
                 };
 
                 //换页
@@ -6296,33 +6392,77 @@
                     self.page = self.page?0:1;
                     if(self.page){
                         for(var i=0; i<self.resourceList.length; i++){
-                            if(self.resourceList[i].ID == self.resource){
+                            if(self.resourceList[i].id == self.resource){
                                 self.resChoosed = self.resourceList[i];
                             }
                         }
                     }
                 };
 
-                //获取资源
-                self.getResourceList =function () {
+                //获取资源信息
+                self.getResourceList = function () {
                     //self.resourceChoosen = 0;  //用于选择多个资源时计数
-                    self.resourceList = [
-                        {
-                            'ID': 1,
-                            'Name': 'test1.jpg',
-                            'Url': 'www'
-                        },
-                        {
-                            'ID': 2,
-                            'Name': 'test2.jpg',
-                            'Url': 'www'
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 5,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var datap = util.getObject('ajaxData');
+                            datap.action = "GetPage";
+                            datap.type = $scope.plan.resourceChoose.ID;
+                            datap.category = -2;
+                            var paramsUrl = params.url();
+                            datap.pager = {
+                                "total":-1,
+                                "per_page": paramsUrl.count - 0,
+                                "page": paramsUrl.page - 0,
+                                "orderby":"",
+                                "sortby":"desc",
+                                "keyword":'',
+                                "status":""
+                            };
+                            var data = JSON.stringify(datap);
+
+                            return $http({
+                                method: 'POST',
+                                url: util.getApiUrl('material', '', 'server2'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    var page = data.data.Pager;
+                                    var res = data.data.Materials;
+                                    self.resourceList = res;
+                                    if (page.total == 0) {
+                                        self.noData = true;
+                                        return;
+                                    }
+                                    params.total(page.total);
+                                    for(var i=0; i<res.length; i++){
+                                        res[i].section = JSON.parse(res[i].section)
+                                        res[i].item = true;
+                                    }
+                                    return res;
+                                } else if (data.tata.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errorInfo);
+                                }
+
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
                         }
-                    ]
+                    });
+
                 };
 
-                self.chooseResource = function () {
-                    console.log(self.resource);
-                };
 
                 //初始化时间
                 var initTime = function () {
@@ -6347,6 +6487,7 @@
                  }
 
                  };*/
+
             }
         ])
 
@@ -6441,8 +6582,8 @@
         ])
 
         //添加文本的插播计划
-        .controller('addPlanTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+        .controller('addPlanTextController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
                 self.init = function () {
                     self.editLangs = util.getParams('editLangs');
@@ -6460,15 +6601,44 @@
                         alert('开始时间必须必须在结束时间之前！');
                         return;
                     }
-                    console.log(times);
+
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'AddPlan';
+                    datap.type = $scope.plan.resourceChoose.ID;
+                    datap.data = {
+                        'name': self.planName,
+                        'starttime': self.startTime,
+                        'endtime': self.stopTime,
+                        'id': self.resource,
+                        'content': self.resChoosed.content
+                    }
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('添加成功！');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                        self.cancel();
+                    });
 
                 };
 
                 self.cancel = function () {
-                    //$scope.video.maskUrl = "";
-                    $scope.app.showHideMask(false);
-                    // $state.reload('app.user.section', $stateParams, {reload: true})
-
+                    $scope.plan.maskUrlPlan = '';
+                    $scope.plan.getPlanList();
                 };
 
                 //换页
@@ -6476,31 +6646,77 @@
                     self.page = self.page?0:1;
                     if(self.page){
                         for(var i=0; i<self.resourceList.length; i++){
-                            if(self.resourceList[i].ID == self.resource){
+                            if(self.resourceList[i].id == self.resource){
                                 self.resChoosed = self.resourceList[i];
                             }
                         }
                     }
                 };
 
-                //获取资源
-                self.getResourceList =function () {
+                //获取资源信息
+                self.getResourceList = function () {
                     //self.resourceChoosen = 0;  //用于选择多个资源时计数
-                    self.resourceList = [
-                        {
-                            'ID': 1,
-                            'Name': 'test1.jpg'
-                        },
-                        {
-                            'ID': 2,
-                            'Name': 'test2.jpg'
+                    self.noData = false;
+                    self.loading = true;
+                    self.tableParams = new NgTableParams({
+                        page: 1,
+                        count: 5,
+                        url: ''
+                    }, {
+                        counts: [],
+                        getData: function (params) {
+                            var datap = util.getObject('ajaxData');
+                            datap.action = "GetPage";
+                            datap.type = $scope.plan.resourceChoose.ID;
+                            datap.category = -2;
+                            var paramsUrl = params.url();
+                            datap.pager = {
+                                "total":-1,
+                                "per_page": paramsUrl.count - 0,
+                                "page": paramsUrl.page - 0,
+                                "orderby":"",
+                                "sortby":"desc",
+                                "keyword":'',
+                                "status":""
+                            };
+                            var data = JSON.stringify(datap);
+
+                            return $http({
+                                method: 'POST',
+                                url: util.getApiUrl('material', '', 'server2'),
+                                data: data
+                            }).then(function successCallback(data, status, headers, config) {
+                                if (data.data.rescode == '200') {
+                                    var page = data.data.Pager;
+                                    var res = data.data.Materials;
+                                    self.resourceList = res;
+                                    if (page.total == 0) {
+                                        self.noData = true;
+                                        return;
+                                    }
+                                    params.total(page.total);
+                                    for(var i=0; i<res.length; i++){
+                                        res[i].section = JSON.parse(res[i].section)
+                                        res[i].item = true;
+                                    }
+                                    return res;
+                                } else if (data.tata.rescode == '401') {
+                                    alert('访问超时，请重新登录');
+                                    $location.path("pages/login.html");
+                                } else {
+                                    alert(data.rescode + ' ' + data.errorInfo);
+                                }
+
+                            }, function errorCallback(response) {
+                                alert(response.status + ' 服务器出错');
+                            }).finally(function (value) {
+                                self.loading = false;
+                            })
                         }
-                    ]
+                    });
+
                 };
 
-                self.chooseResource = function () {
-                    console.log(self.resource);
-                };
 
                 //初始化时间
                 var initTime = function () {
@@ -6525,6 +6741,7 @@
                  }
 
                  };*/
+
             }
         ])
 
