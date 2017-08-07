@@ -17,14 +17,16 @@
                 <button class="btn resource-options btn-del">删除计划</button>
                 <div class="like-input  like-input-search" style="display: inline">
                     <input ng-model="plan.resourceName" placeholder="计划名称" class="input-nostyle input-search">
-                    <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search"></span>
+                    <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search" ng-click="plan.getPlanList()"></span>
                 </div>
             </div>
         </div>
 
         <table ng-table="plan.tableParams"  class="table table-hover  table-striped table-bordered">
 
+
             <div style="overflow-x: auto">
+                <div ng-show="plan.noData == true">暂无插播项</div>
 
                 <tr ng-repeat="row in $data">
 
@@ -61,6 +63,9 @@
             </div>
         </table>
     </div>
+    <!--弹窗-->
+    <div ng-include="plan.maskUrlPlan" class="autoscroll"></div>
+    <!--弹窗-->
 </div>
 <script type="text/ng-template" id="headerCheckbox.html">
 
