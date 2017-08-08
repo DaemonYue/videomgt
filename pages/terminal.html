@@ -1,98 +1,127 @@
-<div ng-controller="terminalController as term" ng-init="term.init()" class="height100">
-
-    <!--body-->
-    <div class="container-fluid height100" >
+<div ng-controller="terminalController as term" ng-init="term.init()" class="height100 background-right">
+    <div class="container-fluid height100">
         <div class="row height100">
             <!--左侧导航栏-->
-            <div class="col-sm-3 col-left height100">
-                <ul>
-                    <li ng-repeat="x in term.section">
-                        <a ng-click="term.getSectionDevNum(x.ID)" class="font-bold no-underline cursor-default" >
-                            <!--<i class="glyphicon glyphicon-term"></i>-->&nbsp&nbsp{{x.Name[term.defaultLang]}}
-                        </a>
-                    </li>
-                </ul>
+            <div class="col-sm-3 col-left height100 ter-left">
+                <a ng-repeat="x in term.section" ng-click="term.changeSection(x.ID)"
+                   class="font-bold no-underline navigation-item ter-guide"
+                   ng-class="{'navigation-item-choose':(term.current == x.ID)}">
+                    <!--<i class="glyphicon glyphicon-term"></i>-->&nbsp&nbsp{{x.Name[term.defaultLang]}}
+                </a>
             </div>
             <!--左侧导航栏-->
 
             <!--pages-->
-            <div class="col-sm-9 page col-right">
-                <a>
-                    <strong>
-
-                        用户管理
-                    </strong>
-                </a>
-                <hr>
+            <div class="col-sm-9 page col-right right-position">
+                <h4 class="subtitle">终端管理</h4>
                 <!--loading-->
+                <div class="container-right">
+                    <div ng-show="term.loading">loading...</div>
+                    <!--loading-->
 
-                <div ng-show="userm.loading">loading...</div>
-                <!--loading-->
-                <h4>{{term.form.HotelName}}<small>&nbsp&nbsp在线：{{term.form.online}} / 总数：{{term.form.total}}</small></h4>
-                <hr>
-                <!-- 搜索 -->
-                <div class="search-bar">
-                    <!-- Online  -->
-                    <div class="form-group">
-                        <select ng-model="term.form.Online" class="form-control">
-                            <option value="">全部</option>
-                            <option value="1">在线</option>
-                            <option value="0">离线</option>
+                    <!-- 搜索 -->
+                    <div class="resource-options-out">
+                        <!-- Online  -->
+                        <span>状态： </span>
+                        <div class="form-group resource-options ">
+                            <select ng-model="term.Online" class="form-control">
+                                <option value="">全部</option>
+                                <option value="1">在线</option>
+                                <option value="0">离线</option>
 
-                        </select>
+                            </select>
+                        </div>
+                        <!-- RoomID -->
+                        &nbsp;&nbsp;
+                        <span>房间号： </span>
+                        <div class="form-group resource-options">
+                            <input type="text" name="" ng-model="term.RoomID" class="form-control"
+                                   placeholder="房间号" ng-blur="term.getSectionDevList()">
+                        </div>
+                        <div class="resource-options term-right">
+                            <h4 class="resource-options">{{term.form.HotelName}}
+                                <small>&nbsp&nbsp在线：{{term.form.online}} / 总数：{{term.form.total}}</small>
+                            </h4>
+                            <button class="btn resource-options" ng-click="term.set(1)">设置</button>
+                        </div>
+
+
                     </div>
-                    <!-- RoomID -->
-                    <div class="form-group">
-                        <input type="text" name="" ng-model="term.form.RoomID" class="form-control" placeholder="房间号">
-                    </div>
-                    <a ng-click="term.getDevList()" class="button button-light">
-                        <i class="icon ion-ios-search-strong"></i>搜索
-                    </a>
+                    <!-- 添加终端 -->
+                    <div class="blue-line"></div>
+                    <!-- 终端列表 -->
+                    <table ng-table="term.tableParams" ng-show="!term.loading" class="table table-hover">
+                        <tr ng-repeat="row in $data track by $index" ng-if="row.SectionID != -1">
+                            <td title="'状态'" style="color:{{row.Online == 0 ? '' : 'rgb(0,185,120)'}}">
+                                {{row.Online == 0 ? "离线" : "在线"}}
+                            </td>
+                            <td title="'科室'">
+                                {{row.Name[term.defaultLang]}}
+                            </td>
+                            <td title="'房间号'">
+                                {{row.RoomID}}
+                            </td>
+                            <td title="'MAC地址'">
+                                {{row.TermMac}}
+                            </td>
+                            <td title="'IP地址'">
+                                {{row.IP}}
+                            </td>
+                            <td title="'操作'" class="operate">
+                                <a ng-click="term.screenShot(row.ID)">截屏</a>
+                                <a ng-click="term.showDetail(row)">详情</a>
+                                <a ng-click="term.delTerm(row.ID)">删除</a>
+                            </td>
+                            <td title="'授权'">
+                                <input type="checkbox" ng-checked="row.Registered==1"
+                                       ng-click="term.validDev(row.ID,row.Registered)">
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- loading -->
+                    <div ng-show="term.loading">loading...</div>
+                    <div ng-show="term.noData">查无数据</div>
                 </div>
-                <!-- 添加终端 -->
-                <a ng-click="term.addDev()" class="button button-light">
-                    <i class="icon ion-ios-plus-outline"></i> 添加终端
-                </a>
-                <!-- 终端列表 -->
-                <table ng-table="term.tableParams" ng-show="!term.loading" class="table table-hover">
-                    <tr ng-repeat="row in $data track by $index">
-                        <td title="'状态'" style="color:{{row.Online == 0 ? '' : 'rgb(0,185,120)'}}">
-                            {{row.Online == 0 ? "离线" : "在线"}}
-                        </td>
-                        <td title="'房间号'">
-                            {{row.RoomID}}
-                        </td>
-                        <td title="'MAC地址'">
-                            {{row.TermMac}}
-                        </td>
-                        <td title="'IP地址'">
-                            {{row.IP}}
-                        </td>
-                        <td title="'内存'">
-                            {{row.Mem}}
-                        </td>
-                        <td title="'容量'">
-                            {{row.DiskInfo}}
-                        </td>
-                        <td title="'操作'">
-                            <a ng-click="term.delTerm(row.ID)">删除</a>
-                        </td>
-                        <td title="'授权'">
-                            <input type="checkbox" ng-checked="row.Registered==1"  ng-click="term.validDev(row.ID,row.Registered)">
-                        </td>
-                    </tr>
-                </table>
-                <!-- loading -->
-                <div ng-show="term.loading">loading...</div>
-                <div ng-show="term.noData">查无数据</div>
-            </div>
 
             </div>
-
             <!--pages-->
-
         </div>
     </div>
-    <!--body-->
+    <!--设置弹窗层-->
+    <div class="modal fade" ng-class="{'in':(term.showSet)}">
+        <div class="modal-backdrop fade in"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button ng-click="term.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                    <h4 class="modal-title">设置</h4>
+                </div>
+                <div class="modal-body">
+                    <div ng-if="term.cover == 1">
+                        音量
+                    </div>
+                    <div ng-if="term.cover == 2">
+                        截屏
+                    </div>
+                    <div ng-if="term.cover == 3">
+                        <div class="">
+                            <span>内存：</span>{{term.ter.Mem}}
+                        </div>
+                        <div class="">
+                            <span>容量：</span>{{term.ter.DiskInfo}}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" ng-hide="term.cover == 3">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--设置弹窗层-->
+
 
 </div>
+

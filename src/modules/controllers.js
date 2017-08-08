@@ -6958,23 +6958,23 @@
         ])
 
         //终端main
-        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG',
-            function ($http, $scope, $state, $stateParams, util, CONFIG) {
+        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
 
                 self.init = function () {
-                    self.form = {};
-                    self.data =  $scope.app.data;
                     self.loading = true;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getSection();
+                    self.showSet = false;
+
 
                 };
 
                 //获取科室
                 self.getSection = function () {
                     self.section = [];
-                    var datap = $scope.app.data;
+                    var datap = util.getObject('ajaxData');
                     datap.action = "getHospitalInfo";
                     var data = JSON.stringify(datap);
                     $http({
@@ -6985,14 +6985,7 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.section = msg.data.Section;
-                            self.sectionOriginal = (msg.data.Section).concat();
-                            //self.sectionName = self.section[0];
-                            var hos = {
-                                'Name': {'zh-CN':'全部'},
-                                'ID': undefined
-                            };
-                            self.section.unshift(hos);
-                            self.sectionName = self.section[0]
+                            self.current = self.section[0].ID
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -7004,10 +6997,11 @@
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
                         self.loading = false;
+                        self.getSectionDevList();
                     });
                 };
 
-              /*  // 获取某分区终端列表 带搜索和分页
+                // 获取某分区终端列表 带搜索和分页
                 self.getSectionDevList = function () {
                     self.noData = false;
                     self.loading = true;
@@ -7018,21 +7012,19 @@
                     }, {
                         counts: [],
                         getData: function (params) {
-                            var data = {
-                                "action": "getDevList",
-                                "token": util.getParams("token"),
-                                "lang": self.langStyle,
-                                "Online": self.form.Online,
-                                "SectionID": self.form.sectionID,
-                                "RoomID": self.form.RoomID
-                            }
+                            var datap = util.getObject('ajaxData');
+                            datap.action = 'getDevList';
+                            datap.Online = self.Online?self.Online:'';
+                            datap.SectionID = self.current;
+                            datap.RoomID = self.RoomID?self.RoomID:'';
+
                             var paramsUrl = params.url();
-                            data.per_page = paramsUrl.count - 0;
-                            data.page = paramsUrl.page - 0;
-                            data = JSON.stringify(data);
+                            datap.per_page = paramsUrl.count - 0;
+                            datap.page = paramsUrl.page - 0;
+                            var data = JSON.stringify(datap);
                             return $http({
-                                method: $filter('ajaxMethod')(),
-                                url: util.getApiUrl('devinfo', 'shopList', 'server'),
+                                method: 'POST',
+                                url: util.getApiUrl('hospitaldev', '', 'server'),
                                 data: data
                             }).then(function successCallback(data, status, headers, config) {
                                 if (data.data.rescode == '200') {
@@ -7040,7 +7032,12 @@
                                         self.noData = true;
                                     }
                                     params.total(data.data.total);
-                                    return data.data.devlist;
+                                    var dev = data.data.DevInfo;
+                                    var len = dev.length;
+                                    for (var i=0; i<len; i++){
+                                        dev[i].Name = JSON.parse(dev[i].Name);
+                                    }
+                                    return dev;
                                 } else if (msg.rescode == '401') {
                                     alert('访问超时，请重新登录');
                                     $location.path("pages/login.html");
@@ -7058,16 +7055,15 @@
                 }
 
                 // 获取某分区终端状态 总数目
-                self.getSectionDevNum = function (ID) {
+                self.getSectionDevNum = function () {
                     // self.form.HotelName = self.hotelList[index].Name[self.defaultLangCode];
-                    self.form.sectionID = ID;
 
                     self.getSectionDevList();
                     var data = {
                         "action": "getDevNum",
                         "token": util.getParams("token"),
                         "lang": self.langStyle,
-                        "SectionID": self.form.sectionID
+                        "SectionID": self.current
                     }
 
                     data = JSON.stringify(data);
@@ -7092,7 +7088,7 @@
                     })
 
 
-                }*/
+                }
 
 
                 self.delTerm = function (id) {
@@ -7100,22 +7096,19 @@
                     if (!conf) {
                         return;
                     }
-                    var data = {
-                        "action": "delDev",
-                        "token": util.getParams("token"),
-                        "lang": self.langStyle,
-                        "ID": id
-                    }
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "delDev";
+                    datap.ID = id;
+                    var data = JSON.stringify(datap);
 
-                    data = JSON.stringify(data);
                     $http({
-                        method: $filter('ajaxMethod')(),
+                        method: 'POST',
                         url: util.getApiUrl('devinfo', '', 'server'),
                         data: data
                     }).then(function successCallback(data, status, headers, config) {
                         if (data.data.rescode == '200') {
-                            self.getDevList();
-                            self.getDevNum(self.form.HotelID, self.hotelListIndex);
+                            self.getSectionDevList();
+                           // self.getDevNum(self.form.HotelID, self.hotelListIndex);
                         } else if (msg.rescode == '401') {
                             alert('访问超时，请重新登录');
                             $location.path("pages/login.html");
@@ -7163,14 +7156,35 @@
                     }).finally(function (value) {
                     });
                 }
+                
+                self.changeSection = function (id) {
+                    self.current = id;
+                    self.getSectionDevList();
+                };
 
-                self.addDev = function () {
-                    $scope.app.maskParams = {'HotelID': self.form.HotelID};
-                    $scope.app.showHideMask(true, 'pages/addDev.html');
+                //设置
+                self.set = function (id) {
+                    self.showSet = true;
+                    self.cover = id
+                };
+
+                //关闭设置页面
+                self.cancel = function () {
+                    self.showSet = false;
                 }
 
+                //展示详情
+                self.showDetail = function (row) {
+                    self.showSet = true;
+                    self.cover = 3;
+                    self.ter = row;
+                };
 
-
+                //截屏
+                self.screenShot = function () {
+                    self.showSet = true;
+                    self.cover = 2;
+                }
 
             }
         ])

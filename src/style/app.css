@@ -883,6 +883,7 @@ body, .app {
     padding: 10px 15px 80px;
     background-color: #f9f9f9;
     border-radius: 2px;
+    margin-bottom: 50px;
 }
 
 
@@ -891,7 +892,7 @@ body, .app {
 }
 
 .btn-container-bottom{
-    margin: 37px 47%;
+    margin: 0  47%;
     background-color: #198ad1;
     color: white;
 }
@@ -948,6 +949,16 @@ body, .app {
 .inline-form input, .inline-form select, .inline-form textarea{
     width: 80% !important;
 }
+
+.right-position{
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    overflow: auto;
+    right: 0;
+    padding-right: 50px;
+    padding-bottom: 50px;
+}
 /*----------------------基础样式   YXX------------------------------------------------*/
 
 /*----------------------login------------------------------------------------*/
@@ -984,6 +995,10 @@ body, .app {
 
 .hospital-edit{
     cursor: pointer;
+    width: 25px;
+    height: 25px;
+    margin-top: -5px;
+    margin-left: 5px;
 }
 
 .user > div{
@@ -999,6 +1014,35 @@ body, .app {
 .version-title{
     font-size: 16px;
     color: #2a6cc7;
+}
+
+.hos-menage-head{
+    position: relative;
+}
+
+.sec-add-btn{
+    position: absolute;
+    right: 20px;
+    bottom: 5px;
+}
+
+.hos-manage-ul{
+    padding: 20px;
+}
+
+.hos-manage-ul li:nth-child(odd){
+    border: none;
+    height: 50px;
+    border-radius: 10px;
+    padding:15px 20px;
+}
+
+.hos-manage-ul li:nth-child(even){
+    border: none;
+    height: 50px;
+    background-color: #f9f9f9;
+    padding:15px 20px;
+
 }
 
 /*---------------------innercut--------------------------------------------*/
@@ -1189,5 +1233,28 @@ td,th{
 }
 
 .littleTypeBehav a{
+    cursor: pointer;
+}
+
+/*---------terminal-----------------*/
+.ter-left{
+    padding-top: 30px;
+}
+
+.ter-guide{
+    height: 40px;
+    padding: 11px 55px;
+}
+
+.ter-guide:first-of-type{
+    padding-left: 30px;
+}
+
+.term-right{
+    position: absolute;
+    right: 20px;
+}
+
+.operate a{
     cursor: pointer;
 }

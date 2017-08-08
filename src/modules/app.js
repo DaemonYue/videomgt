@@ -110,11 +110,11 @@
 
 
         .constant('CONFIG', {
-            serverUrlCommon:'http://192.168.17.88/backend_intercut/',
-            serverUrlVideo: 'http://192.168.17.88/backend_movie/v1/',
-            serverUrlOther: 'http://192.168.17.88/backend_info/',
-            uploadImgUrl: 'http://192.168.17.88/upload',
-            uploadVideoUrl: 'http://192.168.17.88/videoupload',
+            serverUrlCommon:'http://192.168.17.89/backend_intercut/',
+            serverUrlVideo: 'http://192.168.17.89/backend_movie/v1/',
+            serverUrlOther: 'http://192.168.17.89/backend_info/',
+            uploadImgUrl: 'http://192.168.17.89/upload',
+            uploadVideoUrl: 'http://192.168.17.89/videoupload',
             testUrl: 'test/',
             test: false
         })

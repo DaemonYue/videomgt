@@ -1,46 +1,37 @@
 {
-  "Resource": [
+  "terminal": [
     {
-      "name": "荒野求生秘技第1季07肯尼亚草原.avi",
-      "type":1,
-      "starttime": "2017-05-23 13:30:12",
-      "endtime": "2017-05-23 13:30:12",
-      "editor": "root",
-      "version": 197
+      "Online": 0,
+      "sectionName": "神经内科",
+      "RoomID": "112",
+      "TermMac":"00:66:CF:0E:A4:5C",
+      "IP": "192.168.21.188",
+      "DiskInfo": "1702MB/1983MB",
+      "Mem": "180MB/981MB",
+      "ID": 1
     },
     {
-      "name": "荒野求生秘技第1季07肯尼亚草原.avi",
-      "type":1,
-      "starttime": "2017-05-23 13:30:12",
-      "endtime": "2017-05-23 13:30:12",
-      "editor": "root",
-      "version": 197
+      "Online": 1,
+      "sectionName": "神经内科",
+      "RoomID": "112",
+      "TermMac":"00:66:CF:0E:A4:5C",
+      "IP": "192.168.21.188",
+      "DiskInfo": "1702MB/1983MB",
+      "Mem": "180MB/981MB",
+      "ID": 2
     },
     {
-      "name": "荒野求生秘技第1季07肯尼亚草原.avi",
-      "type":1,
-      "starttime": "2017-05-23 13:30:12",
-      "endtime": "2017-05-23 13:30:12",
-      "editor": "root",
-      "version": 197
-    },
-    {
-      "name": "荒野求生秘技第1季07肯尼亚草原.avi",
-      "type":1,
-      "starttime": "2017-05-23 13:30:12",
-      "endtime": "2017-05-23 13:30:12",
-      "editor": "root",
-      "version": 197
+      "Online": 1,
+      "sectionName": "神经内科",
+      "RoomID": "112",
+      "TermMac":"00:66:CF:0E:A4:5C",
+      "IP": "192.168.21.188",
+      "DiskInfo": "1702MB/1983MB",
+      "Mem": "180MB/981MB",
+      "ID": 3
     }
+
   ],
-  "Pager": {
-    "orderby": "CreateTime",
-    "status": "",
-    "keyword": "",
-    "sortby": "DESC",
-    "per_page": 10,
-    "total": 1,
-    "page": "1"
-  },
+  "total": 3,
   "rescode": "200"
 }
