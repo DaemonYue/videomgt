@@ -14,9 +14,9 @@
         <div class="resource-options-out">
             <div class="resource-options" style="width: 100%;">
                 <button class="btn resource-options btn-add" ng-click="plan.addPlan(plan.resourceChoose.ID)">添加计划</button>
-                <button class="btn resource-options btn-del">删除计划</button>
+                <button class="btn resource-options btn-del" ng-click="plan.delPlan()">删除计划</button>
                 <div class="like-input  like-input-search" style="display: inline">
-                    <input ng-model="plan.resourceName" placeholder="计划名称" class="input-nostyle input-search">
+                    <input ng-model="plan.planName" placeholder="计划名称" class="input-nostyle input-search">
                     <span style="background-image: url('dist/imgs/search.png')" class="span-input span-search" ng-click="plan.getPlanList()"></span>
                 </div>
             </div>
@@ -32,7 +32,7 @@
 
                     <td class="list-checkbox" header="'headerCheckbox.html'">
 
-                        <input type="checkbox" ng-model="plan.checkboxes.items[row.id]">
+                        <input type="checkbox" ng-model="plan.checkboxes.items[row.version]" ng-change="plan.changeCheckBox()">
 
                     </td>
 
@@ -49,13 +49,13 @@
                     <td title="'发布终端'">已发布到<a> {{self.terPublished}}0 </a>个终端</td>
 
                     <td title="'操作'">
-                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                        <button class="btn btn-xs btn-default"  ng-click="plan.editPlan(row)" data-toggle="modal" >
                             编辑
                         </button>
-                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal">
                             取消
                         </button>
-                        <button class="btn btn-xs btn-default"  ng-click="plan.editResource(row)" data-toggle="modal" title="编辑">
+                        <button class="btn btn-xs btn-default"  ng-click="plan.delOnePlan(row)" data-toggle="modal">
                             删除
                         </button>
                     </td>
@@ -69,6 +69,6 @@
 </div>
 <script type="text/ng-template" id="headerCheckbox.html">
 
-    <input type="checkbox" ng-model="plan.checkboxes.checked"  value="" />
+    <input type="checkbox" ng-model="plan.checkboxes.checked"  value="" ng-click="plan.checkAll()"/>
 
 </script>
