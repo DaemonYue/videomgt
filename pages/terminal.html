@@ -24,7 +24,7 @@
                         <!-- Online  -->
                         <span>状态： </span>
                         <div class="form-group resource-options ">
-                            <select ng-model="term.Online" class="form-control">
+                            <select ng-model="term.Online" class="form-control" ng-change="term.getSectionDevList()">
                                 <option value="">全部</option>
                                 <option value="1">在线</option>
                                 <option value="0">离线</option>
@@ -40,9 +40,9 @@
                         </div>
                         <div class="resource-options term-right">
                             <h4 class="resource-options">{{term.form.HotelName}}
-                                <small>&nbsp&nbsp在线：{{term.form.online}} / 总数：{{term.form.total}}</small>
+                                <small>&nbsp&nbsp在线：{{term.form.online}} / 总数：{{term.total}}</small>
                             </h4>
-                            <button class="btn resource-options" ng-click="term.set(1)">设置</button>
+                            <button class="btn resource-options" ng-click="term.set(1)" ng-hide="term.total == 0">设置</button>
                         </div>
 
 
@@ -72,10 +72,10 @@
                                 <a ng-click="term.showDetail(row)">详情</a>
                                 <a ng-click="term.delTerm(row.ID)">删除</a>
                             </td>
-                            <td title="'授权'">
+                          <!--  <td title="'授权'">
                                 <input type="checkbox" ng-checked="row.Registered==1"
                                        ng-click="term.validDev(row.ID,row.Registered)">
-                            </td>
+                            </td>-->
                         </tr>
                     </table>
                     <!-- loading -->
@@ -96,14 +96,16 @@
                     <button ng-click="term.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
                     </button>
-                    <h4 class="modal-title">设置</h4>
+                    <h4 class="modal-title" ng-if="term.cover == 1">设置</h4>
+                    <h4 class="modal-title" ng-if="term.cover == 2">截屏</h4>
+                    <h4 class="modal-title" ng-if="term.cover == 3">详情</h4>
                 </div>
                 <div class="modal-body">
                     <div ng-if="term.cover == 1">
-                        音量
+                        <stepper currentStep={{term.step}} maxStep="100"></stepper>{{term.step}}%
                     </div>
                     <div ng-if="term.cover == 2">
-                        截屏
+                        <img src="{{term.screenShotPic}}">
                     </div>
                     <div ng-if="term.cover == 3">
                         <div class="">
@@ -115,7 +117,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn" ng-hide="term.cover == 3">保存</button>
+                    <button class="btn" ng-show="term.cover == 1" ng-click="term.setMaxVoice()">保存</button>
                 </div>
             </div>
         </div>

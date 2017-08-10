@@ -7015,7 +7015,7 @@
                             var datap = util.getObject('ajaxData');
                             datap.action = 'getDevList';
                             datap.Online = self.Online?self.Online:'';
-                            datap.SectionID = self.current;
+                            datap.SectionID = self.current.toString();
                             datap.RoomID = self.RoomID?self.RoomID:'';
 
                             var paramsUrl = params.url();
@@ -7032,6 +7032,7 @@
                                         self.noData = true;
                                     }
                                     params.total(data.data.total);
+                                    self.total = data.data.total;
                                     var dev = data.data.DevInfo;
                                     var len = dev.length;
                                     for (var i=0; i<len; i++){
@@ -7103,10 +7104,11 @@
 
                     $http({
                         method: 'POST',
-                        url: util.getApiUrl('devinfo', '', 'server'),
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
                         data: data
                     }).then(function successCallback(data, status, headers, config) {
                         if (data.data.rescode == '200') {
+                            alert("删除成功！");
                             self.getSectionDevList();
                            // self.getDevNum(self.form.HotelID, self.hotelListIndex);
                         } else if (msg.rescode == '401') {
@@ -7165,7 +7167,8 @@
                 //设置
                 self.set = function (id) {
                     self.showSet = true;
-                    self.cover = id
+                    self.cover = id;
+                    self.getMaxVoice();
                 };
 
                 //关闭设置页面
@@ -7181,9 +7184,126 @@
                 };
 
                 //截屏
-                self.screenShot = function () {
+                self.screenShot = function (id) {
                     self.showSet = true;
                     self.cover = 2;
+
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'setSnapshotPic';
+                    datap.ID = id;
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            setTimeout(getScreenShot(id), 5000);
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取截屏结果
+                var getScreenShot = function (id) {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'showPicURL';
+                    datap.ID = id;
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.screenShotPic = msg.URL;
+
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                }
+
+                //音量控制
+                $scope.$on('changePos', function (evt, val) {
+                    self.step = val;
+                });
+                
+                //获取最大音量
+                self.getMaxVoice = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'showMaxVoice';
+                    datap.SectionID = self.current;
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.step = msg.MaxVoice;
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+
+                }
+
+                //保存最大音量
+                self.setMaxVoice = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'setMaxVoice';
+                    datap.SectionID = self.current;
+                    datap.MaxVoice = self.step;
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert("修改成功!");
+
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
                 }
 
             }

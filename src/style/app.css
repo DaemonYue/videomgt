@@ -1023,7 +1023,7 @@ body, .app {
 .sec-add-btn{
     position: absolute;
     right: 20px;
-    bottom: 5px;
+    bottom: 8px;
 }
 
 .hos-manage-ul{
@@ -1258,3 +1258,8 @@ td,th{
 .operate a{
     cursor: pointer;
 }
+
+
+
+
+

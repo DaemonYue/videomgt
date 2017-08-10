@@ -26,8 +26,8 @@
                                 {{section.Name[hosm.defaultLang]}}
                          <!--       <a ng-click="hosm.showSections(section)"  class="pull-right">分区</a>-->
 
-                                <a ng-click="hosm.deleteSection(section.ID)"  class="pull-right"> &nbsp;删除&nbsp;</a>
-                                <a ng-click="hosm.editSction(section)" class="pull-right">编辑</a>
+                                <a ng-click="hosm.deleteSection(section.ID)"  class="pull-right" ng-hide="section.ID == 0"> &nbsp;删除&nbsp;</a>
+                                <a ng-click="hosm.editSction(section)" class="pull-right" ng-hide="section.ID == 0">编辑</a>
                                 <br>
                             </li>
                         </ul>
