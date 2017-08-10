@@ -1,10 +1,15 @@
 body {
     font-family: "Segoe UI", "Lucida Grande", Helvetica, Arial, "Microsoft YaHei", FreeSans, Arimo, "Droid Sans", "wenquanyi micro hei", "Hiragino Sans GB", "Hiragino Sans GB W3", FontAwesome, sans-serif;
+    color: #666666;
 }
 
 .top-extra {
     background-color: #0788d4;
     height: 56px;
+}
+
+hr{
+    margin-bottom: 15px;
 }
 
 .top-extra a {
@@ -828,9 +833,9 @@ body, .app {
     position: relative;
     display: block;
     width: 100%;
-    height: 40px;
+    height: 36px;
     margin-bottom: 30px;
-    padding: 6px 12px;
+    padding: 3px 12px;
     padding-bottom: 8px;
     font-size: 14px;
     line-height: 1.42857143;
@@ -917,6 +922,7 @@ body, .app {
     font-size: 20px;
     margin-bottom: 20px;
     font-family: 'Microsoft YaHei';
+    color: #333333;
 }
 
 .modal-title{
@@ -958,6 +964,10 @@ body, .app {
     right: 0;
     padding-right: 50px;
     padding-bottom: 50px;
+}
+
+.ng-table th{
+    color: #2a6cc7;
 }
 /*----------------------基础样式   YXX------------------------------------------------*/
 
@@ -1024,6 +1034,13 @@ body, .app {
     position: absolute;
     right: 20px;
     bottom: 8px;
+    background-color: #198ad1;
+    color: white;
+}
+
+.sec-add-btn:hover{
+    background-color: #136da5;
+    color: white;
 }
 
 .hos-manage-ul{
@@ -1074,7 +1091,7 @@ body, .app {
 .like-input-search{
     width: 300px;
     position: absolute;
-    right: 20px;
+    right: 10px;
 }
 
 .list-checkbox{
@@ -1103,7 +1120,7 @@ body, .app {
     position: relative;
     display: inline-block;
     width: 210px;
-    height: 50px;
+    height: 45px;
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
@@ -1121,7 +1138,7 @@ body, .app {
 .select-span{
     display: inline-block;
     height: 100%;
-    padding : 15px 19px;
+    padding : 12px 19px;
 }
 
 .section-select-right{
@@ -1168,6 +1185,8 @@ body, .app {
 .btn-float{
     float: right;
     margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 13px;
 }
 
 .video-option{
@@ -1229,13 +1248,36 @@ td,th{
 }
 
 .littleTypeChoose{
-    background-color: lightblue;
+    background-color: #198ad1!important;
+    color: white;
+}
+
+.littleTypeChoose:hover{
+    background-color: #1881c3!important;
+    color: white;
 }
 
 .littleTypeBehav a{
     cursor: pointer;
+    color: #666666;
 }
 
+.little-type{
+    padding-left: 8px;
+    margin-top: -7px;
+}
+
+.little-type button{
+    background-color: #efefef;
+    border: 1px solid #d8d8d8;
+    margin-right: 15px;
+    padding: 5px 15px;
+}
+
+
+.little-type button:hover{
+    background-color: #d1cfcf;
+}
 /*---------terminal-----------------*/
 .ter-left{
     padding-top: 30px;

@@ -113,9 +113,9 @@
                           ng-click="editedList.getVideos(2)"></span>
                 </div>
             </div>
-            <div>
+            <div class="little-type">
                 <div class="littleTypeBehav">
-                    <h4 class="resource-options">类型</h4>
+                    <h4 class="resource-options video-table-head">类型</h4>
                     <a ng-click="editedList.addLiType()">添加</a>
                     <a ng-hide="editedList.typeBtnChoose == '' || editedList.typeBtnChoose == -1" ng-click="editedList.editLiType()">编辑</a>
                     <a ng-hide="editedList.typeBtnChoose == '' || editedList.typeBtnChoose == -1" ng-click="editedList.delLiType()">删除</a>
@@ -124,6 +124,7 @@
                     <button class="btn btn-small" ng-repeat="type in editedList.littleType" ng-click="editedList.changeType(type)" ng-class="{'littleTypeChoose':(editedList.typeBtnChoose == type.ID)}">{{type.Name}}</button>
                 </div>
             </div>
+            <hr>
             <div  class="">
                 <table ng-table="editedList.tableParams" ng-show="!editedList.loading1" class="table table-hover">
                     <tr ng-repeat="row in $data track by $index">
