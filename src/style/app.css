@@ -1047,19 +1047,28 @@ body, .app {
     padding: 20px;
 }
 
-.hos-manage-ul li:nth-child(odd){
+.white-gray .color-item:nth-child(odd){
     border: none;
     height: 50px;
     border-radius: 10px;
     padding:15px 20px;
 }
 
-.hos-manage-ul li:nth-child(even){
+.white-gray .color-item:nth-child(even){
     border: none;
     height: 50px;
     background-color: #f9f9f9;
     padding:15px 20px;
 
+}
+
+.version-color-item{
+    border: none;
+    height: 50px;
+    background-color: #ffffff;
+    padding:15px 20px!important;
+    margin: 0;
+    border-radius: 3px;
 }
 
 /*---------------------innercut--------------------------------------------*/
@@ -1249,7 +1258,7 @@ td,th{
 
 .littleTypeChoose{
     background-color: #198ad1!important;
-    color: white;
+    color: white!important;
 }
 
 .littleTypeChoose:hover{
@@ -1260,6 +1269,8 @@ td,th{
 .littleTypeBehav a{
     cursor: pointer;
     color: #666666;
+    text-decoration: underline!important;
+    margin-left: 15px;
 }
 
 .little-type{
@@ -1274,10 +1285,10 @@ td,th{
     padding: 5px 15px;
 }
 
-
 .little-type button:hover{
     background-color: #d1cfcf;
 }
+
 /*---------terminal-----------------*/
 .ter-left{
     padding-top: 30px;
