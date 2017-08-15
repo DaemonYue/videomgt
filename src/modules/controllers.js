@@ -5945,6 +5945,35 @@
                     self.maskUrlPlan = 'pages/termPublish.html';
                     self.plan = plan;
                 }
+                
+                //取消插播
+                self.cancel = function (row) {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "CancelPlan";
+                    datap.type = self.resourceChoose.ID;
+                    datap.versions = row.version;
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('修改成功!');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.getPlanList();
+                    });
+                }
 
 
 
@@ -5981,8 +6010,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planName,
-                        'starttime': self.startTime,
-                        'endtime': self.stopTime,
+                        'starttime': util.getRightTime(self.startTime),
+                        'endtime': util.getRightTime(self.stopTime),
                         'id': self.resource
                     }
                     var data = JSON.stringify(datap);
@@ -6103,6 +6132,8 @@
                 };
 
 
+
+
                 //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
                /* self.chooseResource = function (ele) {
                     console.log(ele);
@@ -6145,8 +6176,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planInfo.name,
-                        'starttime': (self.planInfo.starttime).toDateString(),
-                        'endtime': (self.planInfo.endtime).toDateString(),
+                        'starttime': util.getRightTime(self.planInfo.starttime),
+                        'endtime': util.getRightTime(self.planInfo.endtime),
                         'version': self.planInfo.version
                     }
                     var data = JSON.stringify(datap);
@@ -6231,8 +6262,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planName,
-                        'starttime': self.startTime,
-                        'endtime': self.stopTime,
+                        'starttime': util.getRightTime(self.startTime),
+                        'endtime': util.getRightTime(self.stopTime),
                         'id': self.resource
                     }
                     var data = JSON.stringify(datap);
@@ -6402,8 +6433,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planInfo.name,
-                        'starttime': self.planInfo.starttime,
-                        'endtime': self.planInfo.endtime,
+                        'starttime': util.getRightTime(self.planInfo.starttime),
+                        'endtime': util.getRightTime(self.planInfo.endtime),
                         'version': self.planInfo.version
                     }
                     var data = JSON.stringify(datap);
@@ -6488,8 +6519,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planName,
-                        'starttime': self.startTime,
-                        'endtime': self.stopTime,
+                        'starttime': util.getRightTime(self.startTime),
+                        'endtime': util.getRightTime(self.stopTime),
                         'id': self.resource
                     }
                     var data = JSON.stringify(datap);
@@ -6652,8 +6683,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planInfo.name,
-                        'starttime': self.planInfo.starttime,
-                        'endtime': self.planInfo.endtime,
+                        'starttime': util.getRightTime(self.planInfo.starttime),
+                        'endtime': util.getRightTime(self.planInfo.endtime),
                         'version': self.planInfo.version
                     }
                     var data = JSON.stringify(datap);
@@ -6738,8 +6769,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planName,
-                        'starttime': self.startTime,
-                        'endtime': self.stopTime,
+                        'starttime': util.getRightTime(self.startTime),
+                        'endtime': util.getRightTime(self.stopTime),
                         'id': self.resource,
                         'content': self.resChoosed.content
                     }
@@ -6903,8 +6934,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planInfo.name,
-                        'starttime': self.planInfo.starttime,
-                        'endtime': self.planInfo.endtime,
+                        'starttime': util.getRightTime(self.planInfo.starttime),
+                        'endtime': util.getRightTime(self.planInfo.endtime),
                         'version': self.planInfo.version
                     }
                     var data = JSON.stringify(datap);
@@ -6979,10 +7010,10 @@
                 // 保存编辑
                 self.save = function () {
 
-                        if(!self.term || self.term.length == 0){
-                            alert("请选择终端！");
-                            return;
-                        }
+                        // if(!self.term || self.term.length == 0){
+                        //     alert("请选择终端！");
+                        //     return;
+                        // }
 
                         console.log(self.term);
 

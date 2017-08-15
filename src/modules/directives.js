@@ -100,9 +100,6 @@
                 transclude: true,
                 template: '<ul ng-init="getTermList()">'
                 + '<li><input type="checkbox" ng-model="checkall" ng-change="checkHospital(this)"><span></span><h4>{{hospital.SectionName[defaultLang]}}</h4></div>'
-                + '<ul>'
-                + '<li ng-repeat="ter in hosterm"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(this)"><h4>{{ter.IP}}</h4></div>'
-                + '</ul>'
                 + '<ul ng-repeat="sec in sections">'
                 + '<li><input type="checkbox"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
                 + '<ul>'
