@@ -4725,6 +4725,7 @@
 
                     self.getResBtn();
                     self.notEmpty = false;
+                    self.page = 1;
 
 
 
@@ -4811,7 +4812,7 @@
                     self.noData = false;
                     self.loading = true;
                     self.tableParams = new NgTableParams({
-                        page: 1,
+                        page: self.page,
                         count: 5,
                         url: ''
                     }, {
@@ -4832,6 +4833,7 @@
                                 "status":""
                             };
                             var data = JSON.stringify(datap);
+                            self.page = paramsUrl.page - 0;
 
                             return $http({
                                 method: 'POST',
@@ -5694,6 +5696,7 @@
                     $scope.cut.showResource = false;
                     self.defaultLang = util.getDefaultLangCode();
                     self.getResBtn();
+                    self.page = 1;
                 };
 
                 //获取计划列表
@@ -5702,7 +5705,7 @@
                     self.noData = false;
                     self.loading = true;
                     self.tableParams = new NgTableParams({
-                        page: 1,
+                        page: self.page,
                         count: 5,
                         url: ''
                     }, {
@@ -5723,6 +5726,7 @@
                                 "status":""
                             }
                             var data = JSON.stringify(datap);
+                            self.page = paramsUrl.page -0;
 
                             return $http({
                                 method: 'POST',
@@ -7076,7 +7080,9 @@
                             $scope.hosterm = $scope.hospital.Dev;
                             var len = $scope.sections.length;
                             var check = {};
+                            $scope.check = {};
                             for(var i=0; i<len; i++){
+                                $scope.sections[i].termChooseNum = 0;
                                 var id = $scope.sections[i].SectionID;
                                 var sec = $scope.sections;
                                 $scope.term[id] = sec[i].Dev;
@@ -7086,7 +7092,9 @@
                                     if(te[j].flag == 1){
                                         var key = te[j].ID;
                                         check[key] = true;
+                                        console.log('sssssss'+check);
                                         $scope.check = check;
+                                        $scope.sections[i].termChooseNum++
                                     }
                                 }
                             }
@@ -7094,6 +7102,8 @@
                                 originalTerm.push(q);
                             }
                             self.format(originalTerm);
+
+                            $scope.$emit('sectionState', $scope.sections);
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
@@ -7110,6 +7120,7 @@
                 //获取选中的终端
                 $scope.$on('conveyCheck', function (evt, val) {
                     self.format(val);
+                    console.log('aaaaaaaa'+val);
                 });
 
                 //将数据转换为接口中的格式

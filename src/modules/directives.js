@@ -101,7 +101,7 @@
                 template: '<ul ng-init="getTermList()">'
                 + '<li><input type="checkbox" ng-model="checkall" ng-change="checkHospital(this)"><span></span><h4>{{hospital.SectionName[defaultLang]}}</h4></div>'
                 + '<ul ng-repeat="sec in sections">'
-                + '<li><input type="checkbox"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
+                + '<li><input type="checkbox" ng-model="checksection" ng-change="checkSection(this, sec.SectionID)"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
                 + '<ul>'
                 + '<li ng-repeat="ter in term[sec.SectionID]"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(this)"><h4>{{ter.IP}}</h4></div>'
                 + '</ul>'
@@ -114,12 +114,18 @@
                     }
                 },
                 link: function (scope, element, attrs) {
-                    scope.checkbox = [];
-                    scope.showMe = false;
-                    scope.toggle = function toggle() {
-                        scope.showMe = !scope.showMe;
-                    };
+
                     scope.changeCheck = function (a) {
+                       /* console.log(element);
+                        console.log(a);
+                        var uls = element[0].firstChild.children;
+                        console.log(uls);
+                        var leng = uls.length;
+                        for(var j=2 ;j<leng; j++){
+                            console.log(uls[j]);
+                        }*/
+
+                        scope.checkbox = [];
                         /*    if(a.check){
                          for(var q in a.check){
                          scope.checkbox.push(q);
@@ -148,17 +154,56 @@
                             }
                         }
                         scope.conveyCheck(scope.checkbox);
+
+
                     };
                     scope.checkHospital = function (a) {
-                        console.log(a);
-                        console.log(element);
-                        var boxes = element[0].getElementsByTagName('input');
-                        console.log(boxes);
-                        for (var i = 0; i < boxes.length; i++) {
-                            scope.changeCheck(boxes[i]);
+                        console.log(a)
+                        var len = a.sections.length;
+                        if(a.checkall == true){
+                            for(var i=0; i<len; i++){
+                                var r = {'checksection':true};
+                                scope.checkSection(r, a.sections[i].SectionID);
+                            }
+                        }else {
+                            for(var j=0; j<len; j++){
+                                var q = {'checksection':false};
+                                scope.checkSection(q, a.sections[j].SectionID);
+                            }
+                        }
+
+                    };
+                    scope.checkSection = function (b, a) {
+                        var term = scope.term[a];
+                        var len = term.length;
+                        if(b.checksection){
+                            for(var i=0; i<len; i++){
+                                 var s = term[i].ID;
+                                 scope.check[s] = true;
+                            }
+                            scope.changeCheck(scope)
+                        }else {
+                            for(var j=0; j<len; j++){
+                                var q = term[j].ID;
+                                scope.check[q] = false;
+                            }
+                            scope.changeCheck(scope)
                         }
 
                     }
+
+                    //获取选中的终端
+                    scope.$on('sectionState', function (evt, val) {
+                        scope.checksection = {}
+                        var len = val.length;
+                        for (var i=0; i<len; i++){
+                           // console.log(val[i].termChooseNum)
+                            if(val[i].termChooseNum == val[i].Dev.length){
+                                var s = val[i].SectionID;
+                                scope.checksection[s] = true;
+                            }
+                        }
+                    });
                 }
             }
         }])
