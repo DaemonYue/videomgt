@@ -29,7 +29,7 @@
             return {
                 restrict: 'AE',
                 template: '<style>.stepper-box{width:500px;height:10px;background:#f5f5f5;text-align:left;border-radius: 3px}.step-progress{float:left;height:10px;background:#198ad1;border-radius: 3px 0 0 3px}.step-progress ~ button{padding:10px 10px;margin-top:-5px;position:absolute; border-radius: 50%;border:none;margin-left: -3px;background:radial-gradient(#fff 0%, #198ad1 50%)}</style><div class="stepper-box">' +
-                '<div class="step-progress" ng-style="currentPos()"></div><button ng-click="currentPos()"><span>'+''+'</span></button></div>',
+                '<div class="step-progress" ng-style="currentPos()"></div><button ng-click="currentPos()"><span>' + '' + '</span></button></div>',
                 controller: function ($scope) {
                     $scope.currentStep = 0;
                     $scope.maxStep = 0;
@@ -93,5 +93,77 @@
                 }
             }
         })
+        .directive('termList', ['$document', function ($document) {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                template: '<ul ng-init="getTermList()">'
+                + '<li><input type="checkbox" ng-model="checkall" ng-change="checkHospital(this)"><span></span><h4>{{hospital.SectionName[defaultLang]}}</h4></div>'
+                + '<ul>'
+                + '<li ng-repeat="ter in hosterm"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(this)"><h4>{{ter.IP}}</h4></div>'
+                + '</ul>'
+                + '<ul ng-repeat="sec in sections">'
+                + '<li><input type="checkbox"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
+                + '<ul>'
+                + '<li ng-repeat="ter in term[sec.SectionID]"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(this)"><h4>{{ter.IP}}</h4></div>'
+                + '</ul>'
+                + '</ul>'
+                + '</ul>',
+                controller: function ($scope) {
+                    $scope.conveyCheck = function (val) {
+                        console.log(val);
+                        $scope.$emit('conveyCheck', val);
+                    }
+                },
+                link: function (scope, element, attrs) {
+                    scope.checkbox = [];
+                    scope.showMe = false;
+                    scope.toggle = function toggle() {
+                        scope.showMe = !scope.showMe;
+                    };
+                    scope.changeCheck = function (a) {
+                        /*    if(a.check){
+                         for(var q in a.check){
+                         scope.checkbox.push(q);
+                         }
+                         }
+                         scope.checkbox = [];
+                         var exist = false;
+                         for (var i in a.check) {   //获取当前的box 的key
+                         for (var j in scope.checkbox) {
+                         if (i == scope.checkbox[j]) {
+                         if(a.check[i] == false){
+                         scope.checkbox.pop(j);
+                         scope.conveyCheck(scope.checkbox);
+                         }
+                         exist = true;
+                         }
+                         }
+                         if(!exist){
+                         scope.checkbox.push(i);
+                         scope.conveyCheck(scope.checkbox);
+                         }
+                         }*/
+                        for (var i in a.check) {
+                            if (a.check[i] == true) {
+                                scope.checkbox.push(i);
+                            }
+                        }
+                        scope.conveyCheck(scope.checkbox);
+                    };
+                    scope.checkHospital = function (a) {
+                        console.log(a);
+                        console.log(element);
+                        var boxes = element[0].getElementsByTagName('input');
+                        console.log(boxes);
+                        for (var i = 0; i < boxes.length; i++) {
+                            scope.changeCheck(boxes[i]);
+                        }
+
+                    }
+                }
+            }
+        }])
 
 })();

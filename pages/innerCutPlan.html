@@ -46,7 +46,7 @@
 
                     <td title="'编辑者'">{{row.editor}}</td>
 
-                    <td title="'发布终端'">已发布到<a> {{self.terPublished}}0 </a>个终端</td>
+                    <td title="'发布终端'">已发布到<a ng-click="plan.publish(row)"> {{row.count}} </a>个终端</td>
 
                     <td title="'操作'">
                         <button class="btn btn-xs btn-default"  ng-click="plan.editPlan(row)" data-toggle="modal" >

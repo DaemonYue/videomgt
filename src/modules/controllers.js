@@ -5940,6 +5940,12 @@
 
                 }
 
+                //发布到终端
+                self.publish = function (plan) {
+                    self.maskUrlPlan = 'pages/termPublish.html';
+                    self.plan = plan;
+                }
+
 
 
             }
@@ -6139,8 +6145,8 @@
                     datap.type = $scope.plan.resourceChoose.ID;
                     datap.data = {
                         'name': self.planInfo.name,
-                        'starttime': self.planInfo.starttime,
-                        'endtime': self.planInfo.endtime,
+                        'starttime': (self.planInfo.starttime).toDateString(),
+                        'endtime': (self.planInfo.endtime).toDateString(),
                         'version': self.planInfo.version
                     }
                     var data = JSON.stringify(datap);
@@ -6173,7 +6179,7 @@
                 };
 
                 //初始化时间
-                var initTime = function () {
+          /*      var initTime = function () {
                     var currTime = new Date();
                     self.startTime = util.setFormatTime(currTime);
                     var t = currTime.getTime();
@@ -6182,7 +6188,7 @@
                     self.stopTime = util.setFormatTime(afterTime);
 
                 };
-
+*/
 
                 //选取资源——针对多选的情况,Status为选中项的状态，值为true或false
                 /* self.chooseResource = function (ele) {
@@ -6954,6 +6960,137 @@
 
                  };*/
 
+            }
+        ])
+
+        //发布到终端
+        .controller('publishController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
+                var self = this;
+                self.init = function () {
+                    self.editLangs = util.getParams('editLangs');
+                    self.defaultLang = util.getDefaultLangCode();
+                    $scope.defaultLang = self.defaultLang;
+
+                  //  self.getTermList();
+
+                };
+
+                // 保存编辑
+                self.save = function () {
+
+                        if(!self.term || self.term.length == 0){
+                            alert("请选择终端！");
+                            return;
+                        }
+
+                        console.log(self.term);
+
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'PublishPlan';
+                    datap.type = $scope.plan.resourceChoose.ID;
+                    datap.version = $scope.plan.plan.version;
+                    datap.data = {
+                        "terms": self.term
+                    }
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('发布成功！');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                        self.cancel();
+                    });
+
+                };
+
+                self.cancel = function () {
+                    $scope.plan.maskUrlPlan = '';
+                    $scope.plan.getPlanList();
+                };
+
+                //获取终端列表
+                $scope.getTermList = function () {
+                    $scope.term = {}
+                    var originalTerm = [];
+                    var datap = util.getObject('ajaxData');
+                    datap.action = 'getDevListBySection';
+                    datap.ID = $scope.plan.plan.version;
+                    datap.type = $scope.plan.resourceChoose.ID;
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('hospitaldev', '', 'server'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            $scope.hospital = msg.resultJson[0];
+                            $scope.sections = msg.resultJson.slice(1);
+                            $scope.hosterm = $scope.hospital.Dev;
+                            var len = $scope.sections.length;
+                            var check = {};
+                            for(var i=0; i<len; i++){
+                                var id = $scope.sections[i].SectionID;
+                                var sec = $scope.sections;
+                                $scope.term[id] = sec[i].Dev;
+                                var te = $scope.term[id];
+                                var len1 = te.length;
+                                for(var j=0; j<len1; j++){
+                                    if(te[j].flag == 1){
+                                        var key = te[j].ID;
+                                        check[key] = true;
+                                        $scope.check = check;
+                                    }
+                                }
+                            }
+                            for(var q in $scope.check){
+                                originalTerm.push(q);
+                            }
+                            self.format(originalTerm);
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.loading = false;
+                    });
+                };
+
+                //获取选中的终端
+                $scope.$on('conveyCheck', function (evt, val) {
+                    self.format(val);
+                });
+
+                //将数据转换为接口中的格式
+                self.format = function (data) {
+                    self.term = [];
+                    var len = data.length;
+                    for (var i=0; i<len; i++){
+                        var ter = {};
+                        ter.id = data[i];
+                        self.term[i] = ter;
+                    }
+                }
             }
         ])
 

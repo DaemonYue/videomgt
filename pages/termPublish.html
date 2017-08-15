@@ -1,0 +1,64 @@
+<div class="modal fade in">
+    <div class="modal-backdrop fade in"></div>
+    <div class="modal-dialog" ng-controller="publishController as pub" ng-init="pub.init()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button ng-click="pub.cancel()" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                </button>
+                <h4 class="modal-title">选择发布终端</h4>
+            </div>
+
+            <!--<term-list class='expander'>-->
+                <!--{{text}}-->
+            <!--</term-list>-->
+            <div class="modal-body">
+                <div class="term-tree">
+                    <!-- <ul>
+                         <li>
+                             <input type="checkbox"><span></span><h4>全部</h4>
+                         </li>
+                         <ul>
+                             <li><input type="checkbox"><span></span><h4>内科</h4></li>
+                             <ul>
+                                 <li><input type="checkbox"><h4>192.168.18.3</h4></li>
+                                 <li><input type="checkbox"><h4>192.168.18.3</h4></li>
+                             </ul>
+                         </ul>
+                         <ul>
+                             <li><input type="checkbox"><span></span><h4>内科</h4></li>
+                             <ul>
+                                 <li><input type="checkbox"><h4>192.168.18.3</h4></li>
+                                 <li><input type="checkbox"><h4>192.168.18.3</h4></li>
+                             </ul>
+                         </ul>
+
+                     </ul>-->
+                    <term-list></term-list>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" ng-click="pub.save()">保存</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .expander {
+        border: 1px solid black;
+        width: 250px;
+    }
+
+    .expander>.title {
+        background-color: black;
+        color: white;
+        padding: .1em .3em;
+        cursor: pointer;
+    }
+
+    .expander>.body {
+        padding: .1em .3em;
+    }
+</style>

@@ -12,6 +12,10 @@ hr{
     margin-bottom: 15px;
 }
 
+a{
+    cursor: pointer;
+}
+
 .top-extra a {
     color: white;
 }
@@ -1310,6 +1314,30 @@ td,th{
 
 .operate a{
     cursor: pointer;
+}
+
+.term-tree li{
+    list-style: none;
+    margin: 10px 0;
+}
+
+.term-tree h4{
+    display: inline;
+}
+
+.term-tree input{
+    margin: 0 5px;
+    border: 1px solid #c8c8c8;
+    background-color: #f4f4f4;
+}
+
+.term-tree span{
+    margin: 0 5px 0 0;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-image: url("../../dist/imgs/anchor.png");
+    background-size: cover;
 }
 
 
