@@ -109,22 +109,12 @@
                 + '</ul>',
                 controller: function ($scope) {
                     $scope.conveyCheck = function (val) {
-                        console.log(val);
                         $scope.$emit('conveyCheck', val);
                     }
                 },
                 link: function (scope, element, attrs) {
 
                     scope.changeCheck = function (a) {
-                       /* console.log(element);
-                        console.log(a);
-                        var uls = element[0].firstChild.children;
-                        console.log(uls);
-                        var leng = uls.length;
-                        for(var j=2 ;j<leng; j++){
-                            console.log(uls[j]);
-                        }*/
-
                         scope.checkbox = [];
                         /*    if(a.check){
                          for(var q in a.check){
@@ -158,7 +148,6 @@
 
                     };
                     scope.checkHospital = function (a) {
-                        console.log(a)
                         var len = a.sections.length;
                         if(a.checkall == true){
                             for(var i=0; i<len; i++){

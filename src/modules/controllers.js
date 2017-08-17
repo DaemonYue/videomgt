@@ -7211,6 +7211,7 @@
                                         self.noData = true;
                                     }
                                     params.total(data.data.total);
+                                    self.totalOnline = data.data.totalOnline;
                                     self.total = data.data.total;
                                     var dev = data.data.DevInfo;
                                     var len = dev.length;
