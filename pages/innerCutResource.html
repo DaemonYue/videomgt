@@ -51,7 +51,7 @@
 
                     <td data-title="'资源名称'">{{row.name}}</td>
 
-                    <td title="'大小'" ng-if="cut.resourceChoose.ID==1 || cut.resourceChoose.ID==2">{{row.size}}</td>
+                    <td title="'大小'" ng-if="cut.resourceChoose.ID==1 || cut.resourceChoose.ID==2">{{row.size|fileSize}}</td>
 
                     <td title="'时长'" ng-if="cut.resourceChoose.ID==1">{{row.duration}}</td>
 

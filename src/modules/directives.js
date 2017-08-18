@@ -251,4 +251,17 @@
                 }
             }
         }])
+
+        //获得焦点事件
+        .directive('ngFocus', ['$parse', 'CONFIG', function ($parse, CONFIG) {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attrs) {
+
+                    var model = $parse(attrs.ngFocus);
+                    var l = model.assign;
+
+                }
+            };
+        }])
 })();

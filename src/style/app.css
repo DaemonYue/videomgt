@@ -1371,6 +1371,16 @@ td,th{
     text-overflow: ellipsis;
 }
 
+.resource-choose-table th{
+
+}
+
+.resource-choose-table td{
+    padding-right: 20px;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 
 

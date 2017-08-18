@@ -35,7 +35,7 @@
                             </tr>
                             </tbody>
                         </table>-->
-                        <table ng-table="addPlan.tableParams" class="table table-hover  table-striped table-bordered">
+                        <table ng-table="addPlan.tableParams" class="table table-hover  table-striped table-bordered ">
 
                             <div style="overflow-x: auto">
 
@@ -63,19 +63,19 @@
                         <hr>
                         <div>资源</div>
                         <div ng-show="!addPlan.resChoosed">请在上页选择资源</div>
-                        <table ng-if="addPlan.resChoosed && addPlan.resChoosed.length != 0">
+                        <table ng-if="addPlan.resChoosed && addPlan.resChoosed.length != 0" class="resource-choose-table">
                             <thead>
                             <tr>
-                                <th style="width: 200px">资源名称</th>
-                                <th style="width: 100px">大小</th>
-                                <th style="width: 100px">时长</th>
+                                <th>资源名称</th>
+                                <th>大小</th>
+                                <th>时长</th>
 
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <td>{{addPlan.resChoosed.name}}</td>
-                                <td>{{addPlan.resChoosed.size}}</td>
+                                <td ng-focus="addPlan.resChoosed.name">{{addPlan.resChoosed.name}}</td>
+                                <td>{{addPlan.resChoosed.size|fileSize}}</td>
                                 <td>{{addPlan.resChoosed.duration}}</td>
                             </tr>
                             </tbody>
