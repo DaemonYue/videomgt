@@ -34,7 +34,7 @@
         <div ng-show="cut.noData == true">暂无资源</div>
         <div ng-show="cut.loading == true">loading...</div>
 
-        <table ng-table="cut.tableParams" class="table table-hover  table-striped table-bordered">
+        <table ng-table="cut.tableParams" class="table table-hover  table-striped table-bordered resource-table">
 
             <div style="overflow-x: auto">
 
@@ -47,9 +47,9 @@
 
                     </td>
 
-                    <td title="'序号'">{{$index}}</td>
+                    <!--<td title="'序号'">{{$index+1}}</td>-->
 
-                    <td title="'资源名称'">{{row.name}}</td>
+                    <td data-title="'资源名称'">{{row.name}}</td>
 
                     <td title="'大小'" ng-if="cut.resourceChoose.ID==1 || cut.resourceChoose.ID==2">{{row.size}}</td>
 

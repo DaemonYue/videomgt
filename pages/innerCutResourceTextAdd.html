@@ -22,10 +22,10 @@
                                   required></textarea>
                     </div>
 
-                    <div class="resource-options">
-                        <span>资源所属：</span>
+                    <div class="resource-options form-group">
+                        <label>资源所属：</label>
                         <select ng-model="addText.sectionName"
-                                ng-options="x.Name[addText.defaultLang] for x in addText.section"></select>
+                                ng-options="x.Name[addText.defaultLang] for x in addText.section" class="form-control"></select>
                     </div>
 
 

@@ -973,6 +973,31 @@ body, .app {
 .ng-table th{
     color: #2a6cc7;
 }
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+    background-color: #aaaaaa;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track
+{
+    #-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+    border-radius: 2px;
+    background-color: #F5F5F5;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+    border-radius: 2px;
+    #-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,.3);
+    background-color: #aaaaaa;
+}
+
 /*----------------------基础样式   YXX------------------------------------------------*/
 
 /*----------------------login------------------------------------------------*/
@@ -1338,6 +1363,12 @@ td,th{
     height: 15px;
     background-image: url("../../dist/imgs/anchor.png");
     background-size: cover;
+}
+
+.resource-table td{
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 

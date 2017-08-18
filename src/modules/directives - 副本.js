@@ -25,8 +25,6 @@
                 }
             };
         }])
-
-        //音量的拖动框
         .directive('stepper', function ($document) {
             return {
                 restrict: 'AE',
@@ -95,8 +93,6 @@
                 }
             }
         })
-
-        //发布时终端列表
         .directive('termList', ['$document', function ($document) {
             return {
                 restrict: 'E',
@@ -105,9 +101,9 @@
                 template: '<ul ng-init="getTermList()">'
                 + '<li><input type="checkbox" ng-model="checkall" ng-change="checkHospital(this)"><span></span><h4>{{hospital.SectionName[defaultLang]}}</h4></div>'
                 + '<ul ng-repeat="sec in sections">'
-                + '<li><input type="checkbox" ng-model="checksection[sec.SectionID]" ng-change="checkSection(sec, sec.SectionID)"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
+                + '<li><input type="checkbox" ng-model="checksection" ng-change="checkSection(this, sec.SectionID)"><span></span><h4>{{sec.SectionName[defaultLang]}}</h4></div>'
                 + '<ul>'
-                + '<li ng-repeat="ter in term[sec.SectionID]"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(sec, ter)"><h4>{{ter.IP}}</h4></div>'
+                + '<li ng-repeat="ter in term[sec.SectionID]"><input type="checkbox" ng-model="check[ter.ID]" ng-change="changeCheck(this)"><h4>{{ter.IP}}</h4></div>'
                 + '</ul>'
                 + '</ul>'
                 + '</ul>',
@@ -118,10 +114,8 @@
                 },
                 link: function (scope, element, attrs) {
 
-                    //点击终端选择框
-                    scope.changeCheck = function (sec, term) {
+                    scope.changeCheck = function (a) {
                         scope.checkbox = [];
-                        var secId;
                         /*    if(a.check){
                          for(var q in a.check){
                          scope.checkbox.push(q);
@@ -144,111 +138,63 @@
                          scope.conveyCheck(scope.checkbox);
                          }
                          }*/
-                        for (var i in scope.check) {
-                            if (scope.check[i] == true) {
+                        for (var i in a.check) {
+                            if (a.check[i] == true) {
                                 scope.checkbox.push(i);
                             }
                         }
                         scope.conveyCheck(scope.checkbox);
-                        if (!sec) {
-                            return
-                        }
-                        ;
-                        var lens = scope.sections.length;
-                        for (var j = 0; j < lens; j++) {
-                            if (sec.SectionID == scope.sections[j].SectionID) {
-                                secId = j;
-                            }
-                        }
-                        var lend = sec.Dev.length;
-                        scope.sections[secId].termChooseNum = 0;
-                        for (var q = 0; q < lend; q++) {
-                            for (var w in scope.check) {
-                                if (sec.Dev[q].ID == w) {
-                                    if (scope.check[w] = true) {
-                                        scope.sections[secId].termChooseNum++;
-                                    }
-                                }
-                            }
-                        }
-                        check(scope.sections);
 
 
                     };
-
-                    //点击医院选择框
                     scope.checkHospital = function (a) {
-                        scope.checksection = {};
                         var len = a.sections.length;
-
-                        if (a.checkall == true) {
-                            for (var i = 0; i < len; i++) {
-                                var s = a.sections[i].SectionID
-                                scope.checksection[s] = true;
-                                scope.checkSection(a.sections[i], a.sections[i].SectionID);
+                        if(a.checkall == true){
+                            for(var i=0; i<len; i++){
+                                var r = {'checksection':true};
+                                scope.checkSection(r, a.sections[i].SectionID);
                             }
-                        } else {
-                            for (var j = 0; j < len; j++) {
-                                var w = a.sections[j].SectionID
-                                scope.checksection[w] = false;
-                                scope.checkSection(a.sections[j], a.sections[j].SectionID);
+                        }else {
+                            for(var j=0; j<len; j++){
+                                var q = {'checksection':false};
+                                scope.checkSection(q, a.sections[j].SectionID);
                             }
                         }
 
                     };
-
-                    //点击科室选择框
                     scope.checkSection = function (b, a) {
                         var term = scope.term[a];
                         var len = term.length;
-                        if (!scope.checksection) {
-                            return;
-                        }
-                        //var lens = scope.checksection.length;
-                        for (var q in scope.checksection) {
-                            if (q == b.SectionID) {
-                                if (scope.checksection[q]) {
-                                    for (var i = 0; i < len; i++) {
-                                        var s = term[i].ID;
-                                        scope.check[s] = true;
-                                    }
-                                    scope.changeCheck()
-                                } else {
-                                    for (var j = 0; j < len; j++) {
-                                        var w = term[j].ID;
-                                        scope.check[w] = false;
-                                    }
-                                    scope.changeCheck()
-                                }
+                        if(b.checksection){
+                            for(var i=0; i<len; i++){
+                                 var s = term[i].ID;
+                                 scope.check[s] = true;
                             }
+                            scope.changeCheck(scope)
+                        }else {
+                            for(var j=0; j<len; j++){
+                                var q = term[j].ID;
+                                scope.check[q] = false;
+                            }
+                            scope.changeCheck(scope)
                         }
-                    };
+
+                    }
 
                     //获取选中的终端
                     scope.$on('sectionState', function (evt, val) {
-                        check(val);
-                    });
-
-                    //判断全选
-                    var check = function (val) {
                         scope.checksection = {};
-                        scope.choosesection = 0;
                         var len = val.length;
-
-                        for (var i = 0; i < len; i++) {
-                            if (val[i].termChooseNum == val[i].Dev.length && val[i].termChooseNum != 0) {
+                        for (var i=0; i<len; i++){
+                           // console.log(val[i].termChooseNum)
+                            if(val[i].termChooseNum == val[i].Dev.length){
                                 var s = val[i].SectionID;
                                 scope.checksection[s] = true;
                             }
                         }
-                        for (var j in scope.checksection) {
-                            scope.choosesection++;
-                        }
-                        if (scope.choosesection == len) {
-                            scope.checkall = true;
-                        }
-                    }
+                    });
                 }
             }
         }])
+
 })();

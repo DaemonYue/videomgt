@@ -128,9 +128,9 @@
             <div  class="">
                 <table ng-table="editedList.tableParams" ng-show="!editedList.loading1" class="table table-hover">
                     <tr ng-repeat="row in $data track by $index">
-                        <td title="'序号'">
+                      <!--  <td title="'序号'">
                             {{$index}}
-                        </td>
+                        </td>-->
                         <td title="'名称'">
                             {{row.Name[editedList.defaultLang]}}
                         </td>

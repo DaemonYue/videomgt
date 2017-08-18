@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div ng-app="App" ng-controller="Ctrl">
+    Name: <input ng-focus="errors('hide')" ng-blur="errors('show')" />
+    <p ng-show="!showErrors">focus</p>
+    <p ng-show="showErrors">blur</p>
+</div>
+
+<script type="text/javascript" src="../node_modules/angular/angular.min.js"></script>
+<script>
+    angular.module('App', [])
+            .controller('Ctrl', ['$scope', function($scope){
+                $scope.showErrors = true;
+
+                $scope.errors = function(action){
+                    if(action==="show"){
+                        $scope.showErrors = true;
+                    }else{
+                        $scope.showErrors = false;
+                    }
+                }
+            }]);
+
+</script>
+</body>
+</html>

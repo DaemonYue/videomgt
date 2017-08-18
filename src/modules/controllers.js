@@ -4813,7 +4813,7 @@
                     self.loading = true;
                     self.tableParams = new NgTableParams({
                         page: self.page,
-                        count: 5,
+                        count: 8,
                         url: ''
                     }, {
                         counts: [],
@@ -5706,7 +5706,7 @@
                     self.loading = true;
                     self.tableParams = new NgTableParams({
                         page: self.page,
-                        count: 5,
+                        count: 8,
                         url: ''
                     }, {
                         counts: [],
@@ -7092,7 +7092,6 @@
                                     if(te[j].flag == 1){
                                         var key = te[j].ID;
                                         check[key] = true;
-                                        console.log('sssssss'+check);
                                         $scope.check = check;
                                         $scope.sections[i].termChooseNum++
                                     }

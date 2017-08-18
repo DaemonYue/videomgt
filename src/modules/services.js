@@ -146,7 +146,6 @@
                         if(n<10) { n = '0' + n }
                         return n;
                     }
-
                     var year = date.getFullYear();
                     var month = date.getMonth()+1;
                     var day = date.getDate();
@@ -155,7 +154,6 @@
                     var second = date.getSeconds();
                     var dStr = year + '-' + format(month) + '-' + format(day) + 'T' + format(hour) + ':' + format(minute) + ':' + format(second);
                     return dStr;
-
                 },
 
 
