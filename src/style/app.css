@@ -470,8 +470,8 @@ body, .app {
 
 .app-grid-wrapper .app-name {
     position: absolute;
-    top: 150px;
-    left: 66px;
+    top: 160px;
+    left: 68px;
 }
 
 .project-title {
@@ -570,7 +570,7 @@ body, .app {
 }
 
 #main-table .app-icon {
-    position: relative;
+    #position: relative;
     font-style: normal;
 }
 

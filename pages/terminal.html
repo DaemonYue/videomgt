@@ -102,7 +102,7 @@
                 </div>
                 <div class="modal-body">
                     <div ng-if="term.cover == 1">
-                        <stepper currentStep={{term.step}} maxStep="100"></stepper>{{term.step}}%
+                        <span style="display: inline-block;margin-bottom: 10px;margin-right: 10px">音量：</span>{{term.step}}%<stepper currentStep={{term.step}} maxStep="100"></stepper>
                     </div>
                     <div ng-if="term.cover == 2">
                         <img src="{{term.screenShotPic}}">

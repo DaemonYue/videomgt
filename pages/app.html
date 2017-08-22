@@ -32,8 +32,8 @@
         <!-- grid -->
         <div class="app-grid-wrapper">
             <div ng-repeat='appIcon in appList' class="app-grid" id="main-table">
-                <i ng-click="app.switchApp(appIcon.id)" ng-mouseenter="app.focusAppIcon(this.appIcon,$event.target)" ng-mouseleave="app.blurAppIcon(this.appIcon,$event.target)" class="app-icon" style="background-image: url({{appIcon.icon}})"></i>
-                <h4 class="app-name">{{appIcon.name}}</h4>
+                <i ng-click="app.switchApp(appIcon.id)" ng-mouseenter="app.focusAppIcon(this.appIcon,$event.target)" ng-mouseleave="app.blurAppIcon(this.appIcon,$event.target)" class="app-icon" style="background-image: url({{appIcon.icon}})">  <h4 class="app-name">{{appIcon.name}}</h4></i>
+
                 <!-- {{appIcon.bgColor}} -->
             </div>
             <!-- 空白网格，数量等于{每行最大数量}, 用来保持网格整体各式正常-->

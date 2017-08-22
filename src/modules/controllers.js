@@ -215,22 +215,24 @@
                 //app选中样式
                 self.focusAppIcon = function (scop, ele) {
                     var url = 'url(' + scop['icon_focus'] + ')';
-                    var child = ele.nextElementSibling;
-                    child.style.color = 'white';
+                    var child = ele.childNodes[1];
+
                     ele.style.backgroundImage = url;
                     ele.style.width = '210px';
                     ele.style.height = '252px';
+                    child.style.color = 'white';
                     //ele.style.transitionDuration = '.5s';
                 }
 
                 //app未选中样式
                 self.blurAppIcon = function (scop, ele) {
                     var url = 'url(' + scop['icon'] + ')';
-                    var child = ele.nextElementSibling;
-                    child.style.color = '#468ed2';
+                    var child = ele.childNodes[1];
+
                     ele.style.backgroundImage = url;
                     ele.style.width = '188px';
                     ele.style.height = '219px';
+                    child.style.color = '#468ed2';
                     // ele.style.transitionDuration = '.5s';
                 }
 
@@ -1526,7 +1528,7 @@
                                     self.noVideo = true;
                                     return;
                                 }
-                                params.total(data.data.total);
+                                params.total(page.total);
                                 for(var i=0; i<list.length; i++){
                                     list[i].Name = JSON.parse(list[i].Name);
                                     list[i].SName = JSON.parse(list[i].SName);
