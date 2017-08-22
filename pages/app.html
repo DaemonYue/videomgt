@@ -32,7 +32,7 @@
         <!-- grid -->
         <div class="app-grid-wrapper">
             <div ng-repeat='appIcon in appList' class="app-grid" id="main-table">
-                <i ng-click="app.switchApp(appIcon.id)" ng-mouseenter="app.focusAppIcon(this.appIcon,$event.target)" ng-mouseleave="app.blurAppIcon(this.appIcon,$event.target)" class="app-icon" style="background-image: url({{appIcon.icon}})">  <h4 class="app-name">{{appIcon.name}}</h4></i>
+                <i ng-click="app.switchApp(appIcon.id)" ng-mouseenter="app.focusAppIcon(appIcon)" ng-mouseleave="app.blurAppIcon(appIcon)" class="app-icon" style="background-image: url({{appIcon.nowPic}})" ng-class="{'icon-choose':(appIcon.choose == true)}">  <h4 class="app-name" ng-class="{'iconname-choose':(appIcon.choose == true)}">{{appIcon.name}}</h4></i>
 
                 <!-- {{appIcon.bgColor}} -->
             </div>

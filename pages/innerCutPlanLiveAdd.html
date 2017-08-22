@@ -50,7 +50,7 @@
                                         <input type="radio" ng-value="row.id" ng-model="addPlan.resource" required>
                                     </td>
 
-                                    <td title="'序号'">{{$index}}</td>
+                                    <td title="'序号'">{{(addPlan.nowpage-1)*addPlan.count+$index+1}}</td>
 
                                     <td title="'资源名称'">{{row.name}}</td>
 

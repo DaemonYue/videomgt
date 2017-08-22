@@ -51,10 +51,10 @@
                     attrs.$observe('currentstep', function (val) {
                         scope.currentStep = val || 10;
 
-                    })
+                    });
                     scope.currentPos = function (val) {
                         return {width: scope.currentStep * 100 / scope.maxStep + '%'};
-                    }
+                    };
                     scope.currentStep = 2;
                     ele.on('click', function (evt) {
                         var targer = evt.target;
@@ -65,7 +65,7 @@
                             scope.changePos(Math.round(clickL / allWidth * scope.maxStep))
                         })
 
-                    })
+                    });
                     var oButton = ele.find('button');
                     var oProgress = ele.children().find('div');
                     var value;
@@ -89,7 +89,7 @@
                                 scope.$digest();
                             }
                             dragging = false;
-                        })
+                        });
                         evt.preventDefault();
                     })
                 }
@@ -97,7 +97,7 @@
         })
 
         //发布时终端列表
-        .directive('termList', ['$document', function ($document) {
+        .directive('termList', function ($document) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -250,7 +250,7 @@
                     }
                 }
             }
-        }])
+        })
 
         //获得焦点事件
         .directive('ngFocus', ['$parse', 'CONFIG', function ($parse, CONFIG) {

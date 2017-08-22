@@ -117,11 +117,20 @@
                         method: 'GET',
                         url: util.getApiUrl('', 'apps.json', 'local')
                     }).then(function successCallback(data, status, headers, config) {
-                        $scope.appList = data.data.apps;
-                        // 如果有指定appid focus
-                        if ($stateParams.appId) {
-                            self.setFocusApp($stateParams.appId);
+                        var apps = data.data.apps;
+                        var len = apps.length;
+                        for(var i=0; i<len; i++){
+                            apps[i].nowPic = apps[i].icon;
+                            apps[i].choose = false;
+
                         }
+                        $scope.appList = apps;
+
+                        // 如果有指定appid focus
+                        // if ($stateParams.appId) {
+                        //     self.setFocusApp($stateParams.appId);
+                        // }
+
                     }, function errorCallback(data, status, headers, config) {
 
                     }).finally(function (value) {
@@ -213,26 +222,32 @@
                 }
 
                 //app选中样式
-                self.focusAppIcon = function (scop, ele) {
-                    var url = 'url(' + scop['icon_focus'] + ')';
-                    var child = ele.childNodes[1];
-
-                    ele.style.backgroundImage = url;
-                    ele.style.width = '210px';
-                    ele.style.height = '252px';
-                    child.style.color = 'white';
+                self.focusAppIcon = function (app, ele) {
+                    console.log(app);
+                    app.nowPic = app.icon_focus;
+                    app.choose = true;
+                    // var url = 'url(' + scop['icon_focus'] + ')';
+                    // var child = ele.childNodes[1];
+                    //
+                    // ele.style.backgroundImage = url;
+                    // ele.style.width = '210px';
+                    // ele.style.height = '252px';
+                    // child.style.color = 'white';
                     //ele.style.transitionDuration = '.5s';
                 }
 
                 //app未选中样式
-                self.blurAppIcon = function (scop, ele) {
-                    var url = 'url(' + scop['icon'] + ')';
-                    var child = ele.childNodes[1];
+                self.blurAppIcon = function (app, ele) {
+                    app.nowPic = app.icon;
+                    app.choose = false;
 
-                    ele.style.backgroundImage = url;
-                    ele.style.width = '188px';
-                    ele.style.height = '219px';
-                    child.style.color = '#468ed2';
+                    /* var url = 'url(' + scop['icon'] + ')';
+                     var child = ele.childNodes[1];
+
+                     ele.style.backgroundImage = url;
+                     ele.style.width = '188px';
+                     ele.style.height = '219px';
+                     child.style.color = '#468ed2';*/
                     // ele.style.transitionDuration = '.5s';
                 }
 
@@ -6102,6 +6117,8 @@
                                         self.noData = true;
                                         return;
                                     }
+                                    self.count = paramsUrl.count - 0;
+                                    self.nowpage = paramsUrl.page - 0;
                                     params.total(page.total);
                                     for(var i=0; i<res.length; i++){
                                         res[i].section = JSON.parse(res[i].section)
@@ -6342,7 +6359,8 @@
                                 "status":""
                             };
                             var data = JSON.stringify(datap);
-
+                            self.count = paramsUrl.count - 0;
+                            self.nowpage = paramsUrl.page - 0;
                             return $http({
                                 method: 'POST',
                                 url: util.getApiUrl('material', '', 'server2'),
@@ -6600,7 +6618,8 @@
                                 "status":""
                             };
                             var data = JSON.stringify(datap);
-
+                            self.count = paramsUrl.count - 0;
+                            self.nowpage = paramsUrl.page - 0;
                             return $http({
                                 method: 'POST',
                                 url: util.getApiUrl('material', '', 'server2'),
@@ -6851,7 +6870,8 @@
                                 "status":""
                             };
                             var data = JSON.stringify(datap);
-
+                            self.count = paramsUrl.count - 0;
+                            self.nowpage = paramsUrl.page - 0;
                             return $http({
                                 method: 'POST',
                                 url: util.getApiUrl('material', '', 'server2'),
@@ -7141,8 +7161,8 @@
         ])
 
         //终端main
-        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
-            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
+        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams', '$timeout',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams, $timeout) {
                 var self = this;
 
                 self.init = function () {
@@ -7369,6 +7389,9 @@
 
                 //截屏
                 self.screenShot = function (id) {
+                    self.shootfalse = false;
+                    self.shooting = true;
+                    self.screenShotPic = ''
                     self.showSet = true;
                     self.cover = 2;
 
@@ -7383,13 +7406,17 @@
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            setTimeout(getScreenShot(id), 5000);
+                            $timeout(function () {
+                                self.getScreenShot(id);
+                            },3000);
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
                         } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
+                            self.shootfalse = true;
+                            self.shooting = false;
+
                         }
                     }, function errorCallback(response) {
                         alert(response.status + ' 服务器出错');
@@ -7399,7 +7426,8 @@
                 };
 
                 //获取截屏结果
-                var getScreenShot = function (id) {
+                self.getScreenShot = function (id) {
+                    self.shootfalse = false;
                     var datap = util.getObject('ajaxData');
                     datap.action = 'showPicURL';
                     datap.ID = id;
@@ -7412,20 +7440,21 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.screenShotPic = msg.URL;
+                            self.shooting = false;
 
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
                             $state.go('login');
                         } else {
-                            alert(msg.rescode + ' ' + msg.errInfo);
+                            self.shootfalse = true;
                         }
                     }, function errorCallback(response) {
                         alert(response.status + ' 服务器出错');
                     }).finally(function (value) {
                         self.loading = false;
                     });
-                }
+                };
 
                 //音量控制
                 $scope.$on('changePos', function (evt, val) {
