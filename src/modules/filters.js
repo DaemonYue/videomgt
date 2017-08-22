@@ -55,4 +55,36 @@
             };
         })
 
+        //time
+        .filter("videoTime", function () {
+            return function (input) {
+                var hour = '00',
+                    minute = '00',
+                    sec = '00';
+                var format = function (item) {
+                    if(item<10 && item != 0){
+                        item = '0' + item;
+
+                    }
+                    return item;
+                }
+                if(input >= 3600){
+                    hour = Math.floor(input/3600);
+                    minute = Math.floor((input%3600)/60);
+                    sec = input%3600%60;
+                }else if(input >= 60){
+                    minute = Math.floor(input/60);
+                    sec = input%60;
+                }else if(input >= 0) {
+                    if(input){
+                        sec = input
+                    }
+                }
+                hour = format(hour);
+                minute = format(minute);
+                sec = format(sec);
+                return hour+':'+minute+':'+sec;
+            };
+        })
+
 })();

@@ -6359,7 +6359,7 @@
                                     params.total(page.total);
                                     for(var i=0; i<res.length; i++){
                                         res[i].section = JSON.parse(res[i].section)
-                                        res[i].duration = 60;
+
                                     }
                                     return res;
                                 } else if (data.tata.rescode == '401') {
@@ -6390,6 +6390,9 @@
                     self.startTime = util.setFormatTime(currTime);
                     if(self.resource){
                         var duration = self.resChoosed.duration;
+                        if(!duration){
+                            duration = 3600;
+                        }
                         var t = currTime.getTime();
                         t += duration*1000;  //结束时间设为播一遍的时长
                         var afterTime = new Date(t);
