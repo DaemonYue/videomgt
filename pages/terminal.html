@@ -5,7 +5,7 @@
             <div class="col-sm-3 col-left height100 ter-left">
                 <a ng-repeat="x in term.section" ng-click="term.changeSection(x.ID)"
                    class="font-bold no-underline navigation-item ter-guide"
-                   ng-class="{'navigation-item-choose':(term.current == x.ID)}">
+                   ng-class="{'navigation-item-choose ter-guide-choose':(term.current == x.ID)}">
                     <!--<i class="glyphicon glyphicon-term"></i>-->&nbsp&nbsp{{x.Name[term.defaultLang]}}
                 </a>
             </div>
@@ -50,7 +50,7 @@
                     <!-- 添加终端 -->
                     <div class="blue-line"></div>
                     <!-- 终端列表 -->
-                    <table ng-table="term.tableParams" ng-show="!term.loading" class="table table-hover">
+                    <table ng-table="term.tableParams" class="table table-hover">
                         <tr ng-repeat="row in $data track by $index" ng-if="row.SectionID != -1">
                             <td title="'状态'" style="color:{{row.Online == 0 ? '' : 'rgb(0,185,120)'}}">
                                 {{row.Online == 0 ? "离线" : "在线"}}
@@ -70,7 +70,7 @@
                             <td title="'操作'" class="operate">
                                 <a ng-click="term.screenShot(row.ID)" >截屏</a>
                                 <a ng-click="term.showDetail(row)">详情</a>
-                                <a ng-click="term.delTerm(row.ID)">删除</a>
+                                <a ng-click="term.delTerm(row.ID)" ng-hide="row.SectionID == -2">删除</a>
                             </td>
                           <!--  <td title="'授权'">
                                 <input type="checkbox" ng-checked="row.Registered==1"

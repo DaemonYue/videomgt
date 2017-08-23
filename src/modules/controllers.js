@@ -122,14 +122,13 @@
                         for(var i=0; i<len; i++){
                             apps[i].nowPic = apps[i].icon;
                             apps[i].choose = false;
-
                         }
                         $scope.appList = apps;
 
                         // 如果有指定appid focus
-                        // if ($stateParams.appId) {
-                        //     self.setFocusApp($stateParams.appId);
-                        // }
+                        if ($stateParams.appId) {
+                            self.setFocusApp($stateParams.appId);
+                        }
 
                     }, function errorCallback(data, status, headers, config) {
 
@@ -707,7 +706,9 @@
                             if (msg.rescode == '200') {
                                 console && console.log('转码 ' + id);
                                 // 从列表中删除
+                               // console.log(this.maxId);
                                 o.deleteById(id);
+                                //console.log(this.maxId);
                             }
                             else if (msg.rescode == '401') {
                                 alert('访问超时，请重新登录');
@@ -732,6 +733,13 @@
                     },
                     uploadFile: function (videoFile, o, type) {
                         // 上传后台地址
+                        var filename = videoFile.name;
+                        var reg = ".*\\.(mov|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp)";
+                        var r = filename.match(reg);
+                        if (r == null) {
+                            alert("对不起，请上传以mov|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp为后缀的视频文件！");
+                            return;
+                        }
                         var uploadUrl = CONFIG.uploadVideoUrl;
 
                         // 电影对象
@@ -1174,6 +1182,7 @@
                 }
                 // 获取转码完成的列表
                 self.getTranscodeTaskList = function (id) {
+                    self.noData = false;
                     self.current = id;
                     self.loading = true;
                     var data = JSON.stringify({
@@ -1258,6 +1267,7 @@
                     self.getTags();
                     self.getSection();
                     self.getVideoLittelType();
+                    self.videopage = 1;
                 }
 
                 // 上传视频
@@ -1508,7 +1518,7 @@
                     self.loading1 = true;
                     self.noVideo = false;
                     self.tableParams = new NgTableParams({
-                        page: 1,
+                        page: self.videopage,
                         count: 10,
                         url: ''
                     }, {
@@ -1530,7 +1540,7 @@
                                 "LittleTypeID": self.typeBtnChoose
 
                             }
-
+                            self.videopage = paramsUrl.page - 0;
                             data = JSON.stringify(data);
                             return $http({
                                 method: $filter('ajaxMethod')(),
@@ -1574,6 +1584,8 @@
 
                 //删除宣教视频
                 self.delVideo = function (id) {
+                    var s = confirm("确认删除该视频吗？");
+                    if(!s){return;}
                     var datap = util.getObject('ajaxData');
                     datap.action = "DelVideo";
                     datap.VideoID = id;
@@ -4130,6 +4142,8 @@
                 };
                 //删除大分区
                 self.deleteSection = function (id) {
+                    var s = confirm('确定删除本科室吗？');
+                    if(!s){return;}
                     var datap = $scope.app.data;
                     datap.action = "removeSection";
                     datap.data = {
@@ -4353,9 +4367,13 @@
                         alert('请上传分区高亮图标');
                         return;
                     }
-                    if (self.uploadList.data[0].img.percentComplete != 100 || self.uploadListHigh.data[0].img.percentComplete != 100) {
-                        alert('上传中，请稍等');
-                        return;
+                    if(self.uploadList.data[0].img.percentComplete && self.uploadList.data[0].img.percentComplete != 100){
+                            alert('上传中，请稍等');
+                            return;
+                    }
+                    if(self.uploadListHigh.data[0].img.percentComplete &&  self.uploadListHigh.data[0].img.percentComplete != 100){
+                            alert('上传中，请稍等');
+                            return;
                     }
 
                     self.data.action = "editSection";
@@ -5806,7 +5824,7 @@
                         alert("请选择要删除的计划！");
                         return;
                     }
-                    var s = confirm('确定删除该计划吗？');
+                    var s = confirm('计划删除后所有相关终端的插播都会停止，确定删除计划吗？');
                     if(s){
                         self.ids = [];
                         var item = self.checkboxes.items;
@@ -5849,7 +5867,7 @@
 
                 //删除一个计划
                 self.delOnePlan = function (row) {
-                    var s = confirm('确定删除该计划吗？');
+                    var s = confirm('计划删除后所有相关终端的插播都会停止，确定删除计划吗？');
                     if (s) {
                         var datap = util.getObject('ajaxData');
                         datap.action = "DeletePlan";
@@ -5969,6 +5987,8 @@
                 
                 //取消插播
                 self.cancel = function (row) {
+                    var s = confirm("取消后相关终端的插播将停止，确定取消发布吗？");
+                    if(!s){return;}
                     var datap = util.getObject('ajaxData');
                     datap.action = "CancelPlan";
                     datap.type = self.resourceChoose.ID;
@@ -7234,7 +7254,6 @@
                                     if (data.data.total == 0) {
                                         self.noData = true;
                                     }
-                                    params.total(data.data.total);
                                     self.totalOnline = data.data.totalOnline;
                                     self.total = data.data.total;
                                     var dev = data.data.DevInfo;
@@ -7242,6 +7261,8 @@
                                     for (var i=0; i<len; i++){
                                         dev[i].Name = JSON.parse(dev[i].Name);
                                     }
+                                    params.total(data.data.total);
+
                                     return dev;
                                 } else if (msg.rescode == '401') {
                                     alert('访问超时，请重新登录');

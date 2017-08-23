@@ -15,6 +15,7 @@
                         scope.$apply(function () {
                             // console.log(scope)
                             // console.log(element[0].files[0])
+
                             modelSetter(scope, element[0].files[0]);
                         });
                         if (attrs.e != 'none') {

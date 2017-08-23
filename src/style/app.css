@@ -1203,7 +1203,7 @@ body, .app {
     padding: 6px 7px;
     background-color: #f9f9f9;
     color: #2a6cc7;
-
+    width: 55%;
 }
 
 .btn-add{
@@ -1338,9 +1338,22 @@ td,th{
 }
 
 .ter-guide{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     height: 40px;
-    padding: 11px 55px;
+    padding: 11px 50px;
 }
+
+
+.ter-guide:hover{
+    padding: 11px 45px;
+}
+
+.ter-guide-choose{
+    padding: 11px 45px;
+}
+
 
 .ter-guide:first-of-type{
     padding-left: 30px;
