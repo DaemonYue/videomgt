@@ -1,4 +1,4 @@
-<div ng-controller="innerCutPlanController as plan" ng-init="plan.init()" class="col-sm-9 page col-right right-position">
+<div ng-controller="innerCutPlanController as plan"  class="col-sm-9 page col-right right-position" ng-init="plan.init()">
     <h4 class="subtitle">
             插播计划
     </h4>
@@ -39,6 +39,8 @@
                   <!--  <td title="'序号'">{{$index}}</td>-->
 
                     <td title="'计划名称'">{{row.name}}</td>
+
+                    <td title="'资源名称'" style="max-width: 200px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{row.materialName}}</td>
 
                     <td title="'开始时间'">{{row.starttime}}</td>
 

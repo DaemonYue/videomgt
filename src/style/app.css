@@ -1346,21 +1346,21 @@ td,th{
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 40px;
-    padding: 11px 50px;
+    padding: 11px 30px;
 }
 
 
 .ter-guide:hover{
-    padding: 11px 45px;
+    padding: 11px 30px;
 }
 
 .ter-guide-choose{
-    padding: 11px 45px;
+    padding: 11px 30px;
 }
 
 
 .ter-guide:first-of-type{
-    padding-left: 30px;
+    padding-left: 15px;
 }
 
 .term-right{

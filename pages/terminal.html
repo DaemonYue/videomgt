@@ -5,7 +5,8 @@
             <div class="col-sm-3 col-left height100 ter-left">
                 <a ng-repeat="x in term.section" ng-click="term.changeSection(x.ID)"
                    class="font-bold no-underline navigation-item ter-guide"
-                   ng-class="{'navigation-item-choose ter-guide-choose':(term.current == x.ID)}">
+                   ng-class="{'navigation-item-choose ter-guide-choose':(term.current == x.ID)}"
+                   my-focus="aaa">
                     <!--<i class="glyphicon glyphicon-term"></i>-->&nbsp&nbsp{{x.Name[term.defaultLang]}}
                 </a>
             </div>

@@ -734,10 +734,10 @@
                     uploadFile: function (videoFile, o, type) {
                         // 上传后台地址
                         var filename = videoFile.name;
-                        var reg = ".*\\.(mov|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp)";
+                        var reg = ".*\\.(mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp)";
                         var r = filename.match(reg);
                         if (r == null) {
-                            alert("对不起，请上传以mov|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp为后缀的视频文件！");
+                            alert("对不起，请上传以mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp为后缀的视频文件！");
                             return;
                         }
                         var uploadUrl = CONFIG.uploadVideoUrl;
@@ -1155,12 +1155,9 @@
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
                     self.current = util.getParams('currentVideoType');
-
-                    if(!self.current){
-                        self.current = 1
-                    }
+                    self.current = 1
                     self.getTranscodeTaskList(self.current);
-                }
+                };
 
                 // 上传视频
                 self.upload = function () {
@@ -1621,11 +1618,11 @@
 
                 //删除宣教视频种类
                 self.delLiType = function () {
-                    var s = confirm('确定删除该类型吗？');
+                    var s = confirm('删除后该分类下的视频资源类型将变更为“未分类”，确认删除吗？');
                     if(s){
                         var datap = util.getObject('ajaxData');
                         datap.action = "DelType";
-                        datap.LittleTypeID = self.typeBtnChoose
+                        datap.LittleTypeID = self.typeBtnChoose;
                         var data = JSON.stringify(datap);
                         $http({
                             method: 'POST',
@@ -4142,7 +4139,7 @@
                 };
                 //删除大分区
                 self.deleteSection = function (id) {
-                    var s = confirm('确定删除本科室吗？');
+                    var s = confirm('科室删除后，本科室下的资源将放在科室“其他”下面，确定删除本科室吗？');
                     if(!s){return;}
                     var datap = $scope.app.data;
                     datap.action = "removeSection";
@@ -4746,9 +4743,9 @@
 
                     // 上传页面加载页面url
                     self.resourceUrl = '';
-                    // 不显示上传页面
+                    // 不显示
                     self.showResource = false;
-                    // 显示上传页面
+                    // 显示
                     self.gotoPage('innerCutResource');
                     self.defaultLang = util.getDefaultLangCode();
                     // 弹窗层
@@ -4885,8 +4882,16 @@
                                     params.total(page.total);
                                     for(var i=0; i<res.length; i++){
                                         if(res[i].section){
-                                            res[i].section = JSON.parse(res[i].section)
-
+                                            res[i].section = JSON.parse(res[i].section);
+                                           // res[i].name = JSON.parse(res[i].name)
+                                        }
+                                    }
+                                    if(self.resourceChoose.ID == 3){
+                                        for(var i=0; i<res.length; i++){
+                                            if(res[i].section){
+                                                var s = JSON.parse(res[i].name);
+                                                res[i].name = s[self.defaultLang]
+                                            }
                                         }
                                     }
                                     self.res = res;
@@ -4911,6 +4916,33 @@
                 //转换科室
                 self.changeSection = function () {
                     self.getResource();
+                };
+
+                //同步直播资源
+                self.updateLive = function () {
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "livesynchronous";
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('material', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('同步成功！');
+                            self.getResource();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                    });
                 };
 
                 //获取资源分类
@@ -4996,42 +5028,86 @@
                     }
                     var s = confirm('确定删除资源吗？');
                     if(s){
-                        self.ids = [];
-                        var item = self.checkboxes.items;
-                        for (var i in item){
-                            if(item[i] == true){
-                                self.ids.push(i);
-                            }
-                        }
-                        var datap = util.getObject('ajaxData');
-                        datap.action = "DelMaterial";
-                        datap.type = self.resourceChoose.ID;
-                        datap.ids = self.ids;
-
-                        var data = JSON.stringify(datap);
-                        $http({
-                            method: 'POST',
-                            url: util.getApiUrl('material', '', 'server2'),
-                            data: data
-                        }).then(function successCallback(response) {
-                            var msg = response.data;
-                            if (msg.rescode == '200') {
-                                alert('删除成功!');
-                            } else if (msg.rescode == "401") {
-                                alert('访问超时，请重新登录');
-                                $state.go('login');
-                            } else {
-                                alert(msg.rescode + ' ' + msg.errInfo);
-                            }
-                        }, function errorCallback(response) {
-                            alert(response.status + ' 服务器出错');
-                        }).finally(function (value) {
-                            self.getResource();
-                        });
-
+                        self.delR();
                     }
 
                 };
+
+                self.delR = function () {
+                    self.ids = [];
+                    var item = self.checkboxes.items;
+                    for (var i in item){
+                        if(item[i] == true){
+                            self.ids.push(i);
+                        }
+                    }
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "DelMaterial";
+                    datap.type = self.resourceChoose.ID;
+                    datap.ids = self.ids;
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('material', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            alert('删除成功!');
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else if (msg.rescode == "666") {
+                            var s = confirm('资源在插播计划中被占用，删除后相关计划都会被删除，确定要删除该资源吗？');
+                            if(s) {
+                                self.delLinkPlan(msg.Versions);
+                            }
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                        self.getResource();
+                    });
+                }
+
+                //删除资源相关的计划
+                self.delLinkPlan = function (versions) {
+                    self.ids = [];
+                    var item = self.checkboxes.items;
+                    for (var i in versions){
+                        self.ids.push({'id': versions[i].version});
+                    }
+                    var datap = util.getObject('ajaxData');
+                    datap.action = "DeletePlan";
+                    datap.type = self.resourceChoose.ID;
+                    datap.data = {
+                        'versions': self.ids
+                    }
+
+                    var data = JSON.stringify(datap);
+                    $http({
+                        method: 'POST',
+                        url: util.getApiUrl('intercutresource', '', 'server2'),
+                        data: data
+                    }).then(function successCallback(response) {
+                        var msg = response.data;
+                        if (msg.rescode == '200') {
+                            self.delR();
+                        } else if (msg.rescode == "401") {
+                            alert('访问超时，请重新登录');
+                            $state.go('login');
+                        } else {
+                            alert(msg.rescode + ' ' + msg.errInfo);
+                        }
+                    }, function errorCallback(response) {
+                        alert(response.status + ' 服务器出错');
+                    }).finally(function (value) {
+                    });
+
+                }
 
                 //全选
                 self.checkAll = function () {
@@ -5065,7 +5141,7 @@
                         }
                         self.notEmpty = false;
                     }
-                }
+                };
                 
                 //转换资源类型
                 self.changeResource = function (res) {
@@ -5730,6 +5806,7 @@
         .controller('innerCutPlanController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams',
             function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams) {
                 var self = this;
+
                 self.init = function () {
                     $scope.cut.showResource = false;
                     self.defaultLang = util.getDefaultLangCode();
@@ -6385,7 +6462,7 @@
                             var datap = util.getObject('ajaxData');
                             datap.action = "GetPage";
                             datap.type = $scope.plan.resourceChoose.ID;
-                            datap.category = -2;
+                            datap.category = -3;
                             var paramsUrl = params.url();
                             datap.pager = {
                                 "total":-1,

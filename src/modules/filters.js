@@ -62,7 +62,7 @@
                     minute = '00',
                     sec = '00';
                 var format = function (item) {
-                    if(item<10 && item != 0){
+                    if(item<10 && item !== '00'){
                         item = '0' + item;
 
                     }

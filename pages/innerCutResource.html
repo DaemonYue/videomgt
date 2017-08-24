@@ -21,6 +21,9 @@
             <button class="btn resource-options btn-add" ng-click="cut.addResource(cut.resourceChoose.ID)"
                     ng-if="cut.resourceChoose.ID != 1 && cut.resourceChoose.ID != 3">添加{{cut.resourceChoose.Name}}
             </button>
+            <button class="btn resource-options btn-add" ng-click="cut.updateLive()"
+                    ng-if="cut.resourceChoose.ID == 3">同步
+            </button>
 
             <button class="btn resource-options btn-del" ng-if="cut.resourceChoose.ID != 3" ng-click="cut.delResource()">删除{{cut.resourceChoose.Name}}</button>
             <span ng-if="cut.resourceChoose.ID == 1">视频上传请到本地视频库</span>
@@ -41,7 +44,6 @@
                 <tr ng-repeat="row in $data">
 
                     <td class="list-checkbox" header="'headerCheckbox.html'" ng-if="cut.resourceChoose.ID != 3">
-
                         <input type="checkbox" ng-model="cut.checkboxes.items[row.id]"
                         ng-change="cut.changeCheckBox()">
 

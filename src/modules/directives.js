@@ -153,20 +153,21 @@
                         scope.conveyCheck(scope.checkbox);
                         if (!sec) {
                             return
-                        }
-                        ;
+                        };
                         var lens = scope.sections.length;
                         for (var j = 0; j < lens; j++) {
                             if (sec.SectionID == scope.sections[j].SectionID) {
                                 secId = j;
+                                break;
                             }
                         }
+
                         var lend = sec.Dev.length;
                         scope.sections[secId].termChooseNum = 0;
                         for (var q = 0; q < lend; q++) {
                             for (var w in scope.check) {
                                 if (sec.Dev[q].ID == w) {
-                                    if (scope.check[w] = true) {
+                                    if (scope.check[w] == true) {
                                         scope.sections[secId].termChooseNum++;
                                     }
                                 }
@@ -254,15 +255,15 @@
         })
 
         //获得焦点事件
-        .directive('ngFocus', ['$parse', 'CONFIG', function ($parse, CONFIG) {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attrs) {
-
-                    var model = $parse(attrs.ngFocus);
-                    var l = model.assign;
-
-                }
+        .directive('myFocus', ['$parse', function ($parse) {
+            return function (scope, element, attr) {
+                var fn = $parse(attr['myFocus']);
+                element.on('focus', function (event) {
+                    scope.$apply(function () {
+                        fn(scope, {$event: event});
+                    });
+                });
             };
         }])
+
 })();
