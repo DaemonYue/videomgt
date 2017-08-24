@@ -1332,6 +1332,10 @@ td,th{
     background-color: #d1cfcf;
 }
 
+.ng-invalid-min{
+    border-color: red;
+}
+
 /*---------terminal-----------------*/
 .ter-left{
     padding-top: 30px;

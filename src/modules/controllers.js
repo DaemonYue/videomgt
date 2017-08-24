@@ -4823,7 +4823,7 @@
                             /*------第一项为全部的科室分组------*/
                             var hos = {
                                 'Name': {'zh-CN':'全部'},
-                                'ID': -2
+                                'ID': -3
                             };
                             self.section.unshift(hos);
                             self.sectionName = self.section[0];
@@ -4884,7 +4884,10 @@
                                     }
                                     params.total(page.total);
                                     for(var i=0; i<res.length; i++){
-                                        res[i].section = JSON.parse(res[i].section)
+                                        if(res[i].section){
+                                            res[i].section = JSON.parse(res[i].section)
+
+                                        }
                                     }
                                     self.res = res;
                                     return res;
@@ -6040,6 +6043,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.startTime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.stopTime - self.startTime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
@@ -6111,7 +6119,7 @@
                             var datap = util.getObject('ajaxData');
                             datap.action = "GetPage";
                             datap.type = $scope.plan.resourceChoose.ID;
-                            datap.category = -2;
+                            datap.category = -3;
                             var paramsUrl = params.url();
                             datap.pager = {
                                 "total":-1,
@@ -6167,6 +6175,7 @@
                 var initTime = function () {
                     var currTime = new Date();
                     self.startTime = util.setFormatTime(currTime);
+                    //self.mintime = util.setFormatTime(currTime);
                     var t = currTime.getTime();
                     t += 3600000;  //结束时间设为1小时后
                     var afterTime = new Date(t);
@@ -6207,8 +6216,12 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.planInfo.starttime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.planInfo.endtime - self.planInfo.starttime;
-
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
                         return;
@@ -6294,6 +6307,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.startTime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.stopTime - self.startTime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
@@ -6468,8 +6486,12 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.planInfo.starttime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.planInfo.endtime - self.planInfo.starttime;
-
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
                         return;
@@ -6555,6 +6577,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.startTime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.stopTime - self.startTime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
@@ -6626,7 +6653,7 @@
                             var datap = util.getObject('ajaxData');
                             datap.action = "GetPage";
                             datap.type = $scope.plan.resourceChoose.ID;
-                            datap.category = -2;
+                            datap.category = -3;
                             var paramsUrl = params.url();
                             datap.pager = {
                                 "total":-1,
@@ -6719,6 +6746,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.planInfo.starttime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.planInfo.endtime - self.planInfo.starttime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
@@ -6806,6 +6838,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.startTime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.stopTime - self.startTime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
@@ -6878,7 +6915,7 @@
                             var datap = util.getObject('ajaxData');
                             datap.action = "GetPage";
                             datap.type = $scope.plan.resourceChoose.ID;
-                            datap.category = -2;
+                            datap.category = -3;
                             var paramsUrl = params.url();
                             datap.pager = {
                                 "total":-1,
@@ -6971,6 +7008,11 @@
 
                 // 保存编辑
                 self.saveForm = function () {
+                    var currenttime = new Date();
+                    if(currenttime-self.planInfo.starttime>0){
+                        alert("开始时间必须在当前时间之后！");
+                        return;
+                    }
                     var times = self.planInfo.endtime - self.planInfo.starttime;
                     if(times <= 0){
                         alert('开始时间必须必须在结束时间之前！');
