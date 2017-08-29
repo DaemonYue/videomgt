@@ -103,6 +103,17 @@
                     return JSON.parse($window.localStorage[key] || '{}');
                 },
 
+                //清空localStorage
+                'clearStorage': function () {
+                    $window.localStorage.clear();
+                },
+
+                //存储跨域对象，以JSON格式存储
+          /*      'setDomainObject': function(key,value){
+                    $window.postMessage(value,'http://192.168.17.73/mgt/');
+                },
+*/
+
 
                 // 当前系统 使用 的 语言
                 'langStyle': function () {

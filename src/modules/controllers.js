@@ -39,7 +39,9 @@
                     var data = JSON.stringify({
                         username: self.userName,
                         password: md5.createHash(self.password)
-                    })
+                    });
+
+                    util.setObject('user', data);
                     $http({
                         method: 'POST',
                         url: util.getApiUrl('logon', '', 'server'),
@@ -136,6 +138,7 @@
                         self.loading = false;
                     });
                     // console.log(util.getParams('editLangs'))
+                    self.user = util.getObject('user');
                 }
 
                 self.feedback = function () {
@@ -259,6 +262,7 @@
                 }
 
                 self.logout = function (event) {
+                    util.clearStorage();
                     util.setParams('token', '');
                     $state.go('login');
                 }
@@ -734,10 +738,10 @@
                     uploadFile: function (videoFile, o, type) {
                         // 上传后台地址
                         var filename = videoFile.name;
-                        var reg = ".*\\.(mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp)";
+                        var reg = ".*\\.(mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mkv|3gp)";
                         var r = filename.match(reg);
                         if (r == null) {
-                            alert("对不起，请上传以mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mgkv|3gp为后缀的视频文件！");
+                            alert("对不起，请上传以mov|mpg|avi|flv|mp4|wmv|ts|asf|rm|rmvb|mkv|3gp为后缀的视频文件！");
                             return;
                         }
                         var uploadUrl = CONFIG.uploadVideoUrl;
@@ -5855,7 +5859,18 @@
                                         self.noData = true;
                                         return;
                                     }
-                                    self.res = msg.Resource;
+
+
+                                    var res = msg.Resource;
+                                    if(self.resourceChoose.ID == 3){
+                                        for(var i=0, len=res.length; i<len; i++){
+                                            if(res[i].materialName){
+                                                var s = JSON.parse(res[i].materialName);
+                                                res[i].materialName = s[self.defaultLang]
+                                            }
+                                        }
+                                    }
+                                    self.res = res;
                                     params.total(page.total);
 
                                     return self.res;
@@ -6761,7 +6776,10 @@
                                     for(var i=0; i<res.length; i++){
                                         res[i].section = JSON.parse(res[i].section)
                                         res[i].item = true;
+                                        var s = JSON.parse(res[i].name);
+                                        res[i].name = s[self.defaultLang]
                                     }
+
                                     return res;
                                 } else if (data.tata.rescode == '401') {
                                     alert('访问超时，请重新登录');
@@ -7548,7 +7566,7 @@
                         if (msg.rescode == '200') {
                             $timeout(function () {
                                 self.getScreenShot(id);
-                            },3000);
+                            },5000);
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -7581,6 +7599,9 @@
                         if (msg.rescode == '200') {
                             self.screenShotPic = msg.URL;
                             self.shooting = false;
+                            if(self.screenShotPic == ''){
+                                self.shootfalse = true;
+                            }
 
 
                         } else if (msg.rescode == "401") {
