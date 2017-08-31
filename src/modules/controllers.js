@@ -1159,7 +1159,6 @@
                     // 隐藏上传列表
                     $scope.video.showUploadList = false;
                     self.current = util.getParams('currentVideoType');
-                    self.current = 1
                     self.getTranscodeTaskList(self.current);
                 };
 
@@ -1180,11 +1179,13 @@
                     }
 
                     $scope.app.maskParams = task;
+
                 }
                 // 获取转码完成的列表
                 self.getTranscodeTaskList = function (id) {
                     self.noData = false;
                     self.current = id;
+                    util.setParams('currentVideoType', id);
                     self.loading = true;
                     var data = JSON.stringify({
                         "token": util.getParams('token'),
@@ -2106,11 +2107,11 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.section = msg.data.Section;
-                            var hos = {
+                            /*var hos = {
                                 'Name': {'zh-CN':'未分区'},
                                 'ID': undefined
                             };
-                            self.section.unshift(hos);
+                            self.section.unshift(hos);*/
                             self.sectionOne = self.section[0];
                             console.log(self.section)
 
@@ -2311,7 +2312,7 @@
                         "SectionID": self.sectionOne.ID,
                         "Name": self.videoInfo.Name,
                         "Lecturer": self.videoInfo.Lecturer,
-                        "URL_ABS": self.videoInfo.URL,
+                        "URL_ABS": self.videoInfo.URL_ABS,
                         "Duration": self.videoInfo.Duration,
                         "VideoSize": self.videoInfo.Size,
                         "Introduce": self.videoInfo.Introduce,
@@ -3681,6 +3682,11 @@
                         return;
                     }
 
+                    if(self.passwordSure != self.passwordAfter){
+                        alert("两遍新密码输入不同！");
+                        return;
+                    }
+
                     var oldPwd, newPwd = undefined;
                     if(self.passwordBefore){
                        oldPwd = md5.createHash(self.passwordBefore);
@@ -4761,6 +4767,7 @@
 
                     self.getResBtn();
                     self.notEmpty = false;
+                    //列表的初始化页数
                     self.page = 1;
 
 
@@ -4771,9 +4778,11 @@
                     // 上传列表页
                     if (pageName == 'innerCutResource') {
                         self.current = 0;
+
                         // 不是第一次加载
                         if (self.resourceUrl !== '') {
                             self.getResBtn();
+                            self.getSection()
                         }
                         // 第一次加载
                         else {
@@ -7318,8 +7327,8 @@
         ])
 
         //终端main
-        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams', '$timeout',
-            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams, $timeout) {
+        .controller('terminalController', ['$http', '$scope', '$state', '$stateParams', 'util', 'CONFIG', 'NgTableParams', '$interval',
+            function ($http, $scope, $state, $stateParams, util, CONFIG, NgTableParams, $interval) {
                 var self = this;
 
                 self.init = function () {
@@ -7564,9 +7573,15 @@
                     }).then(function successCallback(response) {
                         var msg = response.data;
                         if (msg.rescode == '200') {
-                            $timeout(function () {
+                            self.timer = $interval(function () {
                                 self.getScreenShot(id);
-                            },5000);
+                                console.log('ssss');
+                            },1000,20);
+                            self.timer.then(function () {
+                                self.shooting = false;
+                                self.shootfalse = true;
+                            });
+
 
                         } else if (msg.rescode == "401") {
                             alert('访问超时，请重新登录');
@@ -7583,6 +7598,7 @@
                     });
                 };
 
+
                 //获取截屏结果
                 self.getScreenShot = function (id) {
                     self.shootfalse = false;
@@ -7598,9 +7614,9 @@
                         var msg = response.data;
                         if (msg.rescode == '200') {
                             self.screenShotPic = msg.URL;
-                            self.shooting = false;
-                            if(self.screenShotPic == ''){
-                                self.shootfalse = true;
+                            if(self.screenShotPic != ''){
+                                self.shooting = false;
+                                $interval.cancel(self.timer);
                             }
 
 
